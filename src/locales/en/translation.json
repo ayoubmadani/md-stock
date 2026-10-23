@@ -13,7 +13,10 @@
     "password": "Password",
     "submit": "Sign in",
     "error": "Wrong email or password",
-    "not_verified": "Account not verified — verify it from the dashboard first"
+    "not_verified": "Account not verified — verify it from the dashboard first",
+    "or": "or",
+    "google": "Continue with Google",
+    "google_error": "Google sign-in failed — make sure you have an MD Store account with this email"
   },
   "handoff": {
     "loading": "Opening stock...",
