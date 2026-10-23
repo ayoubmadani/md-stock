@@ -16,7 +16,8 @@
     "not_verified": "Account not verified — verify it from the dashboard first",
     "or": "or",
     "google": "Continue with Google",
-    "google_error": "Google sign-in failed — make sure you have an MD Store account with this email"
+    "google_error": "Google sign-in failed, please try again",
+    "no_account": "No MD Store account with this email — create one from the dashboard first"
   },
   "handoff": {
     "loading": "Opening stock...",

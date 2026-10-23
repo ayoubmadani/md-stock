@@ -11,7 +11,10 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   // رجوع من Google بخطأ (مثلاً حساب غير موجود)
-  const [error, setError] = useState(() => (new URLSearchParams(window.location.search).get('error') ? t('login.google_error') : null));
+  const [error, setError] = useState(() => {
+    const e = new URLSearchParams(window.location.search).get('error');
+    return e === 'no_account' ? t('login.no_account') : e ? t('login.google_error') : null;
+  });
 
   const submit = async (e) => {
     e.preventDefault();

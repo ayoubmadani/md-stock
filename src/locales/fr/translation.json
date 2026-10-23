@@ -16,7 +16,8 @@
     "not_verified": "Compte non vérifié — vérifiez-le d'abord depuis le tableau de bord",
     "or": "ou",
     "google": "Continuer avec Google",
-    "google_error": "Connexion Google impossible — vérifiez que vous avez un compte MD Store avec cet e-mail"
+    "google_error": "Connexion Google impossible, réessayez",
+    "no_account": "Aucun compte MD Store avec cet e-mail — créez-en un depuis le tableau de bord"
   },
   "handoff": {
     "loading": "Ouverture du stock...",
