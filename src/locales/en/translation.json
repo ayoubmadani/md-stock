@@ -1,0 +1,96 @@
+{
+  "app_name": "MD Stock",
+  "nav": {
+    "home": "Home",
+    "stock": "Stock",
+    "history": "History",
+    "alerts": "Alerts"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Your store's stock, with your MD Store account",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "error": "Wrong email or password",
+    "not_verified": "Account not verified — verify it from the dashboard first"
+  },
+  "handoff": {
+    "loading": "Opening stock...",
+    "failed": "Link expired — open stock again from the dashboard or sign in"
+  },
+  "no_store": "No store whose stock you can manage with this account",
+  "logout": "Sign out",
+  "store": "Store",
+  "home": {
+    "recent": "Recent movements",
+    "attention": "Needs attention",
+    "all_good": "All products are in stock 👌",
+    "see_all": "See all"
+  },
+  "alerts_empty": "No low or out-of-stock products",
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Quantities, alerts and the history of every movement",
+    "tab_stock": "Stock",
+    "tab_history": "History",
+    "totals": {
+      "products": "Products",
+      "units": "Units",
+      "low": "Low",
+      "out": "Out",
+      "value_sell": "Value at selling price",
+      "value_cost": "Value at cost",
+      "profit": "Expected margin"
+    },
+    "filter": {
+      "all": "All",
+      "low": "Low",
+      "out": "Out"
+    },
+    "search": "Search products...",
+    "col": {
+      "product": "Product",
+      "stock": "Stock",
+      "status": "Status",
+      "threshold": "Alert at",
+      "cost": "Cost price",
+      "actions": ""
+    },
+    "status": {
+      "ok": "In stock",
+      "low": "Low",
+      "out": "Out of stock"
+    },
+    "restock": "Restock",
+    "count": "Count",
+    "save": "Save",
+    "cancel": "Cancel",
+    "note": "Note (optional)",
+    "mode_add": "Restock: add quantity",
+    "mode_set": "Count: actual stock",
+    "quantity": "Quantity",
+    "saved": "Saved",
+    "error": "Could not save",
+    "variants": "{{count}} variants",
+    "empty": "No products",
+    "history_empty": "No movements yet",
+    "reason": {
+      "order": "Order",
+      "manual": "Manual edit",
+      "restock": "Restock"
+    },
+    "h": {
+      "date": "Date",
+      "product": "Product",
+      "change": "Change",
+      "after": "After",
+      "reason": "Reason",
+      "by": "By"
+    },
+    "order": "Order #{{id}}",
+    "prev": "Previous",
+    "next": "Next",
+    "auto_note": "Stock goes down automatically when an order is confirmed, and comes back on cancellation or return."
+  }
+}

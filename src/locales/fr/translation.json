@@ -1,0 +1,96 @@
+{
+  "app_name": "MD Stock",
+  "nav": {
+    "home": "Accueil",
+    "stock": "Stock",
+    "history": "Historique",
+    "alerts": "Alertes"
+  },
+  "login": {
+    "title": "Connexion",
+    "subtitle": "Le stock de votre boutique, avec votre compte MD Store",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "error": "E-mail ou mot de passe incorrect",
+    "not_verified": "Compte non vérifié — vérifiez-le d'abord depuis le tableau de bord"
+  },
+  "handoff": {
+    "loading": "Ouverture du stock...",
+    "failed": "Lien expiré — rouvrez le stock depuis le tableau de bord ou connectez-vous"
+  },
+  "no_store": "Aucune boutique dont vous pouvez gérer le stock avec ce compte",
+  "logout": "Déconnexion",
+  "store": "Boutique",
+  "home": {
+    "recent": "Derniers mouvements",
+    "attention": "À surveiller",
+    "all_good": "Tous les produits sont disponibles 👌",
+    "see_all": "Tout voir"
+  },
+  "alerts_empty": "Aucun produit faible ou épuisé",
+  "inventory": {
+    "title": "Stock",
+    "subtitle": "Quantités, alertes et historique de chaque mouvement",
+    "tab_stock": "Stock",
+    "tab_history": "Historique",
+    "totals": {
+      "products": "Produits",
+      "units": "Pièces",
+      "low": "Faible",
+      "out": "Épuisé",
+      "value_sell": "Valeur au prix de vente",
+      "value_cost": "Valeur au prix d'achat",
+      "profit": "Marge prévue"
+    },
+    "filter": {
+      "all": "Tout",
+      "low": "Faible",
+      "out": "Épuisé"
+    },
+    "search": "Rechercher un produit...",
+    "col": {
+      "product": "Produit",
+      "stock": "Stock",
+      "status": "État",
+      "threshold": "Seuil d'alerte",
+      "cost": "Prix d'achat",
+      "actions": ""
+    },
+    "status": {
+      "ok": "Disponible",
+      "low": "Faible",
+      "out": "Épuisé"
+    },
+    "restock": "Réappro",
+    "count": "Inventaire",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "note": "Note (optionnel)",
+    "mode_add": "Réappro : ajouter une quantité",
+    "mode_set": "Inventaire : stock réel",
+    "quantity": "Quantité",
+    "saved": "Enregistré",
+    "error": "Échec de l'enregistrement",
+    "variants": "{{count}} variantes",
+    "empty": "Aucun produit",
+    "history_empty": "Aucun mouvement pour l'instant",
+    "reason": {
+      "order": "Commande",
+      "manual": "Modification manuelle",
+      "restock": "Réappro"
+    },
+    "h": {
+      "date": "Date",
+      "product": "Produit",
+      "change": "Variation",
+      "after": "Après",
+      "reason": "Motif",
+      "by": "Par"
+    },
+    "order": "Commande #{{id}}",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "auto_note": "Le stock diminue automatiquement à la confirmation d'une commande et revient en cas d'annulation ou de retour."
+  }
+}
