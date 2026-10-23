@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, Package, Plus, ClipboardCheck } from 'lucide-react';
-import { StatusBadge, InlineNumber, fmt } from './inventory';
+import { StatusBadge, InlineNumber, VariantParts, fmt } from './inventory';
 
 function Actions({ onRestock, onCount }) {
   const { t } = useTranslation();
@@ -66,7 +66,7 @@ export default function ProductRow({ p, onAdjust, onSettings }) {
           {p.variants.map((v) => (
             <div key={v.id} className="flex items-center gap-3 px-3 py-2.5 ps-6">
               <div className="flex-1 min-w-0">
-                <p className="text-sm truncate">{v.label}</p>
+                <VariantParts parts={v.parts} className="text-sm" />
                 <StatusBadge status={v.status} />
               </div>
               <p className="font-bold w-12 text-end" dir="ltr">{fmt(v.stock)}</p>

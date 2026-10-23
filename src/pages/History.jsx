@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { variantLabel } from '../components/inventory';
+import { VariantParts } from '../components/inventory';
 
 export function MovementItem({ m }) {
   const { t, i18n } = useTranslation();
@@ -11,7 +11,8 @@ export function MovementItem({ m }) {
     <div className="flex items-center gap-3 p-3">
       <div className={`w-12 text-center font-bold text-lg ${m.delta > 0 ? 'text-emerald-500' : 'text-rose-500'}`} dir="ltr">{m.delta > 0 ? `+${m.delta}` : m.delta}</div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold truncate">{m.productName || '—'}{m.variantName ? <span className="text-gray-400 font-normal"> — {variantLabel(m.variantName)}</span> : null}</p>
+        <p className="font-semibold truncate">{m.productName || '—'}</p>
+        {m.variantName && <VariantParts parts={m.variantName} className="text-xs text-gray-500 mt-0.5" />}
         <p className="text-xs text-gray-500">
           {t(`inventory.reason.${m.reason}`)}
           {m.orderId && <span className="text-indigo-500"> · {t('inventory.order', { id: String(m.orderId).slice(0, 8) })}</span>}

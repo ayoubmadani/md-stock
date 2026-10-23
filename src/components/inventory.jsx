@@ -17,7 +17,33 @@ export function StatusBadge({ status }) {
   return <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold whitespace-nowrap ${STATUS_CLS[status]}`}>{t(`inventory.status.${status}`)}</span>;
 }
 
-export const variantLabel = (name) => (Array.isArray(name) ? name.map((a) => (a.displayMode === 'color' ? a.attrName : a.value)).join(' / ') : '');
+// أجزاء النسخة من الخادم (parts) أو من السجل (variantName الخام)
+const toParts = (v) => (Array.isArray(v) ? v.map((a) => ({ mode: a.mode || a.displayMode || 'text', value: String(a.value ?? ''), attr: a.attr || a.attrName || '' })) : []);
+
+/** النسخة كما يراها الزبون: نص يُكتب، صورة مصغّرة، أو دائرة لون */
+export function VariantParts({ parts, className = '' }) {
+  const list = toParts(parts);
+  if (!list.length) return null;
+  return (
+    <span className={`inline-flex items-center gap-1.5 flex-wrap ${className}`}>
+      {list.map((p, i) => (
+        <span key={i} className="inline-flex items-center gap-1">
+          {i > 0 && <span className="text-gray-300 dark:text-zinc-600">/</span>}
+          {p.mode === 'image' ? (
+            <img src={p.value} alt={p.attr} title={p.attr} className="w-5 h-5 rounded-md object-cover border border-gray-200 dark:border-zinc-700" />
+          ) : p.mode === 'color' ? (
+            <span title={p.attr} className="w-4 h-4 rounded-full border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: p.value }} />
+          ) : (
+            <span>{p.value}</span>
+          )}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// نص فقط (عنوان نافذة التوريد): الصورة/اللون بلا اسم ← اسم الخاصية
+export const variantLabel = (v) => toParts(v).map((p) => (p.mode === 'text' ? p.value : p.attr)).join(' / ');
 
 const input = 'w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl text-base text-gray-900 dark:text-white outline-none focus:border-indigo-400';
 
