@@ -4,7 +4,8 @@
     "home": "Home",
     "stock": "Stock",
     "history": "History",
-    "alerts": "Alerts"
+    "alerts": "Alerts",
+    "scan": "Scan"
   },
   "login": {
     "title": "Sign in",
@@ -96,5 +97,31 @@
     "prev": "Previous",
     "next": "Next",
     "auto_note": "Stock goes down automatically when an order is confirmed, and comes back on cancellation or return."
+  },
+  "scan": {
+    "title": "Scan barcode",
+    "manual": "or type the barcode",
+    "go": "Find",
+    "unknown": "No product with this barcode",
+    "create": "Create a product with this barcode",
+    "again": "Scan another product",
+    "denied": "Allow camera access in your browser settings",
+    "no_camera": "Camera unavailable — type the barcode",
+    "https": "The camera needs https — type the barcode"
+  },
+  "product": {
+    "new": "New product",
+    "edit": "Edit product",
+    "back": "Back",
+    "name": "Product name",
+    "barcode": "Barcode",
+    "barcode_ph": "Scan or type",
+    "price": "Selling price",
+    "old_price": "Old price",
+    "category": "Category",
+    "variants_barcodes": "Barcode per variant",
+    "variants_note": "Sizes and colors are managed from the dashboard",
+    "confirm_delete": "Delete this product?",
+    "deleted": "Product deleted"
   }
 }

@@ -1,7 +1,8 @@
 // منتج في قائمة المخزون: بطاقة على الهاتف وسطر على الحاسوب، والنسخ تُفتح تحته
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Package, Plus, ClipboardCheck } from 'lucide-react';
+import { ChevronDown, Package, Plus, ClipboardCheck, Pencil } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { StatusBadge, InlineNumber, VariantParts, fmt } from './inventory';
 
 function Actions({ onRestock, onCount }) {
@@ -47,6 +48,7 @@ export default function ProductRow({ p, onAdjust, onSettings }) {
         <div className="text-end shrink-0">
           <p className="text-xl font-bold" dir="ltr">{fmt(p.stock)}</p>
         </div>
+        <Link to={`/products/${p.id}`} className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0"><Pencil className="w-4 h-4" /></Link>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 pb-3">

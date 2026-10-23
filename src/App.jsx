@@ -10,6 +10,8 @@ import HomePage from './pages/Home';
 import StockPage from './pages/Stock';
 import HistoryPage from './pages/History';
 import AlertsPage from './pages/Alerts';
+import ScanPage from './pages/Scan';
+import ProductForm from './pages/ProductForm';
 
 function Gate() {
   const { t } = useTranslation();
@@ -40,6 +42,9 @@ export default function App() {
             <Route path="stock" element={<StockPage />} />
             <Route path="alerts" element={<AlertsPage />} />
             <Route path="history" element={<HistoryPage />} />
+            <Route path="scan" element={<ScanPage />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/:id" element={<ProductForm />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

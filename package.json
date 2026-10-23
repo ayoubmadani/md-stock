@@ -7,9 +7,12 @@
     "dev": "vite --port 5175",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:phone": "PHONE=1 VITE_API_URL=/api vite --host --port 5175"
   },
   "dependencies": {
+    "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
     "axios": "^1.13.5",
     "i18next": "^25.8.4",
     "lucide-react": "^0.563.0",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
     "@vitejs/plugin-react": "^5.1.1",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4.1.18",
