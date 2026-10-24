@@ -11,23 +11,32 @@ export default function Scanner({ onDetected, paused = false }) {
   const [error, setError] = useState(null);
   const [manual, setManual] = useState('');
 
+  // آخر دالة من الأب في ref: إعادة رسم الأب لا تعيد تشغيل الكاميرا
+  const onDetectedRef = useRef(onDetected);
+  useEffect(() => { onDetectedRef.current = onDetected; }, [onDetected]);
+
   useEffect(() => {
     if (paused) return undefined;
     doneRef.current = false;
-    const reader = new BrowserMultiFormatReader();
     let controls;
     let cancelled = false;
-    reader
-      .decodeFromConstraints({ video: { facingMode: 'environment' } }, videoRef.current, (result) => {
-        if (!result || doneRef.current) return;
-        doneRef.current = true; // مرة واحدة لكل مسح
-        navigator.vibrate?.(60);
-        onDetected(result.getText());
-      })
-      .then((c) => { if (cancelled) c.stop(); else controls = c; })
-      .catch((e) => setError(e?.name === 'NotAllowedError' ? t('scan.denied') : window.isSecureContext ? t('scan.no_camera') : t('scan.https')));
-    return () => { cancelled = true; controls?.stop(); };
-  }, [paused, onDetected, t]);
+    // تأخير صغير: React في التطوير يركّب المكوّن مرتين متتاليتين — بدون التأخير يُطلب الهاتف الكاميرا مرتين
+    // وإيقاف الطلب الأول (يصل متأخراً على الهاتف) يقطع فيديو الثاني فتنغلق الكاميرا
+    const timer = setTimeout(() => {
+      const reader = new BrowserMultiFormatReader();
+      reader
+        .decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } } }, videoRef.current, (result) => {
+          if (!result || doneRef.current) return;
+          doneRef.current = true; // مرة واحدة لكل مسح
+          navigator.vibrate?.(60);
+          onDetectedRef.current(result.getText());
+        })
+        .then((c) => { if (cancelled) c.stop(); else controls = c; })
+        .catch((e) => { if (!cancelled) setError(e?.name === 'NotAllowedError' ? t('scan.denied') : window.isSecureContext ? t('scan.no_camera') : t('scan.https')); });
+    }, 150);
+    return () => { cancelled = true; clearTimeout(timer); controls?.stop(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused]);
 
   return (
     <div className="space-y-3">
