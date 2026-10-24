@@ -28,8 +28,9 @@ export default function Login() {
         login(data.access_token);
         window.location.assign('/');
       }
-    } catch {
-      setError(t('login.error'));
+    } catch (err) {
+      // لا رد من الخادم ≠ كلمة سر خاطئة
+      setError(err?.response ? t('login.error') : t('login.network'));
     } finally {
       setLoading(false);
     }

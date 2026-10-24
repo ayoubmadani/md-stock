@@ -18,7 +18,8 @@
     "or": "ou",
     "google": "Continuer avec Google",
     "google_error": "Connexion Google impossible, réessayez",
-    "no_account": "Aucun compte MD Store avec cet e-mail — créez-en un depuis le tableau de bord"
+    "no_account": "Aucun compte MD Store avec cet e-mail — créez-en un depuis le tableau de bord",
+    "network": "Impossible de joindre le serveur — vérifiez la connexion"
   },
   "handoff": {
     "loading": "Ouverture du stock...",

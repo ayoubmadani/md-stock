@@ -18,7 +18,8 @@
     "or": "or",
     "google": "Continue with Google",
     "google_error": "Google sign-in failed, please try again",
-    "no_account": "No MD Store account with this email — create one from the dashboard first"
+    "no_account": "No MD Store account with this email — create one from the dashboard first",
+    "network": "Can't reach the server — check your connection"
   },
   "handoff": {
     "loading": "Opening stock...",
