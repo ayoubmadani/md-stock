@@ -29,8 +29,10 @@ function PushCard() {
       setState(next);
       if (next === 'on') toast.success(t('push.enabled'));
       if (next === 'denied') toast.error(t('push.denied'));
-    } catch {
-      toast.error(t('inventory.error'));
+    } catch (e) {
+      // السبب الحقيقي: شهادة غير موثوقة، إذن، أو خطأ الخادم
+      const msg = e?.response?.data?.message || e?.message || '';
+      toast.error(/ssl|certificate|security|insecure/i.test(msg) ? t('push.bad_cert') : `${t('push.failed')}${msg ? ` — ${msg}` : ''}`);
     } finally {
       setBusy(false);
     }

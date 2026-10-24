@@ -319,6 +319,8 @@
     "enabled": "Notifications enabled on this phone ✓",
     "denied": "Notifications are blocked for this site — allow them in the browser settings",
     "unsupported": "This browser doesn't support notifications",
-    "ios_install": "On iPhone: tap Share then “Add to Home Screen”, open the app from its icon, then enable notifications here"
+    "ios_install": "On iPhone: tap Share then “Add to Home Screen”, open the app from its icon, then enable notifications here",
+    "failed": "Couldn't enable notifications",
+    "bad_cert": "Notifications need a trusted https certificate — they work on the real domain (m.mdstore.top), not on the local address"
   }
 }
