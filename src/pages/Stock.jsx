@@ -11,10 +11,15 @@ import { AdjustModal } from '../components/inventory';
 export default function StockPage({ only }) {
   const { t } = useTranslation();
   const { storeId } = useAuth();
-  const { data, reload, saveSettings } = useInventory(storeId);
+  const { data, reload } = useInventory(storeId);
   const [filter, setFilter] = useState(only || 'all');
   const [q, setQ] = useState('');
   const [adjust, setAdjust] = useState(null);
+
+  const counts = useMemo(() => {
+    const list = data?.products || [];
+    return { all: list.length, low: list.filter((p) => p.status === 'low').length, out: list.filter((p) => p.status === 'out').length };
+  }, [data]);
 
   const rows = useMemo(() => (data?.products || []).filter((p) =>
     (filter === 'all' ? true : filter === 'attention' ? p.status !== 'ok' : p.status === filter)
@@ -40,7 +45,7 @@ export default function StockPage({ only }) {
             {['all', 'low', 'out'].map((f) => (
               <button key={f} type="button" onClick={() => setFilter(f)}
                 className={`flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border ${filter === f ? 'bg-indigo-600 text-white border-transparent' : 'border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300'}`}>
-                {t(`inventory.filter.${f}`)}
+                {t(`inventory.filter.${f}`)} <span className="opacity-70" dir="ltr">{counts[f]}</span>
               </button>
             ))}
           </div>
@@ -50,8 +55,8 @@ export default function StockPage({ only }) {
       {rows.length === 0 ? (
         <p className="text-center text-gray-400 py-16">{only ? t('alerts_empty') : t('inventory.empty')}</p>
       ) : (
-        <div className="grid gap-3 lg:grid-cols-2">
-          {rows.map((p) => <ProductRow key={p.id} p={p} onAdjust={setAdjust} onSettings={saveSettings} />)}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 items-start">
+          {rows.map((p) => <ProductRow key={p.id} p={p} storeId={storeId} onAdjust={setAdjust} onChanged={reload} />)}
         </div>
       )}
 

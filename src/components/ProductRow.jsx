@@ -1,79 +1,123 @@
-// منتج في قائمة المخزون: بطاقة على الهاتف وسطر على الحاسوب، والنسخ تُفتح تحته
-import { useState } from 'react';
+// بطاقة منتج في المخزون (اتجاه «ج»): الكمية بأزرار − و ＋ مباشرة.
+// الضغطات المتتالية تُجمع وتُحفظ مرة واحدة كحركة واحدة؛ الضغط على الرقم يفتح التوريد/الجرد.
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Package, Plus, ClipboardCheck, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { StatusBadge, InlineNumber, VariantParts, fmt } from './inventory';
+import { ChevronDown, Minus, Package, Plus } from 'lucide-react';
+import { toast } from 'sonner';
+import { api } from '../lib/api';
+import { StatusBadge, VariantParts, fmt, variantLabel } from './inventory';
 
-function Actions({ onRestock, onCount, compact = false }) {
+const SAVE_AFTER_MS = 700;
+
+function Stepper({ storeId, productId, variantId, value, name, onOpen, onSaved, size = 'md' }) {
   const { t } = useTranslation();
-  const label = compact ? 'hidden sm:inline' : '';
+  const [shown, setShown] = useState(value);
+  const shownRef = useRef(value);
+  const saved = useRef(value); // آخر قيمة يعرفها الخادم
+  const timer = useRef(null);
+
+  // بعد إعادة التحميل: نأخذ القيمة الجديدة إن لم يكن هناك تغيير ينتظر الحفظ
+  useEffect(() => {
+    if (timer.current) return;
+    saved.current = value;
+    shownRef.current = value;
+    setShown(value);
+  }, [value]);
+
+  const commit = async () => {
+    timer.current = null;
+    const delta = shownRef.current - saved.current;
+    if (!delta) return;
+    saved.current += delta;
+    try {
+      await api.post(`/stores/${storeId}/inventory/adjust`, { productId, variantDetailId: variantId || null, mode: 'add', quantity: delta });
+      onSaved?.();
+    } catch {
+      saved.current -= delta;
+      shownRef.current = saved.current;
+      setShown(saved.current); // رجوع للقيمة المحفوظة
+      toast.error(t('inventory.error'));
+    }
+  };
+
+  const bump = (delta) => {
+    const next = Math.max(0, shownRef.current + delta);
+    shownRef.current = next;
+    setShown(next);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(commit, SAVE_AFTER_MS);
+  };
+
+  // حفظ ما بقي عند مغادرة الصفحة
+  useEffect(() => () => {
+    if (timer.current) { clearTimeout(timer.current); commit(); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const h = size === 'sm' ? 'h-9' : 'h-11';
+  const w = size === 'sm' ? 'w-9' : 'w-11';
   return (
-    <div className="flex gap-1.5 shrink-0">
-      <button type="button" onClick={onRestock} title={t('inventory.restock')} className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-        <Plus className="w-4 h-4" /><span className={label}>{t('inventory.restock')}</span>
+    <div className="flex items-center gap-2">
+      <button type="button" onClick={() => bump(-1)} disabled={shown <= 0} aria-label="−"
+        className={`${w} ${h} shrink-0 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-white flex items-center justify-center active:scale-95 disabled:opacity-40`}>
+        <Minus className="w-4 h-4" />
       </button>
-      <button type="button" onClick={onCount} title={t('inventory.count')} className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300">
-        <ClipboardCheck className="w-4 h-4" /><span className={label}>{t('inventory.count')}</span>
+      <button type="button" onClick={() => onOpen({ productId, variantId, name, stock: shown, mode: 'add' })}
+        className={`flex-1 min-w-0 ${h} rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 font-bold ${size === 'sm' ? 'text-base' : 'text-lg'}`} dir="ltr">
+        {fmt(shown)}
+      </button>
+      <button type="button" onClick={() => bump(1)} aria-label="+"
+        className={`${w} ${h} shrink-0 rounded-xl bg-indigo-600 text-white flex items-center justify-center active:scale-95`}>
+        <Plus className="w-4 h-4" />
       </button>
     </div>
   );
 }
 
-export default function ProductRow({ p, onAdjust, onSettings }) {
+export default function ProductRow({ p, storeId, onAdjust, onChanged }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const hasVariants = p.variants.length > 0;
-  const adjust = (mode, v) => onAdjust({ productId: p.id, variantId: v?.id, name: v ? `${p.name} — ${v.label}` : p.name, stock: v ? v.stock : p.stock, mode });
 
   return (
-    <div className="rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-      <div className="flex items-center gap-3 p-3">
-        <button type="button" disabled={!hasVariants} onClick={() => setOpen((o) => !o)} className="flex items-center gap-3 flex-1 min-w-0 text-start">
-          <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
-            {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Package className="w-5 h-5 text-gray-400" />}
+    <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-3">
+      <div className="flex items-center gap-3">
+        <Link to={`/products/${p.id}`} className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
+          {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Package className="w-5 h-5 text-gray-400" />}
+        </Link>
+        <div className="flex-1 min-w-0">
+          <Link to={`/products/${p.id}`} className="block font-semibold text-sm truncate text-start"><bdi>{p.name}</bdi></Link>
+          <div className="flex items-center gap-1.5 mt-1">
+            <StatusBadge status={p.status} />
+            {hasVariants && <span className="text-[11px] text-gray-400">{t('inventory.variants', { count: p.variants.length })}</span>}
           </div>
-          <div className="min-w-0">
-            <p dir="auto" className="font-semibold leading-snug line-clamp-2 text-start">{p.name}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <StatusBadge status={p.status} />
-              {hasVariants && (
-                <span className="text-[11px] text-gray-400 flex items-center gap-0.5">
-                  {t('inventory.variants', { count: p.variants.length })}
-                  <ChevronDown className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
-                </span>
-              )}
-            </div>
-          </div>
-        </button>
-        <p className="text-2xl font-bold shrink-0 ps-1" dir="ltr">{fmt(p.stock)}</p>
+        </div>
+        {hasVariants && (
+          <button type="button" onClick={() => setOpen((o) => !o)} className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 shrink-0">
+            <span className="font-bold" dir="ltr">{fmt(p.stock)}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+          </button>
+        )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3 pb-3">
-        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-          <label className="flex items-center gap-1.5">{t('inventory.col.threshold')}
-            <InlineNumber key={`t-${p.id}-${p.lowStockThreshold}`} value={p.lowStockThreshold} onSave={(v) => onSettings(p.id, { lowStockThreshold: v ?? 0 })} className="w-14" />
-          </label>
-          <label className="flex items-center gap-1.5">{t('inventory.col.cost')}
-            <InlineNumber key={`c-${p.id}-${p.costPrice}`} value={p.costPrice} placeholder="—" onSave={(v) => onSettings(p.id, { costPrice: v })} />
-          </label>
+      {!hasVariants && (
+        <div className="mt-3">
+          <Stepper storeId={storeId} productId={p.id} value={p.stock} name={p.name} onOpen={onAdjust} onSaved={onChanged} />
         </div>
-        <div className="flex items-center gap-1.5 ms-auto">
-          <Link to={`/products/${p.id}`} title="✏️" className="p-2 rounded-lg text-gray-500 bg-gray-100 dark:bg-zinc-800"><Pencil className="w-4 h-4" /></Link>
-          {!hasVariants && <Actions onRestock={() => adjust('add')} onCount={() => adjust('set')} />}
-        </div>
-      </div>
+      )}
 
-      {open && (
-        <div className="border-t border-gray-100 dark:border-zinc-800 divide-y divide-gray-50 dark:divide-zinc-800/60">
+      {hasVariants && open && (
+        <div className="mt-3 space-y-2.5 border-t border-gray-100 dark:border-zinc-800 pt-3">
           {p.variants.map((v) => (
-            <div key={v.id} className="flex items-center gap-2 px-3 py-2.5">
-              <div className="flex-1 min-w-0 space-y-1">
+            <div key={v.id} className="flex items-center gap-3">
+              <div className="w-24 shrink-0 space-y-1">
                 <VariantParts parts={v.parts} className="text-sm" />
                 <div><StatusBadge status={v.status} /></div>
               </div>
-              <p className="font-bold text-lg w-12 text-center" dir="ltr">{fmt(v.stock)}</p>
-              <Actions compact onRestock={() => adjust('add', v)} onCount={() => adjust('set', v)} />
+              <div className="flex-1">
+                <Stepper size="sm" storeId={storeId} productId={p.id} variantId={v.id} value={v.stock} name={`${p.name} — ${variantLabel(v)}`} onOpen={onAdjust} onSaved={onChanged} />
+              </div>
             </div>
           ))}
         </div>
