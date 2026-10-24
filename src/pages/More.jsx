@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellRing, ChevronLeft, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { Bell, BellRing, ChevronLeft, Volume2, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
+import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
 import { useAuth } from '../lib/auth';
 
@@ -50,6 +51,9 @@ function PushCard() {
         {state === null || busy ? <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
           : (state === 'on' || state === 'off') && !iosNeedsInstall && <Toggle checked={state === 'on'} onChange={toggle} />}
       </div>
+      <button type="button" onClick={playCoin} className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+        <Volume2 className="w-4 h-4" />{t('push.test_sound')}
+      </button>
       {iosNeedsInstall && <p className="flex items-start gap-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3"><Share className="w-4 h-4 shrink-0" />{t('push.ios_install')}</p>}
       {!iosNeedsInstall && state === 'unsupported' && <p className="text-xs text-gray-500">{t('push.unsupported')}</p>}
       {state === 'denied' && <p className="text-xs text-rose-500">{t('push.denied')}</p>}

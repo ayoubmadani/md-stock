@@ -321,6 +321,7 @@
     "unsupported": "This browser doesn't support notifications",
     "ios_install": "On iPhone: tap Share then “Add to Home Screen”, open the app from its icon, then enable notifications here",
     "failed": "Couldn't enable notifications",
-    "bad_cert": "Notifications need a trusted https certificate — they work on the real domain (m.mdstore.top), not on the local address"
+    "bad_cert": "Notifications need a trusted https certificate — they work on the real domain (m.mdstore.top), not on the local address",
+    "test_sound": "Test the new-order sound"
   }
 }

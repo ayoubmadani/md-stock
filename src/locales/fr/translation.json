@@ -321,6 +321,7 @@
     "unsupported": "Ce navigateur ne prend pas en charge les notifications",
     "ios_install": "Sur iPhone : touchez Partager puis « Sur l'écran d'accueil », ouvrez l'app depuis son icône puis activez les notifications ici",
     "failed": "Impossible d'activer les notifications",
-    "bad_cert": "Les notifications exigent un certificat https valide — elles fonctionnent sur le vrai domaine (m.mdstore.top), pas sur l’adresse locale"
+    "bad_cert": "Les notifications exigent un certificat https valide — elles fonctionnent sur le vrai domaine (m.mdstore.top), pas sur l’adresse locale",
+    "test_sound": "Tester le son de nouvelle commande"
   }
 }
