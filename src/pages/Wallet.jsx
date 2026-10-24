@@ -7,6 +7,7 @@ import { ArrowUpCircle, Check, CheckCircle2, Copy, CreditCard, ExternalLink, Loa
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { money } from '../lib/orders';
+import { openBinance } from '../lib/binance-link';
 
 const PRESETS = [2500, 5000, 7500, 10000];
 const MIN = 100;
@@ -101,10 +102,11 @@ function BinanceTopUp({ config, via, onPaid }) {
         {via === 'pay' && config.uid && <CopyRow label="UID" value={config.uid} />}
       </div>
       <p className="text-[11px] text-gray-500 leading-relaxed">{via === 'bsc' ? t('wallet.binance.bsc_note') : t('wallet.binance.scan_or_uid')}</p>
-      <a href={via === 'bsc' ? 'https://www.binance.com/my/wallet/account/main/withdrawal/crypto/USDT' : config.payLink} target="_blank" rel="noreferrer"
-        className="flex items-center justify-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400">
+      {/* تطبيق Binance مباشرة (لا تبويب جديد — الهاتف لا يفتح التطبيقات من تبويب جديد) */}
+      <button type="button" onClick={() => openBinance(via === 'bsc' ? 'https://www.binance.com/my/wallet/account/main/withdrawal/crypto/USDT' : config.payLink)}
+        className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#FCD535] text-gray-900 text-sm font-bold">
         <ExternalLink className="w-4 h-4" />{via === 'bsc' ? t('wallet.binance.open_withdraw') : t('wallet.binance.open_binance')}
-      </a>
+      </button>
       <div className="space-y-1.5">
         <label className="text-xs font-semibold text-gray-500">{t('wallet.binance.txid')}</label>
         <input dir="ltr" value={code} onChange={(e) => setCode(e.target.value)} placeholder={via === 'bsc' ? t('wallet.binance.txid_placeholder_bsc') : t('wallet.binance.txid_placeholder')} className={input} />
