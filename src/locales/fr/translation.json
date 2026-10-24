@@ -308,5 +308,9 @@
     "landing_page": "Dédié à une page d'atterrissage",
     "check": "Vérifier",
     "delete": "Supprimer"
+  },
+  "camera": {
+    "fallback": "Ouverture de l'appareil photo du téléphone…",
+    "shoot": "Prendre"
   }
 }

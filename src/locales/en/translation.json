@@ -308,5 +308,9 @@
     "landing_page": "Dedicated to a landing page",
     "check": "Check",
     "delete": "Delete"
+  },
+  "camera": {
+    "fallback": "Opening the phone camera…",
+    "shoot": "Capture"
   }
 }

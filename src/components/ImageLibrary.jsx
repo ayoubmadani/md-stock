@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Camera, Check, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
+import CameraCapture from './CameraCapture';
 
 const PAGE = 18;
 // نفس إعدادات الضغط في اللوحة: صور النسخ أصغر
@@ -48,6 +49,7 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
   const [selected, setSelected] = useState([]); // روابط بترتيب الاختيار
   const [progress, setProgress] = useState(null); // { done, total, pct }
   const [manage, setManage] = useState(false);
+  const [camera, setCamera] = useState(false);
   const multi = max > 1;
 
   const fetchPage = useCallback(async (p) => {
@@ -144,10 +146,9 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
                 <ImagePlus className="w-5 h-5" />{t('library.from_gallery')}
                 <input type="file" accept={ACCEPT} multiple={multi} hidden onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
               </label>
-              <label className="flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold cursor-pointer">
+              <button type="button" onClick={() => setCamera(true)} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold">
                 <Camera className="w-5 h-5" />{t('library.from_camera')}
-                <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
-              </label>
+              </button>
             </div>
           )}
           {progress && <div className="h-1 rounded-full bg-gray-100 dark:bg-zinc-800 mt-2 overflow-hidden"><div className="h-full bg-indigo-600 transition-all" style={{ width: `${progress.pct}%` }} /></div>}
@@ -186,6 +187,8 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
               </>
             )}
         </div>
+
+        {camera && <CameraCapture onClose={() => setCamera(false)} onCapture={(file) => { setCamera(false); upload([file]); }} />}
 
         {multi && (
           <div className="p-4 pt-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
