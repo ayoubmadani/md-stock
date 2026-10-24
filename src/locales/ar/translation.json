@@ -7,7 +7,9 @@
     "alerts": "التنبيهات",
     "scan": "مسح",
     "orders": "الطلبات",
-    "more": "المزيد"
+    "more": "المزيد",
+    "categories": "التصنيفات",
+    "domains": "الدومين"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -256,5 +258,47 @@
     "add": "إضافة ({{count}})",
     "manage": "حذف صور",
     "confirm_delete": "حذف هذه الصورة من المكتبة نهائياً؟"
+  },
+  "categories": {
+    "new": "تصنيف جديد",
+    "edit": "تعديل التصنيف",
+    "name": "الاسم",
+    "name_required": "اكتب اسم التصنيف",
+    "remove_image": "إزالة الصورة",
+    "parent": "داخل تصنيف",
+    "no_parent": "— تصنيف رئيسي —",
+    "description": "الوصف (اختياري)",
+    "slug": "الرابط (slug)",
+    "order": "الترتيب",
+    "visible": "ظاهر في المتجر",
+    "empty": "لا توجد تصنيفات بعد",
+    "products": "{{count}} منتج",
+    "confirm_delete": "حذف التصنيف «{{name}}»؟",
+    "has_children": "فيه {{count}} تصنيف فرعي",
+    "has_products": "فيه {{count}} منتج",
+    "deleted": "تم حذف التصنيف"
+  },
+  "domains": {
+    "add": "إضافة",
+    "invalid": "اكتب دوميناً صحيحاً مثل example.com",
+    "added": "أُضيف الدومين — أضف سجل DNS ثم اضغط «تحقق»",
+    "active": "الدومين متصل ✓",
+    "not_yet": "لم يتصل بعد — قد يستغرق حتى 30 دقيقة",
+    "confirm_delete": "حذف {{domain}}؟",
+    "limit_reached": "وصلت للحد الأقصى في خطتك ({{limit}}). احذف دوميناً أو رقِّ خطتك.",
+    "dns_title": "إعداد DNS — نفس القيم لكل الدومينات",
+    "dns_desc": "أضف هذا السجل عند مزوّد الدومين (اضغط على أي قيمة لنسخها)",
+    "dns_type": "النوع",
+    "dns_host": "Host / Name",
+    "dns_value": "Value / Target",
+    "dns_ttl": "TTL",
+    "dns_note": "بعد إضافة السجل قد يستغرق التفعيل من 5 إلى 30 دقيقة.",
+    "empty": "لا توجد دومينات بعد",
+    "status_active": "متصل ومؤمّن",
+    "status_pending": "بانتظار التفعيل",
+    "system": "دومين النظام",
+    "landing_page": "مخصص لصفحة هبوط",
+    "check": "تحقق",
+    "delete": "حذف"
   }
 }

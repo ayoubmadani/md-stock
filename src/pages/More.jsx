@@ -1,12 +1,14 @@
 // «المزيد» على الهاتف: بقية الأقسام حسب صلاحيات العضو
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BellRing, ChevronLeft, History } from 'lucide-react';
+import { BellRing, ChevronLeft, FolderTree, Globe, History } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
 export const MORE = [
   { to: '/alerts', key: 'alerts', icon: BellRing, perm: 'product.crud' },
   { to: '/history', key: 'history', icon: History, perm: 'product.crud' },
+  { to: '/categories', key: 'categories', icon: FolderTree, perm: 'category.crud' },
+  { to: '/domains', key: 'domains', icon: Globe, perm: 'domain.crud' },
 ];
 
 export default function MorePage() {

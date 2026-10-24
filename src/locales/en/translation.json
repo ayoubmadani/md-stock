@@ -7,7 +7,9 @@
     "alerts": "Alerts",
     "scan": "Scan",
     "orders": "Orders",
-    "more": "More"
+    "more": "More",
+    "categories": "Categories",
+    "domains": "Domain"
   },
   "login": {
     "title": "Sign in",
@@ -256,5 +258,47 @@
     "add": "Add ({{count}})",
     "manage": "Delete images",
     "confirm_delete": "Delete this image from the library permanently?"
+  },
+  "categories": {
+    "new": "New category",
+    "edit": "Edit category",
+    "name": "Name",
+    "name_required": "Enter the category name",
+    "remove_image": "Remove image",
+    "parent": "Inside category",
+    "no_parent": "— Top-level category —",
+    "description": "Description (optional)",
+    "slug": "Link (slug)",
+    "order": "Order",
+    "visible": "Visible in the store",
+    "empty": "No categories yet",
+    "products": "{{count}} product(s)",
+    "confirm_delete": "Delete the category “{{name}}”?",
+    "has_children": "It has {{count}} sub-categories",
+    "has_products": "It has {{count}} products",
+    "deleted": "Category deleted"
+  },
+  "domains": {
+    "add": "Add",
+    "invalid": "Enter a valid domain like example.com",
+    "added": "Domain added — add the DNS record, then tap “Check”",
+    "active": "Domain connected ✓",
+    "not_yet": "Not connected yet — it can take up to 30 minutes",
+    "confirm_delete": "Delete {{domain}}?",
+    "limit_reached": "You reached your plan limit ({{limit}}). Delete a domain or upgrade.",
+    "dns_title": "DNS setup — same values for every domain",
+    "dns_desc": "Add this record at your domain provider (tap a value to copy it)",
+    "dns_type": "Type",
+    "dns_host": "Host / Name",
+    "dns_value": "Value / Target",
+    "dns_ttl": "TTL",
+    "dns_note": "After adding the record, activation can take 5 to 30 minutes.",
+    "empty": "No domains yet",
+    "status_active": "Connected and secure",
+    "status_pending": "Waiting for activation",
+    "system": "System domain",
+    "landing_page": "Dedicated to a landing page",
+    "check": "Check",
+    "delete": "Delete"
   }
 }

@@ -7,7 +7,9 @@
     "alerts": "Alertes",
     "scan": "Scanner",
     "orders": "Commandes",
-    "more": "Plus"
+    "more": "Plus",
+    "categories": "Catégories",
+    "domains": "Domaine"
   },
   "login": {
     "title": "Connexion",
@@ -256,5 +258,47 @@
     "add": "Ajouter ({{count}})",
     "manage": "Supprimer des images",
     "confirm_delete": "Supprimer définitivement cette image de la bibliothèque ?"
+  },
+  "categories": {
+    "new": "Nouvelle catégorie",
+    "edit": "Modifier la catégorie",
+    "name": "Nom",
+    "name_required": "Saisissez le nom de la catégorie",
+    "remove_image": "Retirer l'image",
+    "parent": "Dans la catégorie",
+    "no_parent": "— Catégorie principale —",
+    "description": "Description (optionnel)",
+    "slug": "Lien (slug)",
+    "order": "Ordre",
+    "visible": "Visible dans la boutique",
+    "empty": "Aucune catégorie",
+    "products": "{{count}} produit(s)",
+    "confirm_delete": "Supprimer la catégorie « {{name}} » ?",
+    "has_children": "Elle contient {{count}} sous-catégorie(s)",
+    "has_products": "Elle contient {{count}} produit(s)",
+    "deleted": "Catégorie supprimée"
+  },
+  "domains": {
+    "add": "Ajouter",
+    "invalid": "Saisissez un domaine valide comme example.com",
+    "added": "Domaine ajouté — ajoutez l’enregistrement DNS puis « Vérifier »",
+    "active": "Domaine connecté ✓",
+    "not_yet": "Pas encore connecté — jusqu'à 30 minutes",
+    "confirm_delete": "Supprimer {{domain}} ?",
+    "limit_reached": "Limite de votre forfait atteinte ({{limit}}). Supprimez un domaine ou passez à un forfait supérieur.",
+    "dns_title": "Configuration DNS — mêmes valeurs pour tous les domaines",
+    "dns_desc": "Ajoutez cet enregistrement chez votre registraire (touchez une valeur pour la copier)",
+    "dns_type": "Type",
+    "dns_host": "Host / Name",
+    "dns_value": "Value / Target",
+    "dns_ttl": "TTL",
+    "dns_note": "Après l'ajout, l'activation peut prendre de 5 à 30 minutes.",
+    "empty": "Aucun domaine",
+    "status_active": "Connecté et sécurisé",
+    "status_pending": "En attente d'activation",
+    "system": "Domaine système",
+    "landing_page": "Dédié à une page d'atterrissage",
+    "check": "Vérifier",
+    "delete": "Supprimer"
   }
 }
