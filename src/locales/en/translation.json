@@ -173,7 +173,9 @@
       "attr_duplicate": "Duplicate attribute name",
       "attr_name": "Name every attribute",
       "offer": "Complete each offer’s name, quantity and price"
-    }
+    },
+    "barcode_generate": "Generate a barcode",
+    "barcode_replace": "Replace the current barcode with a new one?"
   },
   "no_permission": "You don't have permission for this section in this store — ask the store owner",
   "orders": {

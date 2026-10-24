@@ -1,11 +1,13 @@
 // أجزاء نموذج المنتج للهاتف: الصور، الوصف، الخصائص، النسخ، العروض
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, ScanLine, Star, Trash2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, ScanLine, Star, Trash2, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { moveItem, newAttribute, newOffer, newValue } from '../lib/product-form';
 import Scanner from './Scanner';
+import { randomStoreEan13 } from '../lib/barcode';
+import { useAuth } from '../lib/auth';
 import ImageLibrary from './ImageLibrary';
 import { VariantParts } from './inventory';
 
@@ -202,12 +204,44 @@ function ScanSheet({ onCode, onClose }) {
   );
 }
 
+/** باركود جديد غير مستعمل في المتجر (404 من البحث = متاح) */
+async function freshBarcode(storeId) {
+  for (let i = 0; i < 5; i++) {
+    const code = randomStoreEan13();
+    try {
+      await api.get(`/stores/${storeId}/inventory/barcode/${code}`);
+    } catch (e) {
+      if (e.response?.status === 404) return code;
+      throw e;
+    }
+  }
+  throw new Error('no free barcode');
+}
+
 export function BarcodeField({ value, onChange, onCommit, className = input }) {
   const { t } = useTranslation();
+  const { storeId } = useAuth();
   const [scan, setScan] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const generate = async () => {
+    if (value?.trim() && !window.confirm(t('product.barcode_replace'))) return;
+    setBusy(true);
+    try {
+      const code = await freshBarcode(storeId);
+      onChange(code);
+      onCommit?.(code);
+    } catch (e) {
+      toast.error(errorMessage(e, t('inventory.error')));
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <div className="flex gap-2">
       <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onCommit?.(value)} dir="ltr" inputMode="numeric" placeholder={t('product.barcode_ph')} className={`${className} min-w-0`} />
+      <button type="button" onClick={generate} disabled={busy} className="shrink-0 px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 disabled:opacity-60" title={t('product.barcode_generate')}>
+        {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <Wand2 className="w-5 h-5" />}
+      </button>
       <button type="button" onClick={() => setScan(true)} className="shrink-0 px-3.5 rounded-xl bg-indigo-600 text-white" title={t('scan.title')}><ScanLine className="w-5 h-5" /></button>
       {scan && <ScanSheet onClose={() => setScan(false)} onCode={(c) => { onChange(c); onCommit?.(c); }} />}
     </div>
