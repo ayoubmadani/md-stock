@@ -111,10 +111,11 @@
     "go": "Chercher",
     "unknown": "Aucun produit ni commande avec ce code",
     "create": "Créer un produit avec ce code",
-    "again": "Scanner un autre produit",
+    "again": "Scanner le suivant",
     "denied": "Autorisez la caméra dans les réglages du navigateur",
     "no_camera": "Caméra indisponible — saisissez le code",
-    "https": "La caméra nécessite https — saisissez le code"
+    "https": "La caméra nécessite https — saisissez le code",
+    "open_order": "Ouvrir la commande"
   },
   "product": {
     "new": "Nouveau produit",

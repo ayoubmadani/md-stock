@@ -6,8 +6,8 @@ import { ArrowRight, Barcode, Check, Copy, Loader2, MapPin, MessageCircle, Penci
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { STATUS_DOT, money, nextActions, statusPayload, whatsappLink } from '../lib/orders';
-import { OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, statusLabel, timeAgo } from '../components/orders';
+import { money, nextActions, whatsappLink } from '../lib/orders';
+import { NextStepCard, OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, timeAgo } from '../components/orders';
 import { VariantParts } from '../components/inventory';
 
 const QUEUE = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
@@ -34,7 +34,6 @@ export default function OrderDetail() {
   const [sheet, setSheet] = useState(false);
   const [params] = useSearchParams();
   const scanned = params.get('scanned') === '1';
-  const [stepBusy, setStepBusy] = useState(null);
   const [copied, setCopied] = useState(false);
 
   const load = useCallback(() => api.get(`/orders/get-one/${id}`)
@@ -74,23 +73,6 @@ export default function OrderDetail() {
       setRecalling(false);
     }
   };
-
-  // «الخطوة التالية»: تغيير الحالة مباشرة، أو فتح رفع شركة التوصيل
-  const runStep = async (a) => {
-    if (a.action === 'ship') return setAction('ship');
-    setStepBusy(a.status);
-    try {
-      await api.patch(`/orders/${order.id}`, statusPayload(order, a.status));
-      navigator.vibrate?.(40);
-      toast.success(`${order.customerName || ''} ← ${statusLabel(t, a.status, order.isDigital)}`);
-      setOrder((o) => ({ ...o, status: a.status }));
-    } catch (e) {
-      toast.error(errorMessage(e, t('orders.save_failed')));
-    } finally {
-      setStepBusy(null);
-    }
-  };
-  const steps = can('order.manage') ? nextActions(order) : [];
 
   const remove = async () => {
     if (!window.confirm(t('orders.confirm_delete'))) return;
@@ -132,22 +114,8 @@ export default function OrderDetail() {
         <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />
       </div>
 
-      {/* الخطوة التالية — بارزة بعد مسح باركود الطلب */}
-      {steps.length > 0 && (
-        <div className={`${box} space-y-2 ${scanned ? 'ring-2 ring-indigo-500' : ''}`}>
-          <p className="text-xs font-bold text-gray-500">{t('orders.next_step')}</p>
-          <div className={`grid gap-2 ${steps.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            {steps.map((a, i) => (
-              <button key={a.status || a.action} type="button" disabled={!!stepBusy} onClick={() => runStep(a)}
-                className={`flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold disabled:opacity-60 ${i === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800'}`}>
-                {stepBusy === a.status ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : a.action === 'ship' ? <Truck className="w-4 h-4" /> : <span className={`w-2 h-2 rounded-full ${STATUS_DOT[a.status]}`} />}
-                {a.action === 'ship' ? t('orders.actions.ship') : statusLabel(t, a.status, order.isDigital)}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* الخطوة التالية */}
+      {can('order.manage') && <NextStepCard order={order} highlight={scanned} onShip={() => setAction('ship')} onChanged={(st) => setOrder((o) => ({ ...o, status: st }))} />}
 
       {/* إجراءات */}
       {(canEdit || canSend || canRecall || canShip) && (

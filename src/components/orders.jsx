@@ -1,10 +1,10 @@
 // عناصر مشتركة لصفحات الطلبات: شارة الحالة، نافذة تغيير الحالة، والوقت النسبي
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Loader2, Lock, X } from 'lucide-react';
+import { Check, Loader2, Lock, Truck, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { STATUS_CLS, STATUS_DOT, allowedStatuses, statusPayload } from '../lib/orders';
+import { STATUS_CLS, STATUS_DOT, allowedStatuses, nextActions, statusPayload } from '../lib/orders';
 
 export const statusLabel = (t, status, isDigital) =>
   status === 'delivered' && isDigital ? t('orders.status.delivered_digital') : t(`orders.status.${status}`);
@@ -154,5 +154,47 @@ export function ShipSheet({ order, storeId, onClose, onDone }) {
           onDone();
         } catch (e) { toast.error(e.response?.data?.message ?? e.response?.data?.error ?? t('orders.save_failed')); }
       }} />
+  );
+}
+
+/**
+ * «الخطوة التالية» حسب حالة الطلب: تغيير الحالة بضغطة، أو رفع لشركة التوصيل (onShip).
+ * onChanged(status) بعد الحفظ. لا شيء يظهر إن لم تكن هناك خطوة.
+ */
+export function NextStepCard({ order, onChanged, onShip, highlight = false, className = '' }) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(null);
+  const steps = nextActions(order);
+  if (!steps.length) return null;
+
+  const run = async (a) => {
+    if (a.action === 'ship') return onShip();
+    setBusy(a.status);
+    try {
+      await api.patch(`/orders/${order.id}`, statusPayload(order, a.status));
+      navigator.vibrate?.(40);
+      toast.success(`${order.customerName || ''} ← ${statusLabel(t, a.status, order.isDigital)}`);
+      onChanged(a.status);
+    } catch (e) {
+      toast.error(errorMessage(e, t('orders.save_failed')));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className={`rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4 space-y-2 ${highlight ? 'ring-2 ring-indigo-500' : ''} ${className}`}>
+      <p className="text-xs font-bold text-gray-500">{t('orders.next_step')}</p>
+      <div className={`grid gap-2 ${steps.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        {steps.map((a, i) => (
+          <button key={a.status || a.action} type="button" disabled={!!busy} onClick={() => run(a)}
+            className={`flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold disabled:opacity-60 ${i === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800'}`}>
+            {busy === a.status ? <Loader2 className="w-4 h-4 animate-spin" />
+              : a.action === 'ship' ? <Truck className="w-4 h-4" /> : <span className={`w-2 h-2 rounded-full ${STATUS_DOT[a.status]}`} />}
+            {a.action === 'ship' ? t('orders.actions.ship') : statusLabel(t, a.status, order.isDigital)}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

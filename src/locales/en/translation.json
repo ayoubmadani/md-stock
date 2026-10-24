@@ -111,10 +111,11 @@
     "go": "Find",
     "unknown": "No product or order with this code",
     "create": "Create a product with this barcode",
-    "again": "Scan another product",
+    "again": "Scan next",
     "denied": "Allow camera access in your browser settings",
     "no_camera": "Camera unavailable — type the barcode",
-    "https": "The camera needs https — type the barcode"
+    "https": "The camera needs https — type the barcode",
+    "open_order": "Open the order"
   },
   "product": {
     "new": "New product",
