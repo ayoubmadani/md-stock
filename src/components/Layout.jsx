@@ -38,7 +38,7 @@ export default function Layout() {
       {/* جانبي على الحاسوب */}
       <aside className="hidden md:flex md:flex-col w-60 shrink-0 border-e border-gray-100 dark:border-zinc-900 p-4 gap-1 sticky top-0 h-dvh">
         <div className="flex items-center gap-2 px-2 pb-4">
-          <img src="/icon.svg" alt="" className="w-8 h-8" />
+          <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="font-bold">{t('app_name')}</span>
         </div>
         {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => !n.perm || [].concat(n.perm).some((x) => can(x))).map((n) => (
@@ -49,7 +49,7 @@ export default function Layout() {
       <div className="flex-1 min-w-0 pb-20 md:pb-0">
         {/* الشريط العلوي */}
         <header className="sticky top-0 z-30 flex items-center gap-2 px-4 py-3 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur border-b border-gray-100 dark:border-zinc-900">
-          <img src="/icon.svg" alt="" className="w-7 h-7 md:hidden" />
+          <img src="/icon-192.png" alt="" className="w-7 h-7 rounded-lg md:hidden" />
           <select value={storeId || ''} onChange={(e) => selectStore(e.target.value)}
             className="flex-1 min-w-0 md:flex-none md:w-64 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm font-semibold outline-none">
             {stores.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}

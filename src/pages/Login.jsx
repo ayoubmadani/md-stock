@@ -41,7 +41,7 @@ export default function Login() {
     <div className="min-h-dvh flex items-center justify-center p-5">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5">
         <div className="text-center space-y-2">
-          <img src="/icon.svg" alt="" className="w-14 h-14 mx-auto" />
+          <img src="/icon-192.png" alt="" className="w-14 h-14 rounded-2xl mx-auto" />
           <h1 className="text-2xl font-bold">{t('login.title')}</h1>
           <p className="text-sm text-gray-500 dark:text-zinc-400">{t('login.subtitle')}</p>
         </div>
