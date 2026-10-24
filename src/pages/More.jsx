@@ -1,7 +1,11 @@
 // «المزيد» على الهاتف: بقية الأقسام حسب صلاحيات العضو
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { BellRing, ChevronLeft, FolderTree, Globe, History } from 'lucide-react';
+import { Bell, BellRing, ChevronLeft, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
+import { Toggle } from '../components/product';
 import { useAuth } from '../lib/auth';
 
 export const MORE = [
@@ -11,11 +15,53 @@ export const MORE = [
   { to: '/domains', key: 'domains', icon: Globe, perm: 'domain.crud' },
 ];
 
+// تفعيل إشعار «طلب جديد» على هذا الهاتف
+function PushCard() {
+  const { t } = useTranslation();
+  const [state, setState] = useState(null); // on | off | denied | unsupported
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { pushState().then(setState); }, []);
+
+  const toggle = async (on) => {
+    setBusy(true);
+    try {
+      const next = on ? await enablePush() : await disablePush();
+      setState(next);
+      if (next === 'on') toast.success(t('push.enabled'));
+      if (next === 'denied') toast.error(t('push.denied'));
+    } catch {
+      toast.error(t('inventory.error'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const iosNeedsInstall = isIos() && !isStandalone();
+  return (
+    <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4 space-y-2">
+      <div className="flex items-center gap-3">
+        <span className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0"><Bell className="w-5 h-5" /></span>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm">{t('push.title')}</p>
+          <p className="text-xs text-gray-400">{t('push.subtitle')}</p>
+        </div>
+        {state === null || busy ? <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+          : (state === 'on' || state === 'off') && !iosNeedsInstall && <Toggle checked={state === 'on'} onChange={toggle} />}
+      </div>
+      {iosNeedsInstall && <p className="flex items-start gap-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3"><Share className="w-4 h-4 shrink-0" />{t('push.ios_install')}</p>}
+      {!iosNeedsInstall && state === 'unsupported' && <p className="text-xs text-gray-500">{t('push.unsupported')}</p>}
+      {state === 'denied' && <p className="text-xs text-rose-500">{t('push.denied')}</p>}
+    </div>
+  );
+}
+
 export default function MorePage() {
   const { t } = useTranslation();
   const { can } = useAuth();
   return (
-    <div className="max-w-xl mx-auto rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
+    <div className="max-w-xl mx-auto space-y-3">
+    {can('order.view') && <PushCard />}
+    <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
       {MORE.filter((m) => can(m.perm)).map((m) => (
         <Link key={m.to} to={m.to} className="flex items-center gap-3 px-4 py-3.5">
           <m.icon className="w-5 h-5 text-gray-400" />
@@ -23,6 +69,7 @@ export default function MorePage() {
           <ChevronLeft className="w-4 h-4 text-gray-300 ltr:rotate-180" />
         </Link>
       ))}
+    </div>
     </div>
   );
 }

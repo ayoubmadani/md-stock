@@ -312,5 +312,13 @@
   "camera": {
     "fallback": "Opening the phone camera…",
     "shoot": "Capture"
+  },
+  "push": {
+    "title": "New order notifications",
+    "subtitle": "Get a notification on this phone for every new order",
+    "enabled": "Notifications enabled on this phone ✓",
+    "denied": "Notifications are blocked for this site — allow them in the browser settings",
+    "unsupported": "This browser doesn't support notifications",
+    "ios_install": "On iPhone: tap Share then “Add to Home Screen”, open the app from its icon, then enable notifications here"
   }
 }
