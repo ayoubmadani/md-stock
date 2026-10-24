@@ -1,15 +1,17 @@
 {
-  "app_name": "MD Stock",
+  "app_name": "MdStore",
   "nav": {
     "home": "Home",
     "stock": "Stock",
     "history": "History",
     "alerts": "Alerts",
-    "scan": "Scan"
+    "scan": "Scan",
+    "orders": "Orders",
+    "more": "More"
   },
   "login": {
     "title": "Sign in",
-    "subtitle": "Your store's stock, with your MD Store account",
+    "subtitle": "Your store on your phone, with your MD Store account",
     "email": "Email",
     "password": "Password",
     "submit": "Sign in",
@@ -25,7 +27,7 @@
     "loading": "Opening stock...",
     "failed": "Link expired — open stock again from the dashboard or sign in"
   },
-  "no_store": "No store whose stock you can manage with this account",
+  "no_store": "No store is linked to this account",
   "logout": "Sign out",
   "store": "Store",
   "home": {
@@ -124,5 +126,41 @@
     "variants_note": "Sizes and colors are managed from the dashboard",
     "confirm_delete": "Delete this product?",
     "deleted": "Product deleted"
+  },
+  "no_permission": "You don't have permission for this section in this store — ask the store owner",
+  "orders": {
+    "all": "All",
+    "search": "Search by name or phone...",
+    "empty": "No orders",
+    "more": "Load more",
+    "change_status": "Change status",
+    "locked": "The order is with the confirmation company {{name}} — its status can’t be changed now",
+    "save_failed": "Could not save the change",
+    "load_failed": "Could not load the order",
+    "suspicious": "Suspicious",
+    "call": "Call",
+    "copy": "Copy",
+    "ship_home": "Home delivery",
+    "ship_office": "Office pickup",
+    "subtotal": "Products",
+    "shipping_fee": "Delivery",
+    "total": "Total",
+    "status_label": "Order status",
+    "at_company": "With {{name}}",
+    "confirm_delete": "Delete this order permanently?",
+    "deleted": "Order deleted",
+    "status": {
+      "pending": "Pending",
+      "appl1": "Attempt 1",
+      "appl2": "Attempt 2",
+      "appl3": "Attempt 3",
+      "confirmed": "Confirmed",
+      "shipping": "Delivery",
+      "cancelled": "Cancelled",
+      "returned": "Returned",
+      "delivered": "Delivered",
+      "delivered_digital": "Sold",
+      "postponed": "Postponed"
+    }
   }
 }

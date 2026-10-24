@@ -7,6 +7,7 @@ import { useAuth } from '../lib/auth';
 import { useInventory } from '../lib/useInventory';
 import { StatusBadge, fmt } from '../components/inventory';
 import { MovementItem } from './History';
+import { STATUS_DOT, sumCounts } from '../lib/orders';
 
 function Card({ label, value, tone = '', sub, to }) {
   const body = (
@@ -19,7 +20,7 @@ function Card({ label, value, tone = '', sub, to }) {
   return to ? <Link to={to}>{body}</Link> : body;
 }
 
-export default function HomePage() {
+function StockSummary() {
   const { t } = useTranslation();
   const { storeId } = useAuth();
   const { data } = useInventory(storeId);
@@ -77,6 +78,45 @@ export default function HomePage() {
           {recent?.map((m) => <MovementItem key={m.id} m={m} />)}
         </div>
       </section>
+    </div>
+  );
+}
+
+// عدد الطلبات بكل حالة؛ الضغط يفتح القائمة على تلك الحالة
+function OrdersSummary() {
+  const { t } = useTranslation();
+  const { storeId } = useAuth();
+  const [counts, setCounts] = useState(null);
+
+  useEffect(() => {
+    if (!storeId) return;
+    api.get(`/orders/get-count-status/${storeId}`).then((r) => setCounts(sumCounts(r.data))).catch(() => setCounts({}));
+  }, [storeId]);
+
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h2 className="font-bold">{t('nav.orders')}</h2>
+        <Link to="/orders" className="text-xs text-indigo-500 font-semibold">{t('home.see_all')}</Link>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {['pending', 'confirmed', 'shipping', 'delivered'].map((s) => (
+          <Link key={s} to={`/orders?status=${s}`} className="rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+            <p className="flex items-center gap-1.5 text-xs text-gray-500"><span className={`w-2 h-2 rounded-full ${STATUS_DOT[s]}`} />{t(`orders.status.${s}`)}</p>
+            <p className="text-2xl font-bold mt-1" dir="ltr">{counts ? (counts[s] ?? 0) : '…'}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
+  const { can } = useAuth();
+  return (
+    <div className="space-y-6">
+      {can('order.view') && <OrdersSummary />}
+      {can('product.crud') && <StockSummary />}
     </div>
   );
 }

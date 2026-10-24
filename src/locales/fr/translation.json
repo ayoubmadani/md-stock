@@ -1,15 +1,17 @@
 {
-  "app_name": "MD Stock",
+  "app_name": "MdStore",
   "nav": {
     "home": "Accueil",
     "stock": "Stock",
     "history": "Historique",
     "alerts": "Alertes",
-    "scan": "Scanner"
+    "scan": "Scanner",
+    "orders": "Commandes",
+    "more": "Plus"
   },
   "login": {
     "title": "Connexion",
-    "subtitle": "Le stock de votre boutique, avec votre compte MD Store",
+    "subtitle": "Votre boutique sur mobile, avec votre compte MD Store",
     "email": "E-mail",
     "password": "Mot de passe",
     "submit": "Se connecter",
@@ -25,7 +27,7 @@
     "loading": "Ouverture du stock...",
     "failed": "Lien expiré — rouvrez le stock depuis le tableau de bord ou connectez-vous"
   },
-  "no_store": "Aucune boutique dont vous pouvez gérer le stock avec ce compte",
+  "no_store": "Aucune boutique liée à ce compte",
   "logout": "Déconnexion",
   "store": "Boutique",
   "home": {
@@ -124,5 +126,41 @@
     "variants_note": "Les tailles et couleurs se gèrent depuis le tableau de bord",
     "confirm_delete": "Supprimer ce produit ?",
     "deleted": "Produit supprimé"
+  },
+  "no_permission": "Vous n'avez pas l'autorisation pour cette section dans cette boutique — demandez-la au propriétaire",
+  "orders": {
+    "all": "Toutes",
+    "search": "Rechercher par nom ou téléphone...",
+    "empty": "Aucune commande",
+    "more": "Voir plus",
+    "change_status": "Changer le statut",
+    "locked": "La commande est chez l'entreprise de confirmation {{name}} — statut non modifiable pour l'instant",
+    "save_failed": "Échec de l'enregistrement",
+    "load_failed": "Impossible de charger la commande",
+    "suspicious": "Suspect",
+    "call": "Appeler",
+    "copy": "Copier",
+    "ship_home": "Livraison à domicile",
+    "ship_office": "Retrait au bureau",
+    "subtotal": "Produits",
+    "shipping_fee": "Livraison",
+    "total": "Total",
+    "status_label": "Statut de la commande",
+    "at_company": "Chez {{name}}",
+    "confirm_delete": "Supprimer définitivement cette commande ?",
+    "deleted": "Commande supprimée",
+    "status": {
+      "pending": "En attente",
+      "appl1": "Tentative 1",
+      "appl2": "Tentative 2",
+      "appl3": "Tentative 3",
+      "confirmed": "Confirmé",
+      "shipping": "En livraison",
+      "cancelled": "Annulé",
+      "returned": "Retourné",
+      "delivered": "Livré",
+      "delivered_digital": "Vendu",
+      "postponed": "Reporté"
+    }
   }
 }

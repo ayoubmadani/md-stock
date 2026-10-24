@@ -6,6 +6,9 @@ const AuthContext = createContext(null);
 // متاجر يستطيع إدارة مخزونها: المالك، أو عضو له صلاحية المنتجات
 export const canManageStock = (s) => s.role === 'owner' || (s.permissions || []).includes('product.crud') || (s.permissions || []).includes('*');
 
+/** صلاحية في المتجر كما في الفريق: المالك وصاحب «*» لهما كل شيء */
+export const hasPerm = (s, perm) => !!s && (s.role === 'owner' || (s.permissions || []).includes('*') || (s.permissions || []).includes(perm));
+
 export function AuthProvider({ children }) {
   const [token, setTokenState] = useState(getToken());
   const [stores, setStores] = useState([]);
@@ -17,7 +20,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const { data } = await api.get('/stores/user/me');
-      const list = (data?.stores || data?.data || data || []).filter?.((s) => s.selectable !== false && canManageStock(s)) ?? [];
+      const list = (data?.stores || data?.data || data || []).filter?.((s) => s.selectable !== false) ?? [];
       setStores(list);
       const keep = list.find((s) => s.id === getStoreId());
       const next = keep?.id || list[0]?.id || null;
@@ -41,7 +44,7 @@ export function AuthProvider({ children }) {
   const selectStore = (id) => { setStoreId(id); setStoreIdState(id); };
 
   return (
-    <AuthContext.Provider value={{ token, stores, storeId, store: stores.find((s) => s.id === storeId) || null, loading, login, logout, selectStore, refresh }}>
+    <AuthContext.Provider value={{ token, stores, storeId, store: stores.find((s) => s.id === storeId) || null, can: (perm) => hasPerm(stores.find((s) => s.id === storeId), perm), loading, login, logout, selectStore, refresh }}>
       {children}
     </AuthContext.Provider>
   );

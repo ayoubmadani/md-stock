@@ -12,6 +12,10 @@ import HistoryPage from './pages/History';
 import AlertsPage from './pages/Alerts';
 import ScanPage from './pages/Scan';
 import ProductForm from './pages/ProductForm';
+import OrdersPage from './pages/Orders';
+import OrderDetail from './pages/OrderDetail';
+import MorePage from './pages/More';
+import RequirePerm from './components/RequirePerm';
 
 function Gate() {
   const { t } = useTranslation();
@@ -39,12 +43,15 @@ export default function App() {
           <Route path="/handoff" element={<Handoff />} />
           <Route element={<Gate />}>
             <Route index element={<HomePage />} />
-            <Route path="stock" element={<StockPage />} />
-            <Route path="alerts" element={<AlertsPage />} />
-            <Route path="history" element={<HistoryPage />} />
-            <Route path="scan" element={<ScanPage />} />
-            <Route path="products/new" element={<ProductForm />} />
-            <Route path="products/:id" element={<ProductForm />} />
+            <Route path="stock" element={<RequirePerm perm="product.crud"><StockPage /></RequirePerm>} />
+            <Route path="alerts" element={<RequirePerm perm="product.crud"><AlertsPage /></RequirePerm>} />
+            <Route path="history" element={<RequirePerm perm="product.crud"><HistoryPage /></RequirePerm>} />
+            <Route path="scan" element={<RequirePerm perm="product.crud"><ScanPage /></RequirePerm>} />
+            <Route path="orders" element={<RequirePerm perm="order.view"><OrdersPage /></RequirePerm>} />
+            <Route path="orders/:id" element={<RequirePerm perm="order.view"><OrderDetail /></RequirePerm>} />
+            <Route path="more" element={<MorePage />} />
+            <Route path="products/new" element={<RequirePerm perm="product.crud"><ProductForm /></RequirePerm>} />
+            <Route path="products/:id" element={<RequirePerm perm="product.crud"><ProductForm /></RequirePerm>} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
