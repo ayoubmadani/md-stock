@@ -4,6 +4,7 @@ import './i18n';
 import './index.css';
 import App from './App.jsx';
 import { registerSw } from './lib/push';
+import { playCoin, unlockAudio } from './lib/coin';
 
 // الوضع الليلي افتراضياً — يبقى اختيار المستخدم
 try {
@@ -24,3 +25,9 @@ createRoot(document.getElementById('root')).render(
 
 // إشعارات الطلبات تصل حتى والتطبيق مغلق
 registerSw();
+
+// طلب جديد والتطبيق مفتوح: صوت العملة
+unlockAudio();
+navigator.serviceWorker?.addEventListener('message', (e) => {
+  if (e.data?.type === 'push') playCoin();
+});
