@@ -1,13 +1,13 @@
 // صفحة طلب واحد: الزبون (اتصال/واتساب/نسخ)، العنوان، المنتجات، المبالغ، والحالة
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Check, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Trash2, Truck, Undo2 } from 'lucide-react';
+import { ArrowRight, Barcode, Check, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Trash2, Truck, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { money, whatsappLink } from '../lib/orders';
-import { OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, timeAgo } from '../components/orders';
+import { STATUS_DOT, money, nextActions, statusPayload, whatsappLink } from '../lib/orders';
+import { OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, statusLabel, timeAgo } from '../components/orders';
 import { VariantParts } from '../components/inventory';
 
 const QUEUE = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
@@ -32,6 +32,9 @@ export default function OrderDetail() {
   const [action, setAction] = useState(null); // 'confirm' | 'ship'
   const [recalling, setRecalling] = useState(false);
   const [sheet, setSheet] = useState(false);
+  const [params] = useSearchParams();
+  const scanned = params.get('scanned') === '1';
+  const [stepBusy, setStepBusy] = useState(null);
   const [copied, setCopied] = useState(false);
 
   const load = useCallback(() => api.get(`/orders/get-one/${id}`)
@@ -57,7 +60,7 @@ export default function OrderDetail() {
   const queue = QUEUE.includes(order.status);
   const canSend = can('order.manage') && queue && !order.confirmationCompanyId && !order.isDigital;
   const canRecall = can('order.manage') && order.confirmationCompanyId && (queue || order.status === 'cancelled');
-  const canShip = can('order.manage') && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital;
+  const canShip = can('order.manage') && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital && !nextActions(order).some((a) => a.action === 'ship');
   const canEdit = can('order.manage') && !order.confirmationCompanyId;
 
   const recall = async () => {
@@ -71,6 +74,23 @@ export default function OrderDetail() {
       setRecalling(false);
     }
   };
+
+  // «الخطوة التالية»: تغيير الحالة مباشرة، أو فتح رفع شركة التوصيل
+  const runStep = async (a) => {
+    if (a.action === 'ship') return setAction('ship');
+    setStepBusy(a.status);
+    try {
+      await api.patch(`/orders/${order.id}`, statusPayload(order, a.status));
+      navigator.vibrate?.(40);
+      toast.success(`${order.customerName || ''} ← ${statusLabel(t, a.status, order.isDigital)}`);
+      setOrder((o) => ({ ...o, status: a.status }));
+    } catch (e) {
+      toast.error(errorMessage(e, t('orders.save_failed')));
+    } finally {
+      setStepBusy(null);
+    }
+  };
+  const steps = can('order.manage') ? nextActions(order) : [];
 
   const remove = async () => {
     if (!window.confirm(t('orders.confirm_delete'))) return;
@@ -87,7 +107,10 @@ export default function OrderDetail() {
     <div className="max-w-xl mx-auto space-y-3 pb-6">
       <div className="flex items-center justify-between">
         <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</button>
-        <span className="text-xs text-gray-400">{order.createdAt && timeAgo(order.createdAt, i18n.language)}</span>
+        <span className="flex flex-col items-center text-xs text-gray-400">
+          {order.barcode && <span className="flex items-center gap-1 font-bold tracking-wider text-gray-600 dark:text-zinc-300" dir="ltr"><Barcode className="w-3.5 h-3.5" />{order.barcode}</span>}
+          {order.createdAt && timeAgo(order.createdAt, i18n.language)}
+        </span>
         {can('order.manage') && !order.confirmationCompanyId
           ? <button type="button" onClick={remove} className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"><Trash2 className="w-4 h-4" /></button>
           : <span className="w-8" />}
@@ -108,6 +131,23 @@ export default function OrderDetail() {
         </div>
         <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />
       </div>
+
+      {/* الخطوة التالية — بارزة بعد مسح باركود الطلب */}
+      {steps.length > 0 && (
+        <div className={`${box} space-y-2 ${scanned ? 'ring-2 ring-indigo-500' : ''}`}>
+          <p className="text-xs font-bold text-gray-500">{t('orders.next_step')}</p>
+          <div className={`grid gap-2 ${steps.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            {steps.map((a, i) => (
+              <button key={a.status || a.action} type="button" disabled={!!stepBusy} onClick={() => runStep(a)}
+                className={`flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold disabled:opacity-60 ${i === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800'}`}>
+                {stepBusy === a.status ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : a.action === 'ship' ? <Truck className="w-4 h-4" /> : <span className={`w-2 h-2 rounded-full ${STATUS_DOT[a.status]}`} />}
+                {a.action === 'ship' ? t('orders.actions.ship') : statusLabel(t, a.status, order.isDigital)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* إجراءات */}
       {(canEdit || canSend || canRecall || canShip) && (

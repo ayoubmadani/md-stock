@@ -109,7 +109,7 @@
     "title": "Scanner un code-barres",
     "manual": "ou saisissez le code",
     "go": "Chercher",
-    "unknown": "Aucun produit avec ce code-barres",
+    "unknown": "Aucun produit ni commande avec ce code",
     "create": "Créer un produit avec ce code",
     "again": "Scanner un autre produit",
     "denied": "Autorisez la caméra dans les réglages du navigateur",
@@ -247,7 +247,8 @@
       "not_recalled": "Impossible de la récupérer maintenant",
       "shipped": "Envoyée au transporteur {{tracking}}",
       "default": "Par défaut"
-    }
+    },
+    "next_step": "Étape suivante"
   },
   "library": {
     "title_products": "Images des produits",

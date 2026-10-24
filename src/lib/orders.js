@@ -65,3 +65,21 @@ export function sumCounts(rows) {
 }
 
 export const money = (v) => Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+const WAITING = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
+
+/**
+ * «الخطوة التالية» بعد مسح طلب: أزرار حسب الحالة، بنفس قفل شركة التأكيد.
+ * { status } = تغيير الحالة، { action: 'ship' } = رفع لشركة التوصيل. الأول هو الأساسي.
+ */
+export function nextActions(order) {
+  const allowed = allowedStatuses(order);
+  const st = (s) => (allowed.includes(s) ? [{ status: s }] : []);
+  if (WAITING.includes(order.status)) return [...st('confirmed'), ...st('cancelled')];
+  if (order.status === 'confirmed') {
+    if (order.isDigital) return st('delivered');
+    return [...(order.shippingTrackingId ? [] : [{ action: 'ship' }]), ...st('shipping')];
+  }
+  if (order.status === 'shipping') return [...st('delivered'), ...st('returned')];
+  return [];
+}

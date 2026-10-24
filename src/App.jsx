@@ -49,7 +49,7 @@ export default function App() {
             <Route path="stock" element={<RequirePerm perm="product.crud"><StockPage /></RequirePerm>} />
             <Route path="alerts" element={<RequirePerm perm="product.crud"><AlertsPage /></RequirePerm>} />
             <Route path="history" element={<RequirePerm perm="product.crud"><HistoryPage /></RequirePerm>} />
-            <Route path="scan" element={<RequirePerm perm="product.crud"><ScanPage /></RequirePerm>} />
+            <Route path="scan" element={<RequirePerm perm={['product.crud', 'order.view']}><ScanPage /></RequirePerm>} />
             <Route path="orders" element={<RequirePerm perm="order.view"><OrdersPage /></RequirePerm>} />
             <Route path="orders/new" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />
             <Route path="orders/:id/edit" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />

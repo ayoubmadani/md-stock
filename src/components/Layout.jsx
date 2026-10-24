@@ -9,7 +9,7 @@ import { useAuth } from '../lib/auth';
 const NAV = [
   { to: '/', key: 'home', icon: Home, end: true },
   { to: '/orders', key: 'orders', icon: ShoppingBag, perm: 'order.view' },
-  { to: '/scan', key: 'scan', icon: ScanLine, primary: true, perm: 'product.crud' },
+  { to: '/scan', key: 'scan', icon: ScanLine, primary: true, perm: ['product.crud', 'order.view'] },
   { to: '/stock', key: 'stock', icon: Boxes, perm: 'product.crud' },
   { to: '/more', key: 'more', icon: LayoutGrid, mobileOnly: true },
 ];
@@ -41,7 +41,7 @@ export default function Layout() {
           <img src="/icon.svg" alt="" className="w-8 h-8" />
           <span className="font-bold">{t('app_name')}</span>
         </div>
-        {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => !n.perm || can(n.perm)).map((n) => (
+        {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => !n.perm || [].concat(n.perm).some((x) => can(x))).map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
         ))}
       </aside>
@@ -74,7 +74,7 @@ export default function Layout() {
             <span className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30"><n.icon className="w-6 h-6" /></span>
           </NavLink>
         ) : (
-          <NavLink key={n.to} to={n.to} end={n.end} className={(a) => `${navCls(a)} ${n.perm && !can(n.perm) ? 'opacity-40' : ''}`}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
+          <NavLink key={n.to} to={n.to} end={n.end} className={(a) => `${navCls(a)} ${n.perm && ![].concat(n.perm).some((x) => can(x)) ? 'opacity-40' : ''}`}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
         ))}
       </nav>
     </div>

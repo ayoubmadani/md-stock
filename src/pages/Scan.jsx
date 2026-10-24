@@ -13,26 +13,45 @@ const statusOf = (stock, threshold) => (stock <= 0 ? 'out' : stock <= threshold 
 
 export default function ScanPage() {
   const { t } = useTranslation();
-  const { storeId } = useAuth();
+  const { storeId, can } = useAuth();
   const navigate = useNavigate();
   const [code, setCode] = useState(null);
   const [hit, setHit] = useState(null); // { product, variant } | 'none' | null
   const [loading, setLoading] = useState(false);
   const [adjust, setAdjust] = useState(null);
 
+  // منتج أولاً، ثم طلب (باركود الطلب أو رقم تتبع شركة التوصيل) — حسب صلاحيات العضو
   const lookup = useCallback(async (c) => {
     setCode(c);
     setLoading(true);
+    const code = encodeURIComponent(c);
     try {
-      const { data } = await api.get(`/stores/${storeId}/inventory/barcode/${encodeURIComponent(c)}`);
-      setHit(data);
-    } catch (e) {
-      setHit(e.response?.status === 404 ? 'none' : null);
-      if (e.response?.status !== 404) toast.error(t('inventory.error'));
+      if (can('product.crud')) {
+        try {
+          const { data } = await api.get(`/stores/${storeId}/inventory/barcode/${code}`);
+          setHit(data);
+          return;
+        } catch (e) {
+          if (e.response?.status !== 404) throw e;
+        }
+      }
+      if (can('order.view')) {
+        try {
+          const { data } = await api.get(`/orders/scan/${storeId}/${code}`);
+          navigate(`/orders/${data.id}?scanned=1`);
+          return;
+        } catch (e) {
+          if (e.response?.status !== 404) throw e;
+        }
+      }
+      setHit('none');
+    } catch {
+      setHit(null);
+      toast.error(t('inventory.error'));
     } finally {
       setLoading(false);
     }
-  }, [storeId, t]);
+  }, [storeId, t, can, navigate]);
 
   const again = () => { setCode(null); setHit(null); };
   const stock = hit && hit !== 'none' ? (hit.variant ? hit.variant.stock : hit.product.stock) : 0;
@@ -49,10 +68,10 @@ export default function ScanPage() {
           {!loading && hit === 'none' && (
             <div className="rounded-2xl border border-dashed border-gray-300 dark:border-zinc-700 p-6 text-center space-y-4">
               <p className="text-gray-600 dark:text-zinc-300">{t('scan.unknown')}</p>
-              <button onClick={() => navigate(`/products/new?barcode=${encodeURIComponent(code)}`)}
+              {can('product.crud') && <button onClick={() => navigate(`/products/new?barcode=${encodeURIComponent(code)}`)}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-bold">
                 <PackagePlus className="w-5 h-5" />{t('scan.create')}
-              </button>
+              </button>}
             </div>
           )}
 

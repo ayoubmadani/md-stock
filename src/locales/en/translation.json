@@ -109,7 +109,7 @@
     "title": "Scan barcode",
     "manual": "or type the barcode",
     "go": "Find",
-    "unknown": "No product with this barcode",
+    "unknown": "No product or order with this code",
     "create": "Create a product with this barcode",
     "again": "Scan another product",
     "denied": "Allow camera access in your browser settings",
@@ -247,7 +247,8 @@
       "not_recalled": "It can't be recalled now",
       "shipped": "Sent to the delivery company {{tracking}}",
       "default": "Default"
-    }
+    },
+    "next_step": "Next step"
   },
   "library": {
     "title_products": "Product images",

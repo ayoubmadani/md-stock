@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Lock } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
+/** perm: صلاحية واحدة أو قائمة (يكفي واحدة منها) */
 export default function RequirePerm({ perm, children }) {
   const { t } = useTranslation();
   const { can } = useAuth();
-  if (can(perm)) return children;
+  if ([].concat(perm).some((p) => can(p))) return children;
   return (
     <div className="flex flex-col items-center gap-3 py-20 text-center text-gray-400">
       <Lock className="w-8 h-8" />

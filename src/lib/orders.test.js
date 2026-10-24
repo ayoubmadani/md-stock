@@ -45,3 +45,34 @@ describe('sumCounts', () => {
     expect(sumCounts([{ status: 'pending', count: '3' }, { status: 'confirmed', count: '2' }])).toEqual({ pending: 3, confirmed: 2, all: 5 });
   });
 });
+
+import { nextActions } from './orders.js';
+
+describe('nextActions (after scanning an order)', () => {
+  const kinds = (o) => nextActions(o).map((a) => a.status || a.action);
+  it('waiting orders: confirm (or cancel)', () => {
+    expect(kinds({ status: 'pending' })).toEqual(['confirmed', 'cancelled']);
+    expect(kinds({ status: 'appl2' })).toEqual(['confirmed', 'cancelled']);
+  });
+  it('confirmed, not uploaded yet: send to the delivery company, or mark in delivery', () => {
+    expect(kinds({ status: 'confirmed' })).toEqual(['ship', 'shipping']);
+  });
+  it('confirmed and already uploaded: hand it over → in delivery', () => {
+    expect(kinds({ status: 'confirmed', shippingTrackingId: 'YAL-1' })).toEqual(['shipping']);
+  });
+  it('in delivery: delivered or returned', () => {
+    expect(kinds({ status: 'shipping' })).toEqual(['delivered', 'returned']);
+  });
+  it('finished orders have no next step', () => {
+    expect(kinds({ status: 'delivered' })).toEqual([]);
+    expect(kinds({ status: 'returned' })).toEqual([]);
+  });
+  it('respects the confirmation-company lock', () => {
+    expect(kinds({ status: 'appl1', confirmationCompanyId: 'c' })).toEqual([]);
+    expect(kinds({ status: 'confirmed', confirmationCompanyId: 'c' })).toEqual(['ship', 'shipping']);
+    expect(kinds({ status: 'shipping', confirmationCompanyId: 'c' })).toEqual([]);
+  });
+  it('digital orders skip delivery', () => {
+    expect(kinds({ status: 'confirmed', isDigital: true })).toEqual(['delivered']);
+  });
+});
