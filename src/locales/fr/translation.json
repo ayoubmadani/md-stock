@@ -371,5 +371,6 @@
       "deposit": "Rechargement",
       "payment": "Achat"
     }
-  }
+  },
+  "logout_confirm": "Se déconnecter de ce téléphone ?"
 }

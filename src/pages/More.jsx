@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellRing, ChevronLeft, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { Bell, BellRing, ChevronLeft, LogOut, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
@@ -64,7 +64,7 @@ function PushCard() {
 
 export default function MorePage() {
   const { t } = useTranslation();
-  const { can, stores } = useAuth();
+  const { can, stores, logout } = useAuth();
   const owner = stores.some((s) => s.role === 'owner');
   return (
     <div className="max-w-xl mx-auto space-y-3">
@@ -78,6 +78,10 @@ export default function MorePage() {
         </Link>
       ))}
     </div>
+    <button type="button" onClick={() => window.confirm(t('logout_confirm')) && logout()}
+      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 text-rose-500 font-bold text-sm">
+      <LogOut className="w-5 h-5" />{t('logout')}
+    </button>
     </div>
   );
 }

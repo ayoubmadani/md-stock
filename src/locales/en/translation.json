@@ -371,5 +371,6 @@
       "deposit": "Top-up",
       "payment": "Purchase"
     }
-  }
+  },
+  "logout_confirm": "Log out of this phone?"
 }
