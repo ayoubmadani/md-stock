@@ -103,8 +103,7 @@
     "next": "Next",
     "auto_note": "Stock goes down automatically when an order is confirmed, and comes back on cancellation or return.",
     "total": "Total",
-    "show_all": "Show all ({{count}})",
-    "show_less": "Show less"
+    "need_attention": "{{count}} need attention"
   },
   "scan": {
     "title": "Scan barcode",

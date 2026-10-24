@@ -1,9 +1,9 @@
-// بطاقة منتج في المخزون (اتجاه «ج»): الكمية بأزرار − و ＋ مباشرة.
+// منتج في المخزون: بطاقة مختصرة، والضغط يفتح نافذة الكميات بأزرار − و＋.
 // الضغطات المتتالية تُجمع وتُحفظ مرة واحدة كحركة واحدة؛ الضغط على الرقم يفتح التوريد/الجرد.
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Minus, Package, Plus } from 'lucide-react';
+import { ChevronLeft, Minus, Package, Pencil, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
 import { stockLines } from '../lib/stock-lines';
@@ -76,55 +76,82 @@ function Stepper({ storeId, productId, variantId, value, name, onOpen, onSaved, 
   );
 }
 
-const VISIBLE = 3; // نسخ كثيرة: أول 3 ثم «عرض الكل»
-
-export default function ProductRow({ p, storeId, onAdjust, onChanged }) {
+// نافذة المنتج: كل أسطر المخزون (المنتج نفسه أو نسخه) بأزرار − و＋
+function StockSheet({ p, storeId, onAdjust, onChanged, onClose }) {
   const { t } = useTranslation();
-  const [all, setAll] = useState(false);
   const lines = stockLines(p);
-  const shown = all ? lines : lines.slice(0, VISIBLE);
+
+  // بلا تمرير للصفحة خلف النافذة
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-3">
-      {/* الرأس: نفسه لكل المنتجات */}
-      <div className="flex items-center gap-3">
-        <Link to={`/products/${p.id}`} className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
-          {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Package className="w-5 h-5 text-gray-400" />}
-        </Link>
-        <div className="flex-1 min-w-0">
-          <Link to={`/products/${p.id}`} className="block font-semibold text-sm truncate text-start"><bdi>{p.name}</bdi></Link>
-          <div className="flex items-center gap-1.5 mt-1">
-            <StatusBadge status={p.status} />
-            {p.variants.length > 0 && <span className="text-[11px] text-gray-400">{t('inventory.variants', { count: p.variants.length })}</span>}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[88dvh] flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-gray-100 dark:border-zinc-800">
+          <span className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
+            {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Package className="w-5 h-5 text-gray-400" />}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-sm truncate"><bdi>{p.name}</bdi></p>
+            <p className="text-xs text-gray-400 mt-0.5">{t('inventory.total')}: <b className="text-gray-900 dark:text-white" dir="ltr">{fmt(p.stock)}</b></p>
           </div>
+          <Link to={`/products/${p.id}`} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800" title={t('product.edit')}><Pencil className="w-4 h-4" /></Link>
+          <button type="button" onClick={onClose} className="p-2 rounded-xl text-gray-400"><X className="w-5 h-5" /></button>
         </div>
-        <div className="text-end shrink-0">
-          <p className="text-[11px] text-gray-400">{t('inventory.total')}</p>
-          <p className="font-bold" dir="ltr">{fmt(p.stock)}</p>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {lines.map((l) => (
+            <div key={l.key} className="flex items-center gap-3">
+              <div className="w-24 shrink-0 min-w-0 space-y-1">
+                {l.parts ? <VariantParts parts={l.parts} className="text-sm font-semibold" /> : <span className="text-sm text-gray-500">{t('inventory.quantity')}</span>}
+                <div><StatusBadge status={l.status} /></div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <Stepper storeId={storeId} productId={p.id} variantId={l.variantId} value={l.stock}
+                  name={l.parts ? `${p.name} — ${variantLabel(l.parts)}` : p.name} onOpen={onAdjust} onSaved={onChanged} />
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-
-      {/* الأسطر: سطر واحد للمنتج البسيط، سطر لكل نسخة */}
-      <div className="mt-3 space-y-2 border-t border-gray-100 dark:border-zinc-800 pt-3">
-        {shown.map((l) => (
-          <div key={l.key} className="flex items-center gap-3">
-            <div className="w-24 shrink-0 min-w-0 space-y-1">
-              {l.parts ? <VariantParts parts={l.parts} className="text-sm" /> : <span className="text-sm text-gray-500">{t('inventory.quantity')}</span>}
-              {l.parts && <div><StatusBadge status={l.status} /></div>}
-            </div>
-            <div className="flex-1 min-w-0">
-              <Stepper size="sm" storeId={storeId} productId={p.id} variantId={l.variantId} value={l.stock}
-                name={l.parts ? `${p.name} — ${variantLabel(l.parts)}` : p.name} onOpen={onAdjust} onSaved={onChanged} />
-            </div>
-          </div>
-        ))}
-        {lines.length > VISIBLE && (
-          <button type="button" onClick={() => setAll((a) => !a)} className="w-full flex items-center justify-center gap-1 pt-1 text-xs font-semibold text-indigo-500">
-            {all ? t('inventory.show_less') : t('inventory.show_all', { count: lines.length })}
-            <ChevronDown className={`w-4 h-4 transition-transform ${all ? 'rotate-180' : ''}`} />
-          </button>
-        )}
       </div>
     </div>
+  );
+}
+
+// بطاقة مختصرة بنفس الشكل لكل المنتجات؛ الضغط يفتح النافذة
+export default function ProductRow({ p, storeId, onAdjust, onChanged }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const problems = p.variants.filter((v) => v.status !== 'ok').length;
+
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}
+        className="w-full flex items-center gap-3 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-3 text-start active:scale-[0.99] transition-transform">
+        <span className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
+          {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Package className="w-5 h-5 text-gray-400" />}
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block font-semibold text-sm truncate"><bdi>{p.name}</bdi></span>
+          <span className="flex items-center gap-1.5 mt-1">
+            <StatusBadge status={p.status} />
+            {p.variants.length > 0 && (
+              <span className="text-[11px] text-gray-400 truncate">
+                {t('inventory.variants', { count: p.variants.length })}{problems > 0 && ` · ${t('inventory.need_attention', { count: problems })}`}
+              </span>
+            )}
+          </span>
+        </span>
+        <span className="text-end shrink-0">
+          <span className="block text-[11px] text-gray-400">{t('inventory.total')}</span>
+          <span className="block font-bold text-lg leading-tight" dir="ltr">{fmt(p.stock)}</span>
+        </span>
+        <ChevronLeft className="w-4 h-4 text-gray-300 shrink-0 ltr:rotate-180" />
+      </button>
+      {open && <StockSheet p={p} storeId={storeId} onAdjust={onAdjust} onChanged={onChanged} onClose={() => setOpen(false)} />}
+    </>
   );
 }

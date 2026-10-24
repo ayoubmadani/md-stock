@@ -55,7 +55,7 @@ export default function StockPage({ only }) {
       {rows.length === 0 ? (
         <p className="text-center text-gray-400 py-16">{only ? t('alerts_empty') : t('inventory.empty')}</p>
       ) : (
-        <div className="columns-1 lg:columns-2 gap-3 [&>*]:break-inside-avoid [&>*]:mb-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
           {rows.map((p) => <ProductRow key={p.id} p={p} storeId={storeId} onAdjust={setAdjust} onChanged={reload} />)}
         </div>
       )}
