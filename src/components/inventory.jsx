@@ -30,7 +30,7 @@ export function VariantParts({ parts, className = '' }) {
         <span key={i} className="inline-flex items-center gap-1">
           {i > 0 && <span className="text-gray-300 dark:text-zinc-600">/</span>}
           {p.mode === 'image' ? (
-            <img src={p.value} alt={p.attr} title={p.attr} className="w-5 h-5 rounded-md object-cover border border-gray-200 dark:border-zinc-700" />
+            <img src={p.value} alt={p.attr} title={p.attr} className="w-7 h-7 rounded-md object-cover border border-gray-200 dark:border-zinc-700" />
           ) : p.mode === 'color' ? (
             <span title={p.attr} className="w-4 h-4 rounded-full border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: p.value }} />
           ) : (

@@ -15,3 +15,15 @@ describe('stockLines', () => {
     expect(lines.map((l) => [l.key, l.variantId, l.stock, l.status])).toEqual([['v1', 'v1', 2, 'low'], ['v2', 'v2', 7, 'ok']]);
   });
 });
+
+describe('stockLines order', () => {
+  it('puts out-of-stock, then low variants first so the reason for the product status is visible', () => {
+    const lines = stockLines({ id: 'p', stock: 0, status: 'low', variants: [
+      { id: 'a', parts: [], stock: 20, status: 'ok' },
+      { id: 'b', parts: [], stock: 2, status: 'low' },
+      { id: 'c', parts: [], stock: 9, status: 'ok' },
+      { id: 'd', parts: [], stock: 0, status: 'out' },
+    ] });
+    expect(lines.map((l) => l.key)).toEqual(['d', 'b', 'a', 'c']);
+  });
+});
