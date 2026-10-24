@@ -101,7 +101,10 @@
     "order": "Commande #{{id}}",
     "prev": "Précédent",
     "next": "Suivant",
-    "auto_note": "Le stock diminue automatiquement à la confirmation d'une commande et revient en cas d'annulation ou de retour."
+    "auto_note": "Le stock diminue automatiquement à la confirmation d'une commande et revient en cas d'annulation ou de retour.",
+    "total": "Total",
+    "show_all": "Tout afficher ({{count}})",
+    "show_less": "Afficher moins"
   },
   "scan": {
     "title": "Scanner un code-barres",
