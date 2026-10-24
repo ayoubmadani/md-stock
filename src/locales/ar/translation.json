@@ -242,5 +242,19 @@
       "shipped": "تم الرفع لشركة التوصيل {{tracking}}",
       "default": "افتراضي"
     }
+  },
+  "library": {
+    "title_products": "صور المنتجات",
+    "title_productVariant": "صور النسخ",
+    "title_category": "صور التصنيفات",
+    "pick_up_to": "اختر حتى {{max}}",
+    "max": "الحد الأقصى {{max}} صور",
+    "upload": "رفع صور من الهاتف",
+    "uploading": "جارٍ الرفع {{done}} من {{total}}",
+    "upload_failed": "فشل رفع الصورة",
+    "empty": "لا توجد صور بعد — ارفع أول صورة",
+    "add": "إضافة ({{count}})",
+    "manage": "حذف صور",
+    "confirm_delete": "حذف هذه الصورة من المكتبة نهائياً؟"
   }
 }

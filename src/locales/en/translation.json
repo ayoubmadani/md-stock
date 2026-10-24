@@ -242,5 +242,19 @@
       "shipped": "Sent to the delivery company {{tracking}}",
       "default": "Default"
     }
+  },
+  "library": {
+    "title_products": "Product images",
+    "title_productVariant": "Variant images",
+    "title_category": "Category images",
+    "pick_up_to": "Pick up to {{max}}",
+    "max": "Maximum {{max}} images",
+    "upload": "Upload from phone",
+    "uploading": "Uploading {{done}} of {{total}}",
+    "upload_failed": "Upload failed",
+    "empty": "No images yet — upload the first one",
+    "add": "Add ({{count}})",
+    "manage": "Delete images",
+    "confirm_delete": "Delete this image from the library permanently?"
   }
 }

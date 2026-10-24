@@ -6,19 +6,13 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { moveItem, newAttribute, newOffer, newValue } from '../lib/product-form';
 import Scanner from './Scanner';
+import ImageLibrary from './ImageLibrary';
 import { VariantParts } from './inventory';
 
 export const input = 'w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400';
 export const label = 'text-xs font-semibold text-gray-500 dark:text-zinc-400';
 export const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4 space-y-3';
 const small = 'px-3 py-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400';
-
-export async function uploadImage(file, folder = 'products') {
-  const body = new FormData();
-  body.append('file', file);
-  const { data } = await api.post(`/images/upload?folder=${folder}`, body);
-  return data?.url;
-}
 
 export function Section({ title, children, action }) {
   return (
@@ -45,32 +39,34 @@ export function Toggle({ checked, onChange, children }) {
 }
 
 /* ── الصور: الأولى هي الرئيسية، أسهم للترتيب ── */
+// حد صور المنتج في خطة صاحب المتجر (الخادم يتحقق أيضاً)
+let planMax = null;
+const loadPlanMax = () => (planMax !== null ? Promise.resolve(planMax)
+  : api.get('/subscription/my').then(({ data }) => (planMax = Number(data?.plan?.features?.productImagesNumber) || 0)).catch(() => 0));
+
 export function ImagesEditor({ images, onChange }) {
   const { t, i18n } = useTranslation();
-  const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [limit, setLimit] = useState(0);
+  useEffect(() => { loadPlanMax().then(setLimit); }, []);
   const rtl = i18n.dir() === 'rtl';
-  const add = async (files) => {
-    setBusy(true);
-    try {
-      const urls = [];
-      for (const f of files) { const u = await uploadImage(f); if (u && !images.includes(u)) urls.push(u); }
-      onChange([...images, ...urls]);
-    } catch (e) {
-      toast.error(errorMessage(e, t('inventory.error')));
-    } finally {
-      setBusy(false);
-    }
+  const room = limit ? Math.max(0, limit - images.length) : 10;
+  const pick = (urls) => {
+    setOpen(false);
+    onChange([...images, ...urls.filter((u) => !images.includes(u))]);
   };
   // «قبل» في القراءة = يمين في العربية
   const Before = rtl ? ChevronRight : ChevronLeft;
   const After = rtl ? ChevronLeft : ChevronRight;
   return (
     <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-      <label className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-1 text-gray-400 cursor-pointer text-[11px]">
-        {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-6 h-6" />}
+      <button type="button" onClick={() => (room ? setOpen(true) : toast.error(t('library.max', { max: limit })))}
+        className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-1 text-gray-400 text-[11px]">
+        <ImagePlus className="w-6 h-6" />
         {t('product.add_images')}
-        <input type="file" accept="image/*" multiple hidden onChange={(e) => { add([...e.target.files]); e.target.value = ''; }} />
-      </label>
+        {limit > 0 && <span dir="ltr">{images.length}/{limit}</span>}
+      </button>
+      {open && <ImageLibrary folder="products" max={room} onPick={pick} onClose={() => setOpen(false)} />}
       {images.map((src, i) => (
         <div key={src} className="relative shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800">
           <img src={src} alt="" className="w-full h-full object-cover" />
@@ -112,17 +108,13 @@ function AttributeCard({ attr, onChange, onRemove }) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const [color, setColor] = useState('#000000');
-  const [busy, setBusy] = useState(false);
+  const [library, setLibrary] = useState(false);
   const mode = attr.type === 'color' ? attr.displayMode || 'color' : 'text';
   const addValue = (v) => {
     const value = String(v || '').trim();
     if (!value) return;
     if (attr.variants.some((x) => x.value === value)) return toast.error(t('product.attr.duplicate_value'));
     onChange({ ...attr, variants: [...attr.variants, newValue(value)] });
-  };
-  const addImage = async (file) => {
-    setBusy(true);
-    try { addValue(await uploadImage(file, 'productVariant')); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(false); }
   };
   return (
     <div className="rounded-xl border border-gray-100 dark:border-zinc-800 p-3 space-y-3">
@@ -163,10 +155,12 @@ function AttributeCard({ attr, onChange, onRemove }) {
         </div>
       )}
       {mode === 'image' && (
-        <label className="flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer">
-          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}{t('product.attr.add_image')}
-          <input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) addImage(f); e.target.value = ''; }} />
-        </label>
+        <>
+          <button type="button" onClick={() => setLibrary(true)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+            <ImagePlus className="w-4 h-4" />{t('product.attr.add_image')}
+          </button>
+          {library && <ImageLibrary folder="productVariant" max={1} onPick={([u]) => { setLibrary(false); addValue(u); }} onClose={() => setLibrary(false)} />}
+        </>
       )}
     </div>
   );
