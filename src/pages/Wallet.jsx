@@ -103,7 +103,7 @@ function BinanceTopUp({ config, via, onPaid }) {
       </div>
       <p className="text-[11px] text-gray-500 leading-relaxed">{via === 'bsc' ? t('wallet.binance.bsc_note') : t('wallet.binance.scan_or_uid')}</p>
       {/* تطبيق Binance مباشرة (لا تبويب جديد — الهاتف لا يفتح التطبيقات من تبويب جديد) */}
-      <button type="button" onClick={() => openBinance(via === 'bsc' ? 'https://www.binance.com/my/wallet/account/main/withdrawal/crypto/USDT' : config.payLink)}
+      <button type="button" onClick={() => openBinance(via === 'bsc' ? 'https://app.binance.com/en/my/wallet/account/main/withdrawal/crypto/USDT' : config.payLink)}
         className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#FCD535] text-gray-900 text-sm font-bold">
         <ExternalLink className="w-4 h-4" />{via === 'bsc' ? t('wallet.binance.open_withdraw') : t('wallet.binance.open_binance')}
       </button>
