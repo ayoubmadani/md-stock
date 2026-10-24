@@ -1,7 +1,7 @@
 // مكتبة الصور (نفس مكتبة لوحة التاجر): الصور المرفوعة سابقاً في المجلد، رفع مع ضغط، اختيار واحد أو عدة، حذف
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
+import { Camera, Check, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 
@@ -133,11 +133,23 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
         </div>
 
         <div className="px-4">
-          <label className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed text-sm font-bold cursor-pointer ${progress ? 'border-indigo-300 text-indigo-400' : 'border-gray-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400'}`}>
-            {progress ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
-            {progress ? t('library.uploading', { done: progress.done + 1, total: progress.total }) : t('library.upload')}
-            <input type="file" accept={ACCEPT} multiple={multi} hidden disabled={!!progress} onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
-          </label>
+          {progress ? (
+            <div className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-indigo-300 text-indigo-400 text-sm font-bold">
+              <Loader2 className="w-4 h-4 animate-spin" />{t('library.uploading', { done: progress.done + 1, total: progress.total })}
+            </div>
+          ) : (
+            // معرض الصور، أو التصوير مباشرة بالكاميرا الخلفية
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer">
+                <ImagePlus className="w-5 h-5" />{t('library.from_gallery')}
+                <input type="file" accept={ACCEPT} multiple={multi} hidden onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
+              </label>
+              <label className="flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold cursor-pointer">
+                <Camera className="w-5 h-5" />{t('library.from_camera')}
+                <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
+              </label>
+            </div>
+          )}
           {progress && <div className="h-1 rounded-full bg-gray-100 dark:bg-zinc-800 mt-2 overflow-hidden"><div className="h-full bg-indigo-600 transition-all" style={{ width: `${progress.pct}%` }} /></div>}
         </div>
 

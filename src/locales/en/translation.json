@@ -263,7 +263,9 @@
     "empty": "No images yet — upload the first one",
     "add": "Add ({{count}})",
     "manage": "Delete images",
-    "confirm_delete": "Delete this image from the library permanently?"
+    "confirm_delete": "Delete this image from the library permanently?",
+    "from_gallery": "Gallery",
+    "from_camera": "Camera"
   },
   "categories": {
     "new": "New category",

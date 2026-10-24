@@ -263,7 +263,9 @@
     "empty": "Aucune image — importez la première",
     "add": "Ajouter ({{count}})",
     "manage": "Supprimer des images",
-    "confirm_delete": "Supprimer définitivement cette image de la bibliothèque ?"
+    "confirm_delete": "Supprimer définitivement cette image de la bibliothèque ?",
+    "from_gallery": "Galerie",
+    "from_camera": "Appareil photo"
   },
   "categories": {
     "new": "Nouvelle catégorie",
