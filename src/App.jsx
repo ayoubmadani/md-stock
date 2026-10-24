@@ -14,6 +14,7 @@ import ScanPage from './pages/Scan';
 import ProductForm from './pages/ProductForm';
 import OrdersPage from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
+import OrderForm from './pages/OrderForm';
 import MorePage from './pages/More';
 import RequirePerm from './components/RequirePerm';
 
@@ -48,6 +49,8 @@ export default function App() {
             <Route path="history" element={<RequirePerm perm="product.crud"><HistoryPage /></RequirePerm>} />
             <Route path="scan" element={<RequirePerm perm="product.crud"><ScanPage /></RequirePerm>} />
             <Route path="orders" element={<RequirePerm perm="order.view"><OrdersPage /></RequirePerm>} />
+            <Route path="orders/new" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />
+            <Route path="orders/:id/edit" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />
             <Route path="orders/:id" element={<RequirePerm perm="order.view"><OrderDetail /></RequirePerm>} />
             <Route path="more" element={<MorePage />} />
             <Route path="products/new" element={<RequirePerm perm="product.crud"><ProductForm /></RequirePerm>} />

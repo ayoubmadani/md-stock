@@ -1,8 +1,8 @@
 // قائمة الطلبات للهاتف: تبويبات الحالات بعددها، بحث بالاسم أو الهاتف، وتغيير الحالة من البطاقة
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2, MapPin, Phone, Search, ShieldAlert } from 'lucide-react';
+import { Loader2, MapPin, Phone, Plus, Search, ShieldAlert } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { STATUSES, STATUS_DOT, money, sumCounts } from '../lib/orders';
@@ -115,10 +115,17 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-3">
-      <div className="relative">
+      <div className="flex gap-2">
+      <div className="relative flex-1">
         <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('orders.search')} type="search"
           className="w-full ps-9 pe-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400" />
+      </div>
+      {can('order.manage') && (
+        <Link to="/orders/new" aria-label={t('orders.form.new')} className="shrink-0 flex items-center justify-center gap-1.5 px-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold">
+          <Plus className="w-4 h-4" /><span className="hidden sm:inline">{t('orders.form.new')}</span>
+        </Link>
+      )}
       </div>
 
       {/* تبويبات الحالات — تمرير أفقي */}

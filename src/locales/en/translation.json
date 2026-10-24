@@ -161,6 +161,42 @@
       "delivered": "Delivered",
       "delivered_digital": "Sold",
       "postponed": "Postponed"
+    },
+    "form": {
+      "new": "New order",
+      "edit": "Edit order",
+      "create": "Create order",
+      "created": "Order created",
+      "add_product": "Add product",
+      "no_offer": "No offer",
+      "unavailable": "This combination is not available",
+      "last_item": "Can't remove the last product — delete the order instead",
+      "missing": "Missing",
+      "pick_variant": "Choose the variant for each product",
+      "free_shipping": "Free delivery for this order",
+      "f_name": "Customer name",
+      "f_phone": "Phone",
+      "f_contact": "Email or WhatsApp",
+      "f_wilaya": "Wilaya",
+      "f_commune": "Commune",
+      "f_items": "Products"
+    },
+    "actions": {
+      "edit": "Edit",
+      "send_confirm": "Confirmation",
+      "recall": "Recall",
+      "ship": "Delivery",
+      "no_companies": "No saved confirmation companies — add one from the dashboard",
+      "no_accounts": "No delivery account — add one from the dashboard",
+      "company_blocked": "Blocked your orders",
+      "company_paused": "Paused",
+      "commission": "{{amount}} DA per delivered order",
+      "sent": "Order sent to {{name}}",
+      "not_sent": "The order was not sent",
+      "recalled": "Order recalled",
+      "not_recalled": "It can't be recalled now",
+      "shipped": "Sent to the delivery company {{tracking}}",
+      "default": "Default"
     }
   }
 }

@@ -1,15 +1,17 @@
 // صفحة طلب واحد: الزبون (اتصال/واتساب/نسخ)، العنوان، المنتجات، المبالغ، والحالة
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Check, Copy, Loader2, MapPin, MessageCircle, Phone, PhoneCall, Trash2, Truck } from 'lucide-react';
+import { ArrowRight, Check, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Trash2, Truck, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money, whatsappLink } from '../lib/orders';
-import { OrderStatusBadge, StatusSheet, timeAgo } from '../components/orders';
+import { OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, timeAgo } from '../components/orders';
 import { VariantParts } from '../components/inventory';
 
+const QUEUE = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
+const actionBtn = 'flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold';
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4';
 
 function Row({ label, children }) {
@@ -25,16 +27,17 @@ export default function OrderDetail() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { can } = useAuth();
+  const { can, storeId } = useAuth();
   const [order, setOrder] = useState(null);
+  const [action, setAction] = useState(null); // 'confirm' | 'ship'
+  const [recalling, setRecalling] = useState(false);
   const [sheet, setSheet] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    api.get(`/orders/get-one/${id}`)
-      .then((r) => setOrder(r.data))
-      .catch(() => { toast.error(t('orders.load_failed')); navigate('/orders'); });
-  }, [id, navigate, t]);
+  const load = useCallback(() => api.get(`/orders/get-one/${id}`)
+    .then((r) => setOrder(r.data))
+    .catch(() => { toast.error(t('orders.load_failed')); navigate('/orders'); }), [id, navigate, t]);
+  useEffect(() => { load(); }, [load]);
 
   if (!order) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
 
@@ -48,6 +51,25 @@ export default function OrderDetail() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch { /* المتصفح منع النسخ */ }
+  };
+
+  // نفس شروط أزرار القائمة في اللوحة
+  const queue = QUEUE.includes(order.status);
+  const canSend = can('order.manage') && queue && !order.confirmationCompanyId && !order.isDigital;
+  const canRecall = can('order.manage') && order.confirmationCompanyId && (queue || order.status === 'cancelled');
+  const canShip = can('order.manage') && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital;
+  const canEdit = can('order.manage') && !order.confirmationCompanyId;
+
+  const recall = async () => {
+    setRecalling(true);
+    try {
+      const { data } = await api.post(`/stores/${storeId}/confirmation/recall`, { orderIds: [order.id] });
+      if (data?.recalled) { toast.success(t('orders.actions.recalled')); load(); } else toast.warning(t('orders.actions.not_recalled'));
+    } catch (e) {
+      toast.error(errorMessage(e, t('orders.save_failed')));
+    } finally {
+      setRecalling(false);
+    }
   };
 
   const remove = async () => {
@@ -86,6 +108,16 @@ export default function OrderDetail() {
         </div>
         <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />
       </div>
+
+      {/* إجراءات */}
+      {(canEdit || canSend || canRecall || canShip) && (
+        <div className="grid grid-cols-2 gap-2">
+          {canEdit && <Link to={`/orders/${order.id}/edit`} className={`${actionBtn} bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800`}><Pencil className="w-4 h-4" />{t('orders.actions.edit')}</Link>}
+          {canSend && <button type="button" onClick={() => setAction('confirm')} className={`${actionBtn} bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400`}><PhoneCall className="w-4 h-4" />{t('orders.actions.send_confirm')}</button>}
+          {canRecall && <button type="button" disabled={recalling} onClick={recall} className={`${actionBtn} bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 disabled:opacity-60`}>{recalling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Undo2 className="w-4 h-4" />}{t('orders.actions.recall')}</button>}
+          {canShip && <button type="button" onClick={() => setAction('ship')} className={`${actionBtn} bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400`}><Truck className="w-4 h-4" />{t('orders.actions.ship')}</button>}
+        </div>
+      )}
 
       {/* الزبون */}
       <div className={`${box} space-y-3`}>
@@ -142,6 +174,8 @@ export default function OrderDetail() {
         </div>
       </div>
 
+      {action === 'confirm' && <SendConfirmationSheet order={order} storeId={storeId} onClose={() => setAction(null)} onDone={() => { setAction(null); load(); }} />}
+      {action === 'ship' && <ShipSheet order={order} storeId={storeId} onClose={() => setAction(null)} onDone={() => { setAction(null); load(); }} />}
       {sheet && <StatusSheet order={order} onClose={() => setSheet(false)} onChanged={(s) => { setSheet(false); setOrder((o) => ({ ...o, status: s })); }} />}
     </div>
   );

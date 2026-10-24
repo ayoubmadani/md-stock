@@ -161,6 +161,42 @@
       "delivered": "Livré",
       "delivered_digital": "Vendu",
       "postponed": "Reporté"
+    },
+    "form": {
+      "new": "Nouvelle commande",
+      "edit": "Modifier la commande",
+      "create": "Créer la commande",
+      "created": "Commande créée",
+      "add_product": "Ajouter un produit",
+      "no_offer": "Sans offre",
+      "unavailable": "Cette combinaison n'est pas disponible",
+      "last_item": "Impossible de supprimer le dernier produit — supprimez la commande",
+      "missing": "Manquant",
+      "pick_variant": "Choisissez la variante de chaque produit",
+      "free_shipping": "Livraison gratuite pour cette commande",
+      "f_name": "Nom du client",
+      "f_phone": "Téléphone",
+      "f_contact": "Email ou WhatsApp",
+      "f_wilaya": "Wilaya",
+      "f_commune": "Commune",
+      "f_items": "Produits"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "send_confirm": "Confirmation",
+      "recall": "Récupérer",
+      "ship": "Livraison",
+      "no_companies": "Aucune entreprise de confirmation enregistrée — ajoutez-en depuis le tableau de bord",
+      "no_accounts": "Aucun compte de livraison — ajoutez-en depuis le tableau de bord",
+      "company_blocked": "A bloqué vos commandes",
+      "company_paused": "En pause",
+      "commission": "{{amount}} DA par commande livrée",
+      "sent": "Commande envoyée à {{name}}",
+      "not_sent": "La commande n'a pas été envoyée",
+      "recalled": "Commande récupérée",
+      "not_recalled": "Impossible de la récupérer maintenant",
+      "shipped": "Envoyée au transporteur {{tracking}}",
+      "default": "Par défaut"
     }
   }
 }
