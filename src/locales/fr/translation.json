@@ -9,7 +9,8 @@
     "orders": "Commandes",
     "more": "Plus",
     "categories": "Catégories",
-    "domains": "Domaine"
+    "domains": "Domaine",
+    "wallet": "Portefeuille"
   },
   "login": {
     "title": "Connexion",
@@ -323,5 +324,52 @@
     "failed": "Impossible d'activer les notifications",
     "bad_cert": "Les notifications exigent un certificat https valide — elles fonctionnent sur le vrai domaine (m.mdstore.top), pas sur l’adresse locale",
     "test_sound": "Tester le son de nouvelle commande"
+  },
+  "wallet": {
+    "balance": "Solde actuel",
+    "top_up": "Recharger le portefeuille",
+    "total_in": "Total rechargé",
+    "total_out": "Total dépensé",
+    "history": "Historique",
+    "empty": "Aucune opération",
+    "tab_card": "Carte",
+    "tab_pay": "Binance Pay",
+    "tab_bsc": "USDT BEP20",
+    "custom": "Ou un autre montant",
+    "pay_card": "Payer par carte (CIB / Edahabia)",
+    "card_note": "Vous êtes redirigé vers la page de paiement sécurisée puis revenez ici",
+    "min": "Montant minimum {{min}} DA",
+    "top_up_failed": "Impossible de créer le paiement",
+    "paid": "{{amount}} DA rechargés ✓",
+    "payment_failed": "Le paiement n'a pas abouti",
+    "binance": {
+      "txid": "ID de la transaction",
+      "txid_placeholder": "Order ID de Binance Pay",
+      "confirm": "Confirmer le paiement",
+      "hint": "ID de la transaction dans Binance : Pay → History.",
+      "error": "Impossible de vérifier la transaction, réessayez",
+      "open_binance": "Payer avec Binance",
+      "scan_or_uid": "Scannez avec l'app Binance, ou Pay → Send → UID, et envoyez le montant USDT de votre choix — sans frais.",
+      "calc_label": "Combien voulez-vous recharger ? (en DA)",
+      "bsc_note": "Depuis votre compte Binance : Wallet → Withdraw → USDT, collez l'adresse et choisissez le réseau BSC (BEP20). Binance affichera « Internal transfer » avec 0 frais. Les autres portefeuilles ou plateformes ne sont pas acceptés pour le moment.",
+      "txid_placeholder_bsc": "Off-chain transfer 123456789",
+      "hint_bsc": "ID dans Binance : historique des retraits (Withdraw History) → Internal transfer.",
+      "bsc_network": "Réseau",
+      "bsc_coin": "Crypto",
+      "pay_method": "Méthode",
+      "open_withdraw": "Retirer des USDT depuis Binance"
+    },
+    "type": {
+      "plan_subscription": "Abonnement au plan",
+      "plan_upgrade": "Mise à niveau du plan",
+      "store_fee": "Frais de boutique",
+      "refund": "Remboursement",
+      "sell_theme": "Achat de thème",
+      "top_up": "Rechargement"
+    },
+    "action": {
+      "deposit": "Rechargement",
+      "payment": "Achat"
+    }
   }
 }

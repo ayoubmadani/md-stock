@@ -9,7 +9,8 @@
     "orders": "الطلبات",
     "more": "المزيد",
     "categories": "التصنيفات",
-    "domains": "الدومين"
+    "domains": "الدومين",
+    "wallet": "المحفظة"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -323,5 +324,52 @@
     "failed": "تعذّر تفعيل الإشعارات",
     "bad_cert": "الإشعارات تحتاج شهادة https موثوقة — تعمل على الرابط الحقيقي (m.mdstore.top) لا على العنوان المحلي",
     "test_sound": "تجربة صوت الطلب الجديد"
+  },
+  "wallet": {
+    "balance": "الرصيد الحالي",
+    "top_up": "شحن المحفظة",
+    "total_in": "مجموع الشحن",
+    "total_out": "مجموع المصاريف",
+    "history": "سجل العمليات",
+    "empty": "لا توجد عمليات بعد",
+    "tab_card": "بطاقة",
+    "tab_pay": "Binance Pay",
+    "tab_bsc": "USDT BEP20",
+    "custom": "أو مبلغ آخر",
+    "pay_card": "ادفع بالبطاقة (CIB / الذهبية)",
+    "card_note": "تُحوَّل لصفحة الدفع الآمنة ثم تعود هنا تلقائياً",
+    "min": "أقل مبلغ {{min}} DA",
+    "top_up_failed": "تعذّر إنشاء عملية الدفع",
+    "paid": "تم شحن {{amount}} DA ✓",
+    "payment_failed": "لم تكتمل عملية الدفع",
+    "binance": {
+      "txid": "رقم المعاملة",
+      "txid_placeholder": "Order ID من Binance Pay",
+      "confirm": "تأكيد الدفع",
+      "hint": "رقم المعاملة في Binance: Pay ← History.",
+      "error": "تعذّر التحقق من المعاملة، حاول مرة أخرى",
+      "open_binance": "ادفع عبر Binance",
+      "scan_or_uid": "امسح الرمز بتطبيق Binance، أو Pay ← Send ← UID، وأرسل أي مبلغ USDT — بلا رسوم.",
+      "calc_label": "كم تريد أن تشحن؟ (بالدينار)",
+      "bsc_note": "من حسابك في Binance: Wallet ← Withdraw ← USDT، الصق العنوان واختر شبكة BSC (BEP20). سيظهر «Internal transfer» برسوم 0. التحويل من محفظة أو منصة أخرى غير مقبول حالياً.",
+      "txid_placeholder_bsc": "Off-chain transfer 123456789",
+      "hint_bsc": "رقم التحويل في Binance: سجل السحب (Withdraw History) ← Internal transfer.",
+      "bsc_network": "الشبكة",
+      "bsc_coin": "العملة",
+      "pay_method": "الطريقة",
+      "open_withdraw": "اسحب USDT من Binance"
+    },
+    "type": {
+      "plan_subscription": "اشتراك في خطة",
+      "plan_upgrade": "ترقية الخطة",
+      "store_fee": "رسوم المتجر",
+      "refund": "استرجاع",
+      "sell_theme": "شراء قالب",
+      "top_up": "شحن رصيد"
+    },
+    "action": {
+      "deposit": "شحن رصيد",
+      "payment": "شراء"
+    }
   }
 }

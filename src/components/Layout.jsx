@@ -18,6 +18,7 @@ const LANGS = ['ar', 'fr', 'en'];
 export default function Layout() {
   const { t, i18n } = useTranslation();
   const { stores, storeId, selectStore, logout, can } = useAuth();
+  const owner = stores.some((s) => s.role === 'owner');
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
 
   const toggleTheme = () => {
@@ -41,7 +42,7 @@ export default function Layout() {
           <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="font-bold">{t('app_name')}</span>
         </div>
-        {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => !n.perm || [].concat(n.perm).some((x) => can(x))).map((n) => (
+        {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => (n.owner ? owner : !n.perm || [].concat(n.perm).some((x) => can(x)))).map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
         ))}
       </aside>

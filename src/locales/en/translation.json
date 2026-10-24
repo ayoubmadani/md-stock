@@ -9,7 +9,8 @@
     "orders": "Orders",
     "more": "More",
     "categories": "Categories",
-    "domains": "Domain"
+    "domains": "Domain",
+    "wallet": "Wallet"
   },
   "login": {
     "title": "Sign in",
@@ -323,5 +324,52 @@
     "failed": "Couldn't enable notifications",
     "bad_cert": "Notifications need a trusted https certificate — they work on the real domain (m.mdstore.top), not on the local address",
     "test_sound": "Test the new-order sound"
+  },
+  "wallet": {
+    "balance": "Current balance",
+    "top_up": "Top up wallet",
+    "total_in": "Total topped up",
+    "total_out": "Total spent",
+    "history": "Transactions",
+    "empty": "No transactions yet",
+    "tab_card": "Card",
+    "tab_pay": "Binance Pay",
+    "tab_bsc": "USDT BEP20",
+    "custom": "Or another amount",
+    "pay_card": "Pay by card (CIB / Edahabia)",
+    "card_note": "You'll go to the secure payment page and come back here",
+    "min": "Minimum {{min}} DA",
+    "top_up_failed": "Couldn't start the payment",
+    "paid": "{{amount}} DA added ✓",
+    "payment_failed": "The payment didn't complete",
+    "binance": {
+      "txid": "Transaction ID",
+      "txid_placeholder": "Binance Pay Order ID",
+      "confirm": "Confirm payment",
+      "hint": "Transaction ID in Binance: Pay → History.",
+      "error": "Couldn't verify the transaction, try again",
+      "open_binance": "Pay with Binance",
+      "scan_or_uid": "Scan with the Binance app, or Pay → Send → UID, and send any USDT amount — no fee.",
+      "calc_label": "How much do you want to top up? (DA)",
+      "bsc_note": "From your Binance account: Wallet → Withdraw → USDT, paste the address and choose the BSC (BEP20) network. Binance shows “Internal transfer” with 0 fee. Other wallets or exchanges aren't accepted for now.",
+      "txid_placeholder_bsc": "Off-chain transfer 123456789",
+      "hint_bsc": "ID in Binance: Withdraw History → Internal transfer.",
+      "bsc_network": "Network",
+      "bsc_coin": "Coin",
+      "pay_method": "Method",
+      "open_withdraw": "Withdraw USDT from Binance"
+    },
+    "type": {
+      "plan_subscription": "Plan Subscription",
+      "plan_upgrade": "Plan Upgrade",
+      "store_fee": "Store Fee",
+      "refund": "Refund",
+      "sell_theme": "Theme Purchase",
+      "top_up": "Top-up"
+    },
+    "action": {
+      "deposit": "Top-up",
+      "payment": "Purchase"
+    }
   }
 }

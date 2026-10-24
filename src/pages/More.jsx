@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellRing, ChevronLeft, Volume2, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { Bell, BellRing, ChevronLeft, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
 import { useAuth } from '../lib/auth';
 
 export const MORE = [
+  { to: '/wallet', key: 'wallet', icon: Wallet, owner: true },
   { to: '/alerts', key: 'alerts', icon: BellRing, perm: 'product.crud' },
   { to: '/history', key: 'history', icon: History, perm: 'product.crud' },
   { to: '/categories', key: 'categories', icon: FolderTree, perm: 'category.crud' },
@@ -63,12 +64,13 @@ function PushCard() {
 
 export default function MorePage() {
   const { t } = useTranslation();
-  const { can } = useAuth();
+  const { can, stores } = useAuth();
+  const owner = stores.some((s) => s.role === 'owner');
   return (
     <div className="max-w-xl mx-auto space-y-3">
     {can('order.view') && <PushCard />}
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
-      {MORE.filter((m) => can(m.perm)).map((m) => (
+      {MORE.filter((m) => (m.owner ? owner : can(m.perm))).map((m) => (
         <Link key={m.to} to={m.to} className="flex items-center gap-3 px-4 py-3.5">
           <m.icon className="w-5 h-5 text-gray-400" />
           <span className="flex-1 font-semibold text-sm">{t(`nav.${m.key}`)}</span>
