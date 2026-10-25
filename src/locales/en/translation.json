@@ -416,7 +416,20 @@
     "confirm_delete": "Delete this ad? It will be removed from the profit.",
     "history": "Recorded ads",
     "none": "No ads for this product",
-    "now": "now"
+    "now": "now",
+    "meta_campaigns": "Meta campaigns",
+    "meta_none": "No campaigns — tap “Refresh from Meta” on the Meta page",
+    "meta_link": "Link",
+    "meta_move": "Move here",
+    "meta_here": "Linked",
+    "meta_unlink": "Unlink",
+    "meta_linked": "Campaign linked to the product",
+    "meta_unlinked": "Campaign unlinked",
+    "meta_30d": "last 30 days",
+    "meta_on": "on:",
+    "meta_connect": "Connect Facebook to link your campaigns to products",
+    "manual": "Manual ad",
+    "meta_hint": "A linked campaign's spend goes into this product's profit automatically — don't enter it manually too."
   },
   "abandoned": {
     "hint": "Customers who typed their phone in the order form but didn't finish (at least 30 min ago). Call them — some will order.",

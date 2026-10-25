@@ -416,7 +416,20 @@
     "confirm_delete": "Supprimer cette pub ? Elle sera retirée du calcul.",
     "history": "Pubs enregistrées",
     "none": "Aucune pub pour ce produit",
-    "now": "maintenant"
+    "now": "maintenant",
+    "meta_campaigns": "Campagnes Meta",
+    "meta_none": "Aucune campagne — appuyez sur « Actualiser depuis Meta » dans la page Meta",
+    "meta_link": "Lier",
+    "meta_move": "Déplacer ici",
+    "meta_here": "Liée",
+    "meta_unlink": "Délier",
+    "meta_linked": "Campagne liée au produit",
+    "meta_unlinked": "Campagne déliée",
+    "meta_30d": "30 derniers jours",
+    "meta_on": "sur :",
+    "meta_connect": "Connectez Facebook pour lier vos campagnes aux produits",
+    "manual": "Publicité manuelle",
+    "meta_hint": "Les dépenses d'une campagne liée entrent automatiquement dans le profit de ce produit — ne les saisissez pas aussi manuellement."
   },
   "abandoned": {
     "hint": "Clients qui ont saisi leur téléphone sans valider la commande (depuis au moins 30 min). Appelez-les — une partie finalise.",

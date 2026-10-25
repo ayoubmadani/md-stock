@@ -1,14 +1,86 @@
 // إعلانات منتج: مصروف يومي بالدولار × سعر الدولار بالدينار، من تاريخ إلى تاريخ (أو مستمرة)
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Megaphone, Pause, Trash2, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Check, Facebook, Link2, Loader2, Megaphone, Pause, Trash2, Unlink, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { localDate } from '../lib/periods';
+import { localDate, periodRange } from '../lib/periods';
+import { campaignsFor } from '../lib/campaign-links';
 import { money } from '../lib/orders';
 
 const input = 'w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400';
 const label = 'text-xs font-semibold text-gray-500';
+
+// حملات Meta: ربط حملة بهذا المنتج (مصروفها يدخل في ربحه تلقائياً)
+function MetaCampaigns({ storeId, product, onChanged }) {
+  const { t } = useTranslation();
+  const [status, setStatus] = useState(null);
+  const [list, setList] = useState(null);
+  const [busy, setBusy] = useState(null);
+
+  const load = useCallback(() => {
+    const { from, to } = periodRange('30d');
+    api.get(`/stores/${storeId}/meta/campaigns`, { params: { from, to } }).then((r) => setList(r.data || [])).catch(() => setList([]));
+  }, [storeId]);
+  useEffect(() => {
+    api.get(`/stores/${storeId}/meta`).then((r) => { setStatus(r.data); if (r.data?.adAccountId) load(); }).catch(() => setStatus({ connected: false }));
+  }, [storeId, load]);
+
+  const link = async (c, productId) => {
+    setBusy(c.campaignId);
+    try {
+      await api.put(`/stores/${storeId}/meta/campaigns/${c.campaignId}/product`, { productId });
+      toast.success(productId ? t('ads.meta_linked') : t('ads.meta_unlinked'));
+      load();
+      onChanged?.();
+    } catch (err) {
+      toast.error(errorMessage(err, t('inventory.error')));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (!status) return null;
+  if (!status.adAccountId) {
+    return (
+      <Link to="/meta" className="flex items-center gap-3 rounded-xl bg-[#1877F2]/10 p-3 text-sm">
+        <Facebook className="w-5 h-5 text-[#1877F2] shrink-0" />
+        <span className="flex-1 text-[#1877F2] dark:text-blue-300 font-semibold">{t('ads.meta_connect')}</span>
+      </Link>
+    );
+  }
+  const rows = campaignsFor(list, product.id);
+  return (
+    <div className="space-y-2">
+      <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-500"><Facebook className="w-3.5 h-3.5 text-[#1877F2]" />{t('ads.meta_campaigns')}</p>
+      {list === null ? <div className="flex justify-center py-3"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
+        : rows.length === 0 ? <p className="text-xs text-gray-400 text-center py-2">{t('ads.meta_none')}</p>
+        : rows.map((c) => (
+          <div key={c.campaignId} className={`flex items-center gap-3 rounded-xl border p-3 ${c.link === 'here' ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5' : 'border-gray-100 dark:border-zinc-800'}`}>
+            <span className={`w-2 h-2 rounded-full shrink-0 ${c.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold truncate"><bdi>{c.name}</bdi></p>
+              <p className="text-[11px] text-gray-400 truncate">
+                <span dir="ltr">{money(c.spendDzd ?? 0)} DA</span> · {t('ads.meta_30d')}
+                {c.link === 'other' && <> · {t('ads.meta_on')} <bdi>{c.productName || '—'}</bdi></>}
+              </p>
+            </div>
+            {c.link === 'here' ? (
+              <button type="button" disabled={busy === c.campaignId} onClick={() => link(c, null)} title={t('ads.meta_unlink')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-400 disabled:opacity-50">
+                {busy === c.campaignId ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}{t('ads.meta_here')}<Unlink className="w-3.5 h-3.5 ms-1 text-gray-400" />
+              </button>
+            ) : (
+              <button type="button" disabled={busy === c.campaignId} onClick={() => link(c, product.id)} className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold disabled:opacity-50 ${c.link === 'free' ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300'}`}>
+                {busy === c.campaignId ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2 className="w-3.5 h-3.5" />}{c.link === 'free' ? t('ads.meta_link') : t('ads.meta_move')}
+              </button>
+            )}
+          </div>
+        ))}
+      <p className="text-[11px] text-gray-400 leading-relaxed">{t('ads.meta_hint')}</p>
+    </div>
+  );
+}
 
 export default function AdsSheet({ storeId, product, onClose, onChanged }) {
   const { t } = useTranslation();
@@ -68,6 +140,8 @@ export default function AdsSheet({ storeId, product, onClose, onChanged }) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <MetaCampaigns storeId={storeId} product={product} onChanged={onChanged} />
+          <p className={label}>{t('ads.manual')}</p>
           <form onSubmit={add} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5"><label className={label}>{t('ads.daily_usd')}</label>
