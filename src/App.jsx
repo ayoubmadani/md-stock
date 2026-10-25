@@ -20,6 +20,7 @@ import CategoriesPage from './pages/Categories';
 import DomainsPage from './pages/Domains';
 import WalletPage from './pages/Wallet';
 import ProfitPage from './pages/Profit';
+import AbandonedPage from './pages/Abandoned';
 import RequirePerm from './components/RequirePerm';
 
 function Gate() {
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="orders/:id" element={<RequirePerm perm="order.view"><OrderDetail /></RequirePerm>} />
             <Route path="more" element={<MorePage />} />
             <Route path="wallet" element={<WalletPage />} />
+            <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
             <Route path="profit" element={<RequirePerm perm="product.crud"><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />
             <Route path="domains" element={<RequirePerm perm="domain.crud"><DomainsPage /></RequirePerm>} />

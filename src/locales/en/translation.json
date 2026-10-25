@@ -11,7 +11,8 @@
     "categories": "Categories",
     "domains": "Domain",
     "wallet": "Wallet",
-    "profit": "Profit"
+    "profit": "Profit",
+    "abandoned": "Abandoned orders"
   },
   "login": {
     "title": "Sign in",
@@ -414,5 +415,14 @@
     "history": "Recorded ads",
     "none": "No ads for this product",
     "now": "now"
+  },
+  "abandoned": {
+    "hint": "Customers who typed their phone in the order form but didn't finish (at least 30 min ago). Call them — some will order.",
+    "empty": "No abandoned orders",
+    "no_name": "No name",
+    "past": "{{count}} past order(s)",
+    "dismiss": "Dismiss",
+    "convert": "To order",
+    "banner": "{{count}} abandoned order(s) — customers to call back"
   }
 }

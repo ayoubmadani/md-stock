@@ -1,6 +1,6 @@
 // تعديل طلب أو إنشاء طلب يدوي من الهاتف: الزبون، العنوان والتوصيل، المنتجات بنسخها وعروضها
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Loader2, Minus, Plus, Search, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -133,7 +133,10 @@ export default function OrderForm() {
   const isNew = !id;
   const navigate = useNavigate();
   const { storeId, store } = useAuth();
-  const [form, setForm] = useState(isNew ? EMPTY : null);
+  const location = useLocation();
+  // من «الطلبات المتروكة»: الاسم والهاتف والمنتج كما كتبها الزبون
+  const draft = isNew ? location.state?.draft : null;
+  const [form, setForm] = useState(isNew ? { ...EMPTY, customerName: draft?.name || '', customerPhone: draft?.phone || '' } : null);
   const [orderStore, setOrderStore] = useState(null);
   const [wilayas, setWilayas] = useState([]);
   const [communes, setCommunes] = useState([]);
@@ -184,6 +187,17 @@ export default function OrderForm() {
     }).catch(() => { toast.error(t('orders.load_failed')); navigate('/orders'); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isNew]);
+
+  useEffect(() => {
+    if (!draft?.productId) return;
+    api.get(`/stores/${storeId}/products/${draft.productId}`).then(({ data }) => {
+      const p = data?.data || data;
+      if (!p?.id) return;
+      setForm((f) => (f.items.length ? f : { ...f, isDigital: !!p.isDigital, items: [{ id: `new-${Date.now()}`, productId: p.id, product: p, quantity: 1, finalPrice: Number(p.price || 0), variantDetailId: null, offerId: null }] }));
+      loadOptions([p.id]);
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const free = useMemo(() => (form ? isFreeShipping(form, orderStore || store) : false), [form, orderStore, store]);
   if (!form) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;

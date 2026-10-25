@@ -68,6 +68,8 @@ export default function OrdersPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [counts, setCounts] = useState({});
   const [sheet, setSheet] = useState(null);
+  const [abandoned, setAbandoned] = useState(0);
+  useEffect(() => { api.get(`/stores/${storeId}/abandoned/count`).then((r) => setAbandoned(r.data?.count || 0)).catch(() => {}); }, [storeId]);
 
   // البحث بعد توقف الكتابة
   useEffect(() => {
@@ -127,6 +129,12 @@ export default function OrdersPage() {
         </Link>
       )}
       </div>
+
+      {abandoned > 0 && (
+        <Link to="/abandoned" className="flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm font-semibold">
+          <span>{t('abandoned.banner', { count: abandoned })}</span><span aria-hidden>←</span>
+        </Link>
+      )}
 
       {/* تبويبات الحالات — تمرير أفقي */}
       <div className="-mx-4 px-4 md:mx-0 md:px-0 flex gap-1.5 overflow-x-auto no-scrollbar pb-1">

@@ -11,7 +11,8 @@
     "categories": "Catégories",
     "domains": "Domaine",
     "wallet": "Portefeuille",
-    "profit": "Rentabilité"
+    "profit": "Rentabilité",
+    "abandoned": "Commandes abandonnées"
   },
   "login": {
     "title": "Connexion",
@@ -414,5 +415,14 @@
     "history": "Pubs enregistrées",
     "none": "Aucune pub pour ce produit",
     "now": "maintenant"
+  },
+  "abandoned": {
+    "hint": "Clients qui ont saisi leur téléphone sans valider la commande (depuis au moins 30 min). Appelez-les — une partie finalise.",
+    "empty": "Aucune commande abandonnée",
+    "no_name": "Sans nom",
+    "past": "{{count}} commande(s) passée(s)",
+    "dismiss": "Ignorer",
+    "convert": "Créer",
+    "banner": "{{count}} commande(s) abandonnée(s) — clients à rappeler"
   }
 }

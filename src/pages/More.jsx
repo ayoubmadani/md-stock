@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellRing, ChevronLeft, LogOut, TrendingUp, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { Bell, BellRing, ChevronLeft, LogOut, ShoppingCart, TrendingUp, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
 import { useAuth } from '../lib/auth';
 
 export const MORE = [
+  { to: '/abandoned', key: 'abandoned', icon: ShoppingCart, perm: 'order.view' },
   { to: '/profit', key: 'profit', icon: TrendingUp, perm: 'product.crud' },
   { to: '/wallet', key: 'wallet', icon: Wallet, owner: true },
   { to: '/alerts', key: 'alerts', icon: BellRing, perm: 'product.crud' },
