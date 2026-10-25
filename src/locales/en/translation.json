@@ -10,7 +10,8 @@
     "more": "More",
     "categories": "Categories",
     "domains": "Domain",
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "profit": "Profit"
   },
   "login": {
     "title": "Sign in",
@@ -372,5 +373,46 @@
       "payment": "Purchase"
     }
   },
-  "logout_confirm": "Log out of this phone?"
+  "logout_confirm": "Log out of this phone?",
+  "profit": {
+    "period": {
+      "today": "Today",
+      "7d": "7 days",
+      "30d": "30 days",
+      "month": "This month"
+    },
+    "revenue": "Sales",
+    "ads": "Ads",
+    "net": "Net profit",
+    "summary": "{{delivered}} delivered of {{orders}} orders",
+    "no_cost": "No cost price",
+    "cogs": "Cost price ({{units}} pcs)",
+    "free_shipping": "Free delivery paid",
+    "returns": "Returns ({{count}})",
+    "commission": "Confirmation commission",
+    "return_rate": "Return rate",
+    "ad_per_order": "Ad cost per order",
+    "set_cost": "Enter the cost price",
+    "missing_cost": "{{count}} product(s) without a cost price — profit unknown. Add it on the product page.",
+    "empty": "No orders or ads in this period",
+    "note": "Sales = delivered orders only, by order creation date. A return costs the return fee of the delivery account."
+  },
+  "ads": {
+    "title": "Ads",
+    "subtitle": "Daily ad spend for the profit calculation",
+    "daily_usd": "Daily amount",
+    "usd_rate": "Dollar rate",
+    "per_day": "per day",
+    "start": "From",
+    "end": "To",
+    "ongoing": "Ongoing (no end date)",
+    "add": "Add ad",
+    "added": "Ad added",
+    "stopped": "Ad stopped today",
+    "stop": "Stop today",
+    "confirm_delete": "Delete this ad? It will be removed from the profit.",
+    "history": "Recorded ads",
+    "none": "No ads for this product",
+    "now": "now"
+  }
 }

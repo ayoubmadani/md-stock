@@ -10,7 +10,8 @@
     "more": "Plus",
     "categories": "Catégories",
     "domains": "Domaine",
-    "wallet": "Portefeuille"
+    "wallet": "Portefeuille",
+    "profit": "Rentabilité"
   },
   "login": {
     "title": "Connexion",
@@ -372,5 +373,46 @@
       "payment": "Achat"
     }
   },
-  "logout_confirm": "Se déconnecter de ce téléphone ?"
+  "logout_confirm": "Se déconnecter de ce téléphone ?",
+  "profit": {
+    "period": {
+      "today": "Aujourd'hui",
+      "7d": "7 jours",
+      "30d": "30 jours",
+      "month": "Ce mois"
+    },
+    "revenue": "Ventes",
+    "ads": "Publicité",
+    "net": "Bénéfice net",
+    "summary": "{{delivered}} livrées sur {{orders}} commandes",
+    "no_cost": "Sans prix d'achat",
+    "cogs": "Prix d'achat ({{units}} pièces)",
+    "free_shipping": "Livraison gratuite payée",
+    "returns": "Retours ({{count}})",
+    "commission": "Commission de confirmation",
+    "return_rate": "Taux de retour",
+    "ad_per_order": "Coût pub par commande",
+    "set_cost": "Saisir le prix d'achat",
+    "missing_cost": "{{count}} produit(s) sans prix d'achat — bénéfice inconnu. Ajoutez-le dans la fiche produit.",
+    "empty": "Aucune commande ni pub sur cette période",
+    "note": "Ventes = commandes livrées uniquement, selon la date de création. Un retour coûte les frais de retour du compte de livraison."
+  },
+  "ads": {
+    "title": "Publicité",
+    "subtitle": "Dépense pub quotidienne pour le calcul du bénéfice",
+    "daily_usd": "Montant quotidien",
+    "usd_rate": "Taux du dollar",
+    "per_day": "par jour",
+    "start": "Du",
+    "end": "Au",
+    "ongoing": "En cours (sans date de fin)",
+    "add": "Ajouter la pub",
+    "added": "Pub ajoutée",
+    "stopped": "Pub arrêtée aujourd'hui",
+    "stop": "Arrêter aujourd'hui",
+    "confirm_delete": "Supprimer cette pub ? Elle sera retirée du calcul.",
+    "history": "Pubs enregistrées",
+    "none": "Aucune pub pour ce produit",
+    "now": "maintenant"
+  }
 }

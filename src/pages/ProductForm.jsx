@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Loader2, Trash2 } from 'lucide-react';
+import { ArrowRight, Loader2, Megaphone, Trash2 } from 'lucide-react';
+import AdsSheet from '../components/AdsSheet';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -28,6 +29,7 @@ export default function ProductForm() {
   const [attributes, setAttributes] = useState([]);
   const [offers, setOffers] = useState([]);
   const [variants, setVariants] = useState([]);
+  const [ads, setAds] = useState(false);
   const [savedAttrs, setSavedAttrs] = useState('[]'); // لمعرفة هل تغيّرت الخصائص منذ آخر حفظ
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v?.target ? v.target.value : v }));
 
@@ -102,6 +104,7 @@ export default function ProductForm() {
   const attrsDirty = JSON.stringify(attributes) !== savedAttrs;
 
   return (
+    <>
     <form onSubmit={save} className="max-w-xl mx-auto space-y-3 pb-28 md:pb-6">
       <div className="flex items-center justify-between">
         <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</button>
@@ -151,6 +154,13 @@ export default function ProductForm() {
         <OffersEditor offers={offers} onChange={setOffers} />
       </Section>
 
+      {!isNew && (
+        <button type="button" onClick={() => setAds(true)} className="w-full flex items-center gap-3 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4 text-start">
+          <span className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0"><Megaphone className="w-5 h-5" /></span>
+          <span className="flex-1"><span className="block font-bold text-sm">{t('ads.title')}</span><span className="block text-xs text-gray-400">{t('ads.subtitle')}</span></span>
+        </button>
+      )}
+
       <Section title={t('product.stock_section')}>
         <div className="grid grid-cols-2 gap-3">
           {!attributes.length && (
@@ -168,5 +178,8 @@ export default function ProductForm() {
         </button>
       </div>
     </form>
+    {/* خارج نموذج المنتج: نموذج داخل نموذج غير صالح */}
+    {ads && <AdsSheet storeId={storeId} product={{ id, name: form.name }} onClose={() => setAds(false)} />}
+    </>
   );
 }
