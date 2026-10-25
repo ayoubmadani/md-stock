@@ -12,7 +12,8 @@
     "domains": "Domain",
     "wallet": "Wallet",
     "profit": "Profit",
-    "abandoned": "Abandoned orders"
+    "abandoned": "Abandoned orders",
+    "meta": "Meta ads"
   },
   "login": {
     "title": "Sign in",
@@ -424,5 +425,26 @@
     "dismiss": "Dismiss",
     "convert": "To order",
     "banner": "{{count}} abandoned order(s) — customers to call back"
+  },
+  "meta": {
+    "connect_title": "Connect your Facebook ad account",
+    "connect_hint": "We fetch each campaign's spend day by day; link a campaign to a product to see the real profit in Profit. We never change your campaigns.",
+    "connect": "Connect Facebook",
+    "connected": "Facebook connected ✓ — pick the ad account",
+    "connect_failed": "Couldn't connect",
+    "pick_account": "Pick the ad account for this store",
+    "no_accounts": "No ad accounts",
+    "inactive": "inactive",
+    "usd_rate": "Dollar rate (to convert spend)",
+    "sync": "Refresh from Meta",
+    "synced": "Refreshed — {{campaigns}} campaign(s)",
+    "last_sync": "Last refreshed {{ago}}",
+    "need_rate": "Enter the dollar rate so spend is counted in dinars",
+    "no_campaigns": "No campaigns",
+    "sync_first": "Tap “Refresh from Meta” to load your campaigns",
+    "link_product": "— Link to a product —",
+    "confirm_disconnect": "Disconnect Facebook? The token and campaign stats are deleted right away.",
+    "disconnect": "Disconnect",
+    "profit_note": "A campaign linked to a product adds its spend to that product's ads in Profit."
   }
 }
