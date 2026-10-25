@@ -44,3 +44,25 @@ export async function disablePush() {
   }
   return 'off';
 }
+
+const currentSub = async () => {
+  try {
+    if (!pushSupported() || Notification.permission !== 'granted') return null;
+    const reg = await navigator.serviceWorker.getRegistration('/');
+    return (await reg?.pushManager.getSubscription()) || null;
+  } catch {
+    return null;
+  }
+};
+
+/** بعد الدخول/تبديل الحساب: هاتف مفعّل الإشعارات يُسجَّل للحساب الحالي (الخادم ينقله إليه) */
+export async function syncPush() {
+  const sub = await currentSub();
+  if (sub) await api.post('/push/subscribe', sub.toJSON()).catch(() => {});
+}
+
+/** قبل الخروج: الحساب الذي نخرج منه لا يرسل إشعارات لهذا الهاتف بعد الآن */
+export async function releasePush() {
+  const sub = await currentSub();
+  if (sub) await api.post('/push/unsubscribe', { endpoint: sub.endpoint }).catch(() => {});
+}

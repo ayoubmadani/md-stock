@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { api, getStoreId, getToken, setStoreId, setToken } from './api';
+import { releasePush, syncPush } from './push';
 
 const AuthContext = createContext(null);
 
@@ -34,13 +35,18 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => { refresh(); }, [token, refresh]);
+  // حساب جديد على هذا الهاتف: الإشعارات تتبعه (لا تبقى للحساب السابق)
+  useEffect(() => { if (token) syncPush(); }, [token]);
 
   const login = (newToken, preferredStoreId) => {
     if (preferredStoreId) setStoreId(preferredStoreId);
     setToken(newToken);
     setTokenState(newToken);
   };
-  const logout = () => { setToken(null); setTokenState(null); setStores([]); };
+  const logout = async () => {
+    await releasePush(); // قبل مسح الجلسة: الطلب يحتاجها
+    setToken(null); setTokenState(null); setStores([]);
+  };
   const selectStore = (id) => { setStoreId(id); setStoreIdState(id); };
 
   return (
