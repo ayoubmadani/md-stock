@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "top.mdstore.m.twa",
+        "sha256_cert_fingerprints": ["7C:0D:F5:CD:E0:7D:3C:C6:4B:E7:8A:34:8E:37:A9:AE:A9:9B:F0:8D:1F:22:F7:D7:4C:52:8D:A9:F8:B3:2B:CF"]
+      }
+    }]
