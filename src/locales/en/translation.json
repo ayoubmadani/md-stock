@@ -13,7 +13,8 @@
     "wallet": "Wallet",
     "profit": "Profit",
     "abandoned": "Abandoned orders",
-    "meta": "Meta ads"
+    "meta": "Meta ads",
+    "pixels": "Pixels"
   },
   "login": {
     "title": "Sign in",
@@ -457,5 +458,24 @@
     "create": "Create",
     "pixel_created": "Pixel created and added to the store ✓",
     "cancel": "Cancel"
+  },
+  "pixels": {
+    "new": "New pixel",
+    "edit": "Edit pixel",
+    "type_facebook": "Facebook",
+    "type_tiktok": "TikTok",
+    "type_google": "Google",
+    "pixel_id": "Pixel ID",
+    "name": "Name (optional)",
+    "optional": "optional",
+    "clear_token": "Remove the saved token",
+    "active": "Active",
+    "id_required": "Enter the pixel ID",
+    "id_digits": "A Facebook pixel ID is digits only",
+    "confirm_delete": "Delete pixel {{id}}?",
+    "deleted": "Pixel deleted",
+    "empty": "No pixels in this store",
+    "landing": "Landing page",
+    "from_meta": "Meta: fetch your pixels or create one in a tap"
   }
 }

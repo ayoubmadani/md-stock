@@ -13,7 +13,8 @@
     "wallet": "Portefeuille",
     "profit": "Rentabilité",
     "abandoned": "Commandes abandonnées",
-    "meta": "Publicités Meta"
+    "meta": "Publicités Meta",
+    "pixels": "Pixels"
   },
   "login": {
     "title": "Connexion",
@@ -457,5 +458,24 @@
     "create": "Créer",
     "pixel_created": "Pixel créé et ajouté à la boutique ✓",
     "cancel": "Annuler"
+  },
+  "pixels": {
+    "new": "Nouveau pixel",
+    "edit": "Modifier le pixel",
+    "type_facebook": "Facebook",
+    "type_tiktok": "TikTok",
+    "type_google": "Google",
+    "pixel_id": "ID du pixel",
+    "name": "Nom (optionnel)",
+    "optional": "optionnel",
+    "clear_token": "Supprimer le jeton enregistré",
+    "active": "Actif",
+    "id_required": "Saisissez l'ID du pixel",
+    "id_digits": "L'ID d'un pixel Facebook ne contient que des chiffres",
+    "confirm_delete": "Supprimer le pixel {{id}} ?",
+    "deleted": "Pixel supprimé",
+    "empty": "Aucun pixel dans cette boutique",
+    "landing": "Page de destination",
+    "from_meta": "Meta : récupérer vos pixels ou en créer un en un clic"
   }
 }

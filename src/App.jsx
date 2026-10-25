@@ -22,6 +22,7 @@ import WalletPage from './pages/Wallet';
 import ProfitPage from './pages/Profit';
 import AbandonedPage from './pages/Abandoned';
 import MetaPage from './pages/Meta';
+import PixelsPage from './pages/Pixels';
 import RequirePerm from './components/RequirePerm';
 
 function Gate() {
@@ -61,6 +62,7 @@ export default function App() {
             <Route path="more" element={<MorePage />} />
             <Route path="wallet" element={<WalletPage />} />
             <Route path="meta" element={<RequirePerm perm="product.crud"><MetaPage /></RequirePerm>} />
+            <Route path="pixels" element={<PixelsPage />} />
             <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
             <Route path="profit" element={<RequirePerm perm="product.crud"><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />
