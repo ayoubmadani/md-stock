@@ -445,6 +445,12 @@
     "link_product": "— Associer à un produit —",
     "confirm_disconnect": "Déconnecter Facebook ? Le jeton et les statistiques sont supprimés immédiatement.",
     "disconnect": "Déconnecter",
-    "profit_note": "Les dépenses d'une campagne associée à un produit s'ajoutent à la pub de ce produit dans « Rentabilité »."
+    "profit_note": "Les dépenses d'une campagne associée à un produit s'ajoutent à la pub de ce produit dans « Rentabilité ».",
+    "pixels": "Pixels du compte publicitaire",
+    "no_pixels": "Aucun pixel — créez-en un dans Events Manager",
+    "pixel_added": "Pixel ajouté avec Conversions API ✓",
+    "pixel_in_store": "Dans la boutique",
+    "add_pixel": "Ajouter",
+    "pixels_hint": "Un pixel ajouté ici fonctionne dans la boutique avec l'API Conversions automatiquement (sans copier de jeton)."
   }
 }

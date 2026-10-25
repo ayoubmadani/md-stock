@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Facebook, Loader2, MousePointerClick, RefreshCw, Unplug, Eye } from 'lucide-react';
+import { Check, Code2, Facebook, Loader2, MousePointerClick, Plus, RefreshCw, Unplug, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -52,6 +52,8 @@ export default function MetaPage() {
   const [campaigns, setCampaigns] = useState(null);
   const [products, setProducts] = useState([]);
   const [syncing, setSyncing] = useState(false);
+  const [pixels, setPixels] = useState(null);
+  const [adding, setAdding] = useState(null);
 
   const loadStatus = useCallback(() => api.get(`/stores/${storeId}/meta`).then((r) => { setStatus(r.data); setRate(r.data.usdRate ? String(r.data.usdRate) : ''); }).catch(() => setStatus({ connected: false })), [storeId]);
   useEffect(() => { loadStatus(); }, [loadStatus]);
@@ -70,6 +72,25 @@ export default function MetaPage() {
     if (!status.adAccountId) api.get(`/stores/${storeId}/meta/ad-accounts`).then((r) => setAccounts(r.data)).catch((e) => { setAccounts([]); toast.error(errorMessage(e, t('inventory.error'))); });
     api.get(`/stores/${storeId}/products`).then((r) => setProducts(r.data?.products || r.data?.data || [])).catch(() => {});
   }, [status?.connected, status?.adAccountId, storeId, t]);
+
+  // بكسلات الحساب الإعلاني
+  const loadPixels = useCallback(() => {
+    if (!status?.adAccountId) return;
+    api.get(`/stores/${storeId}/meta/pixels`).then((r) => setPixels(r.data)).catch(() => setPixels([]));
+  }, [storeId, status?.adAccountId]);
+  useEffect(() => { loadPixels(); }, [loadPixels]);
+  const addPixel = async (px) => {
+    setAdding(px.id);
+    try {
+      await api.post(`/stores/${storeId}/meta/pixels/${px.id}`);
+      toast.success(t('meta.pixel_added'));
+      setPixels((l) => l.map((x) => (x.id === px.id ? { ...x, added: true } : x)));
+    } catch (e) {
+      toast.error(errorMessage(e, t('inventory.error')));
+    } finally {
+      setAdding(null);
+    }
+  };
 
   const loadCampaigns = useCallback(() => {
     if (!status?.adAccountId) return;
@@ -154,6 +175,28 @@ export default function MetaPage() {
         )}
         {status.lastSyncAt && <p className="text-[11px] text-gray-400 text-center">{t('meta.last_sync', { ago: timeAgo(status.lastSyncAt, i18n.language) })}</p>}
       </div>
+
+      {/* البكسلات */}
+      {status.adAccountId && (
+        <div className={`${box} space-y-2 p-3`}>
+          <p className="flex items-center gap-2 font-bold text-sm px-1"><Code2 className="w-4 h-4 text-gray-400" />{t('meta.pixels')}</p>
+          {pixels === null ? <div className="flex justify-center py-3"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
+            : pixels.length === 0 ? <p className="text-xs text-gray-400 px-1">{t('meta.no_pixels')}</p>
+            : pixels.map((px) => (
+              <div key={px.id} className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-zinc-800 p-2.5">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate"><bdi>{px.name}</bdi></p>
+                  <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{px.id}{px.lastFiredAt ? ` · ${timeAgo(px.lastFiredAt, i18n.language)}` : ''}</p>
+                </div>
+                {px.added ? <span className="flex items-center gap-1 text-xs font-bold text-emerald-600"><Check className="w-4 h-4" />{t('meta.pixel_in_store')}</span>
+                  : <button type="button" disabled={adding === px.id || !px.available} onClick={() => addPixel(px)} className="flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold disabled:opacity-50">
+                      {adding === px.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}{t('meta.add_pixel')}
+                    </button>}
+              </div>
+            ))}
+          <p className="text-[11px] text-gray-400 px-1 leading-relaxed">{t('meta.pixels_hint')}</p>
+        </div>
+      )}
 
       {/* الحملات */}
       {status.adAccountId && (
