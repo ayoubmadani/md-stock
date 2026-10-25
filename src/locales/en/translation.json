@@ -451,6 +451,11 @@
     "pixel_added": "Pixel added with Conversions API ✓",
     "pixel_in_store": "In store",
     "add_pixel": "Add to store",
-    "pixels_hint": "A pixel added here runs in the store with the Conversions API automatically (no token to copy)."
+    "pixels_hint": "A pixel added here runs in the store with the Conversions API automatically (no token to copy).",
+    "create_pixel": "Create a new pixel",
+    "pixel_name": "Pixel name (optional)",
+    "create": "Create",
+    "pixel_created": "Pixel created and added to the store ✓",
+    "cancel": "Cancel"
   }
 }

@@ -451,6 +451,11 @@
     "pixel_added": "أُضيف البكسل مع Conversions API ✓",
     "pixel_in_store": "في المتجر",
     "add_pixel": "إضافة للمتجر",
-    "pixels_hint": "البكسل المضاف من هنا يعمل في المتجر مع Conversions API تلقائياً، دون نسخ رمز الوصول يدوياً."
+    "pixels_hint": "البكسل المضاف من هنا يعمل في المتجر مع Conversions API تلقائياً، دون نسخ رمز الوصول يدوياً.",
+    "create_pixel": "إنشاء بكسل جديد",
+    "pixel_name": "اسم البكسل (اختياري)",
+    "create": "إنشاء",
+    "pixel_created": "أُنشئ البكسل وأُضيف للمتجر ✓",
+    "cancel": "إلغاء"
   }
 }

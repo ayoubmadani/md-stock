@@ -451,6 +451,11 @@
     "pixel_added": "Pixel ajouté avec Conversions API ✓",
     "pixel_in_store": "Dans la boutique",
     "add_pixel": "Ajouter",
-    "pixels_hint": "Un pixel ajouté ici fonctionne dans la boutique avec l'API Conversions automatiquement (sans copier de jeton)."
+    "pixels_hint": "Un pixel ajouté ici fonctionne dans la boutique avec l'API Conversions automatiquement (sans copier de jeton).",
+    "create_pixel": "Créer un nouveau pixel",
+    "pixel_name": "Nom du pixel (optionnel)",
+    "create": "Créer",
+    "pixel_created": "Pixel créé et ajouté à la boutique ✓",
+    "cancel": "Annuler"
   }
 }

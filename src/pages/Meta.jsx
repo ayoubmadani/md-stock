@@ -54,6 +54,7 @@ export default function MetaPage() {
   const [syncing, setSyncing] = useState(false);
   const [pixels, setPixels] = useState(null);
   const [adding, setAdding] = useState(null);
+  const [newPixel, setNewPixel] = useState(null); // null = مغلق، نص = اسم البكسل الجديد
 
   const loadStatus = useCallback(() => api.get(`/stores/${storeId}/meta`).then((r) => { setStatus(r.data); setRate(r.data.usdRate ? String(r.data.usdRate) : ''); }).catch(() => setStatus({ connected: false })), [storeId]);
   useEffect(() => { loadStatus(); }, [loadStatus]);
@@ -85,6 +86,21 @@ export default function MetaPage() {
       await api.post(`/stores/${storeId}/meta/pixels/${px.id}`);
       toast.success(t('meta.pixel_added'));
       setPixels((l) => l.map((x) => (x.id === px.id ? { ...x, added: true } : x)));
+    } catch (e) {
+      toast.error(errorMessage(e, t('inventory.error')));
+    } finally {
+      setAdding(null);
+    }
+  };
+
+  const createPixel = async () => {
+    setAdding('new');
+    try {
+      await api.post(`/stores/${storeId}/meta/pixels`, { name: newPixel });
+      toast.success(t('meta.pixel_created'));
+      setNewPixel(null);
+      setPixels(null);
+      loadPixels();
     } catch (e) {
       toast.error(errorMessage(e, t('inventory.error')));
     } finally {
@@ -194,6 +210,17 @@ export default function MetaPage() {
                     </button>}
               </div>
             ))}
+          {newPixel === null
+            ? <button type="button" onClick={() => setNewPixel('')} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-semibold text-indigo-600 dark:text-indigo-400"><Plus className="w-4 h-4" />{t('meta.create_pixel')}</button>
+            : (
+              <div className="flex gap-2">
+                <input autoFocus value={newPixel} onChange={(e) => setNewPixel(e.target.value)} maxLength={100} placeholder={t('meta.pixel_name')} className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-sm outline-none focus:border-indigo-500" />
+                <button type="button" disabled={adding === 'new'} onClick={createPixel} className="flex items-center gap-1 px-3 rounded-xl bg-indigo-600 text-white text-xs font-bold disabled:opacity-50">
+                  {adding === 'new' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}{t('meta.create')}
+                </button>
+                <button type="button" onClick={() => setNewPixel(null)} className="px-3 rounded-xl text-xs font-bold text-gray-500">{t('meta.cancel')}</button>
+              </div>
+            )}
           <p className="text-[11px] text-gray-400 px-1 leading-relaxed">{t('meta.pixels_hint')}</p>
         </div>
       )}
