@@ -23,6 +23,8 @@ import ProfitPage from './pages/Profit';
 import AbandonedPage from './pages/Abandoned';
 import MetaPage from './pages/Meta';
 import PixelsPage from './pages/Pixels';
+import StoresPage from './pages/Stores';
+import StoreForm from './pages/StoreForm';
 import RequirePerm from './components/RequirePerm';
 
 function Gate() {
@@ -63,6 +65,9 @@ export default function App() {
             <Route path="wallet" element={<WalletPage />} />
             <Route path="meta" element={<RequirePerm perm="product.crud"><MetaPage /></RequirePerm>} />
             <Route path="pixels" element={<PixelsPage />} />
+            <Route path="stores" element={<StoresPage />} />
+            <Route path="stores/new" element={<StoreForm />} />
+            <Route path="stores/:id" element={<StoreForm />} />
             <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
             <Route path="profit" element={<RequirePerm perm="product.crud"><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />

@@ -14,7 +14,8 @@
     "profit": "Rentabilité",
     "abandoned": "Commandes abandonnées",
     "meta": "Publicités Meta",
-    "pixels": "Pixels"
+    "pixels": "Pixels",
+    "stores": "Mes boutiques"
   },
   "login": {
     "title": "Connexion",
@@ -270,7 +271,8 @@
     "manage": "Supprimer des images",
     "confirm_delete": "Supprimer définitivement cette image de la bibliothèque ?",
     "from_gallery": "Galerie",
-    "from_camera": "Appareil photo"
+    "from_camera": "Appareil photo",
+    "title_store": "Images de la boutique"
   },
   "categories": {
     "new": "Nouvelle catégorie",
@@ -490,5 +492,45 @@
     "empty": "Aucun pixel dans cette boutique",
     "landing": "Page de destination",
     "from_meta": "Meta : récupérer vos pixels ou en créer un en un clic"
+  },
+  "stores": {
+    "new": "Nouvelle boutique",
+    "edit": "Modifier",
+    "create": "Créer la boutique",
+    "created": "Boutique créée ✓",
+    "name": "Nom de la boutique",
+    "name_required": "Saisissez le nom de la boutique",
+    "identity": "Identité",
+    "primaryColor": "Couleur principale",
+    "secondaryColor": "Couleur secondaire",
+    "contact": "Contact",
+    "phone": "Téléphone",
+    "wilaya": "Wilaya",
+    "address": "Adresse",
+    "selling": "Vente",
+    "language": "Langue",
+    "currency": "Devise",
+    "lang_ar": "Arabe",
+    "lang_fr": "Français",
+    "lang_en": "Anglais",
+    "cart": "Panier (plusieurs produits par commande)",
+    "support_qty": "Choix de la quantité",
+    "free_shipping": "Livraison gratuite",
+    "free_min": "Minimum pour la livraison gratuite (0 = toujours)",
+    "look": "Apparence",
+    "top_bar": "Barre du haut",
+    "top_bar_ph": "Texte de la barre du haut",
+    "hero": "Image de couverture",
+    "hero_title": "Titre de couverture",
+    "hero_subtitle": "Sous-titre",
+    "remove_image": "Retirer l'image",
+    "empty": "Aucune boutique",
+    "current": "Actuelle",
+    "switch": "Basculer",
+    "deleted": "Boutique supprimée",
+    "delete": "Supprimer définitivement",
+    "delete_title": "Supprimer la boutique",
+    "delete_warn": "La boutique est supprimée avec ses produits, commandes, pages et domaines. Irréversible.",
+    "delete_type": "Pour confirmer, tapez le nom :"
   }
 }

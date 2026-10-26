@@ -8,7 +8,8 @@ import CameraCapture from './CameraCapture';
 
 const PAGE = 18;
 // نفس إعدادات الضغط في اللوحة: صور النسخ أصغر
-const COMPRESS = { products: { max: 1920, quality: 0.8 }, productVariant: { max: 600, quality: 0.75 }, category: { max: 1920, quality: 0.8 } };
+// store: شعار/غلاف المتجر يُرفع كما هو (الشعار PNG بخلفية شفافة)
+const COMPRESS = { products: { max: 1920, quality: 0.8 }, productVariant: { max: 600, quality: 0.75 }, category: { max: 1920, quality: 0.8 }, store: null };
 const ACCEPT = 'image/jpeg,image/png,image/gif,image/webp';
 
 /** تصغير الصورة في المتصفح قبل الرفع (JPEG بخلفية بيضاء)؛ GIF يبقى كما هو */
@@ -36,7 +37,7 @@ async function compress(file, { max, quality }) {
 }
 
 /**
- * folder: products | productVariant | category
+ * folder: products | productVariant | category | store
  * max: كم صورة يمكن اختيارها (1 = اختيار مباشر بالضغط)
  * onPick(urls[])
  */
@@ -89,7 +90,8 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
     const uploaded = [];
     try {
       for (const [i, raw] of list.entries()) {
-        const file = await compress(raw, COMPRESS[folder] || COMPRESS.products);
+        const preset = folder in COMPRESS ? COMPRESS[folder] : COMPRESS.products;
+        const file = preset ? await compress(raw, preset) : raw;
         const body = new FormData();
         body.append('file', file);
         const { data } = await api.post(`/images/upload?folder=${folder}`, body, {

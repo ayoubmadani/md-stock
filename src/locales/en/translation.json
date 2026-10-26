@@ -14,7 +14,8 @@
     "profit": "Profit",
     "abandoned": "Abandoned orders",
     "meta": "Meta ads",
-    "pixels": "Pixels"
+    "pixels": "Pixels",
+    "stores": "My stores"
   },
   "login": {
     "title": "Sign in",
@@ -270,7 +271,8 @@
     "manage": "Delete images",
     "confirm_delete": "Delete this image from the library permanently?",
     "from_gallery": "Gallery",
-    "from_camera": "Camera"
+    "from_camera": "Camera",
+    "title_store": "Store images"
   },
   "categories": {
     "new": "New category",
@@ -490,5 +492,45 @@
     "empty": "No pixels in this store",
     "landing": "Landing page",
     "from_meta": "Meta: fetch your pixels or create one in a tap"
+  },
+  "stores": {
+    "new": "New store",
+    "edit": "Edit",
+    "create": "Create store",
+    "created": "Store created ✓",
+    "name": "Store name",
+    "name_required": "Enter the store name",
+    "identity": "Identity",
+    "primaryColor": "Primary color",
+    "secondaryColor": "Secondary color",
+    "contact": "Contact",
+    "phone": "Phone",
+    "wilaya": "Wilaya",
+    "address": "Address",
+    "selling": "Selling",
+    "language": "Store language",
+    "currency": "Currency",
+    "lang_ar": "Arabic",
+    "lang_fr": "French",
+    "lang_en": "English",
+    "cart": "Cart (several products per order)",
+    "support_qty": "Quantity picker",
+    "free_shipping": "Free shipping",
+    "free_min": "Free shipping minimum (0 = always)",
+    "look": "Look",
+    "top_bar": "Top bar",
+    "top_bar_ph": "Top bar text",
+    "hero": "Cover image",
+    "hero_title": "Cover title",
+    "hero_subtitle": "Cover subtitle",
+    "remove_image": "Remove image",
+    "empty": "No stores yet",
+    "current": "Current",
+    "switch": "Switch to it",
+    "deleted": "Store deleted",
+    "delete": "Delete permanently",
+    "delete_title": "Delete store",
+    "delete_warn": "The store is deleted with all its products, orders, pages and domains. This cannot be undone.",
+    "delete_type": "To confirm, type the store name:"
   }
 }
