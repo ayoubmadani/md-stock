@@ -262,7 +262,8 @@
       "shipped": "Sent to the delivery company {{tracking}}",
       "default": "Default"
     },
-    "next_step": "Next step"
+    "next_step": "Next step",
+    "filter_status": "Order status"
   },
   "library": {
     "title_products": "Product images",

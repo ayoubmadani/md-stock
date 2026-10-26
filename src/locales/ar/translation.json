@@ -262,7 +262,8 @@
       "shipped": "تم الرفع لشركة التوصيل {{tracking}}",
       "default": "افتراضي"
     },
-    "next_step": "الخطوة التالية"
+    "next_step": "الخطوة التالية",
+    "filter_status": "حالة الطلبات"
   },
   "library": {
     "title_products": "صور المنتجات",

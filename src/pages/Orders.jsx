@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2, MapPin, Phone, Plus, Search, ShieldAlert } from 'lucide-react';
+import { Check, ChevronDown, Loader2, MapPin, Phone, Plus, Search, ShieldAlert, X } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { STATUSES, STATUS_DOT, money, sumCounts } from '../lib/orders';
@@ -67,6 +67,7 @@ export default function OrdersPage() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [counts, setCounts] = useState({});
+  const [statusSheet, setStatusSheet] = useState(false);
   const [sheet, setSheet] = useState(null);
   const [abandoned, setAbandoned] = useState(0);
   useEffect(() => { api.get(`/stores/${storeId}/abandoned/count`).then((r) => setAbandoned(r.data?.count || 0)).catch(() => {}); }, [storeId]);
@@ -136,8 +137,38 @@ export default function OrdersPage() {
         </Link>
       )}
 
-      {/* تبويبات الحالات — تمرير أفقي */}
-      <div className="-mx-4 px-4 md:mx-0 md:px-0 flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+      {/* الهاتف: زر يشبه select يفتح قائمة الحالات */}
+      <button type="button" onClick={() => setStatusSheet(true)} className="md:hidden w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-sm font-bold">
+        {status ? <span className={`w-2 h-2 rounded-full ${STATUS_DOT[status]}`} /> : <span className="w-2 h-2 rounded-full bg-indigo-500" />}
+        <span className="flex-1 text-start">{status ? t(`orders.status.${status}`) : t('orders.all')}</span>
+        <span className="text-xs text-gray-400" dir="ltr">{counts[status || 'all'] ?? 0}</span>
+        <ChevronDown className="w-4 h-4 text-gray-400" />
+      </button>
+      {statusSheet && (
+        <div className="md:hidden fixed inset-0 z-50 flex items-end bg-black/50 backdrop-blur-sm" onClick={(e) => e.target === e.currentTarget && setStatusSheet(false)}>
+          <div className="bg-white dark:bg-zinc-900 rounded-t-3xl w-full max-h-[85dvh] overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between px-1 pb-2">
+              <p className="font-bold">{t('orders.filter_status')}</p>
+              <button type="button" onClick={() => setStatusSheet(false)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+            </div>
+            {['', ...STATUSES].map((s) => {
+              const active = status === s;
+              return (
+                <button key={s || 'all'} type="button" onClick={() => { setStatus(s); setStatusSheet(false); }}
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold ${active ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : ''}`}>
+                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${s ? STATUS_DOT[s] : 'bg-indigo-500'}`} />
+                  <span className="flex-1 text-start">{s ? t(`orders.status.${s}`) : t('orders.all')}</span>
+                  <span className="min-w-[2rem] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-xs text-gray-600 dark:text-zinc-300 text-center" dir="ltr">{counts[s || 'all'] ?? 0}</span>
+                  {active ? <Check className="w-4 h-4" /> : <span className="w-4" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* الكمبيوتر: تبويبات الحالات */}
+      <div className="hidden md:flex gap-1.5 flex-wrap pb-1">
         {['', ...STATUSES].map((s) => {
           const active = status === s;
           return (

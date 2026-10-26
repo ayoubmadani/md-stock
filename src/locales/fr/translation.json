@@ -262,7 +262,8 @@
       "shipped": "Envoyée au transporteur {{tracking}}",
       "default": "Par défaut"
     },
-    "next_step": "Étape suivante"
+    "next_step": "Étape suivante",
+    "filter_status": "Statut des commandes"
   },
   "library": {
     "title_products": "Images des produits",
