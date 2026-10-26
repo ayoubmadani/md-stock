@@ -16,7 +16,8 @@
     "meta": "Publicités Meta",
     "pixels": "Pixels",
     "stores": "Mes boutiques",
-    "themes": "Thèmes"
+    "themes": "Thèmes",
+    "subscription": "Abonnement"
   },
   "login": {
     "title": "Connexion",
@@ -557,5 +558,30 @@
     "apply": "Appliquer",
     "coupon_invalid": "Coupon invalide",
     "wallet_note": "Le prix est débité du portefeuille ; le thème reste dans « Mes thèmes » pour toutes vos boutiques."
+  },
+  "sub": {
+    "month": "Mensuel",
+    "year": "Annuel",
+    "mo": "mois",
+    "trial": "Essai gratuit",
+    "days_left": "{{count}} jours restants",
+    "auto_renew": "Renouvellement automatique (portefeuille)",
+    "none": "Aucun abonnement — choisissez un plan.",
+    "choose": "Choisir un plan",
+    "upgrade_title": "Passer à un plan supérieur",
+    "subscribe": "S'abonner",
+    "upgrade": "Mettre à niveau",
+    "success": "Plan activé ✓",
+    "wallet_note": "Le montant est débité du portefeuille et le plan est activé immédiatement.",
+    "upgrade_note": "La différence est débitée après déduction de la valeur des jours restants.",
+    "top_up": "Recharger le portefeuille",
+    "coupon_ok": "Coupon appliqué : −{{v}}",
+    "billed_yearly": "{{price}} {{currency}} facturés par an",
+    "f_stores": "boutiques",
+    "f_products": "produits",
+    "f_pages": "pages",
+    "f_domains": "domaines",
+    "f_members": "membres",
+    "f_commission": "Commission {{n}}% par commande"
   }
 }

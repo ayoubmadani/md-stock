@@ -16,7 +16,8 @@
     "meta": "Meta ads",
     "pixels": "Pixels",
     "stores": "My stores",
-    "themes": "Themes"
+    "themes": "Themes",
+    "subscription": "Subscription"
   },
   "login": {
     "title": "Sign in",
@@ -557,5 +558,30 @@
     "apply": "Apply",
     "coupon_invalid": "Invalid coupon",
     "wallet_note": "The price is taken from your wallet; the theme stays in “My themes” for all your stores."
+  },
+  "sub": {
+    "month": "Monthly",
+    "year": "Yearly",
+    "mo": "mo",
+    "trial": "Free trial",
+    "days_left": "{{count}} days left",
+    "auto_renew": "Auto-renew from wallet",
+    "none": "No subscription — pick a plan to unlock everything.",
+    "choose": "Choose a plan",
+    "upgrade_title": "Upgrade your plan",
+    "subscribe": "Subscribe",
+    "upgrade": "Upgrade",
+    "success": "Plan activated ✓",
+    "wallet_note": "The amount is taken from your wallet and the plan starts right away.",
+    "upgrade_note": "The difference is taken from your wallet after crediting the days left on your current plan.",
+    "top_up": "Top up wallet",
+    "coupon_ok": "Coupon applied: −{{v}}",
+    "billed_yearly": "{{price}} {{currency}} billed yearly",
+    "f_stores": "stores",
+    "f_products": "products",
+    "f_pages": "landing pages",
+    "f_domains": "domains",
+    "f_members": "team members",
+    "f_commission": "{{n}}% commission per order"
   }
 }
