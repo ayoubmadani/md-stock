@@ -25,7 +25,8 @@
     "landing": "Landing pages",
     "keys": "API keys",
     "rates": "Delivery rates",
-    "pos": "In-shop sale"
+    "pos": "In-shop sale",
+    "pos_short": "Sell"
   },
   "login": {
     "title": "Sign in",

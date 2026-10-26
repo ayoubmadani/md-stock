@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store } from 'lucide-react';
+import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store, ScanBarcode } from 'lucide-react';
 import { MORE } from '../pages/More';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
@@ -64,6 +64,12 @@ export default function Layout() {
             {stores.length > 1 && <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
           </Link>
           <div className="flex-1 hidden md:block" />
+          {/* بيع في المحل — ظاهر في كل الصفحات */}
+          {can('order.manage') && (
+            <NavLink to="/pos" className={({ isActive }) => `flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold shrink-0 ${isActive ? 'bg-emerald-700 text-white' : 'bg-emerald-600 text-white'}`}>
+              <ScanBarcode className="w-4 h-4" /><span>{t('nav.pos_short')}</span>
+            </NavLink>
+          )}
           <button onClick={nextLang} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900 flex items-center gap-1 text-xs font-bold uppercase" title="Language">
             <Languages className="w-4 h-4" />{i18n.language}
           </button>

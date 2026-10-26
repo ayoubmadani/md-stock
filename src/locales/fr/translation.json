@@ -25,7 +25,8 @@
     "landing": "Landing pages",
     "keys": "Clés API",
     "rates": "Tarifs de livraison",
-    "pos": "Vente en boutique"
+    "pos": "Vente en boutique",
+    "pos_short": "Vente"
   },
   "login": {
     "title": "Connexion",
