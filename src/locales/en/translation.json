@@ -752,6 +752,7 @@
     "step_design": "AI is designing the page…",
     "step_capture": "Turning sections into images…",
     "step_upload": "Uploading images…",
-    "step_save": "Saving the page…"
+    "step_save": "Saving the page…",
+    "photos_hint": "Product photos show up automatically — remove any or add your own. The first one is the main photo."
   }
 }

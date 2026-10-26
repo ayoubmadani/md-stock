@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Camera, ImagePlus, Images, LayoutTemplate, Loader2, RotateCcw, Sparkles, Type, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { captureAndUpload, fetchProductPhotos, generateImagePage } from '../lib/imagePage/generator';
+import { captureAndUpload, fetchProductPhoto, generateImagePage } from '../lib/imagePage/generator';
 import { progressFor } from '../lib/imagePage/progress';
 import { input, label } from './product';
 
@@ -21,7 +21,9 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
   const [name, setName] = useState('');
   const [lang, setLang] = useState(['ar', 'fr', 'en'].includes(i18n.language) ? i18n.language : 'ar');
   const [color, setColor] = useState(null);
-  const [own, setOwn] = useState([]); // صور التاجر (اختياري) — وإلا صور المنتج
+  // الصور المختارة بالترتيب (الأولى رئيسية): { n, url } صورة منتج برقمها، أو { file, url } صورة من الهاتف
+  const [photos, setPhotos] = useState([]);
+  const [loadingPhotos, setLoadingPhotos] = useState(false);
   const [usage, setUsage] = useState(null);
   const [step, setStep] = useState(null);
   const [stepAt, setStepAt] = useState(0);
@@ -33,7 +35,20 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
 
   useEffect(() => { api.get('/builder-pages/image-pages/usage').then((r) => setUsage({ used: Number(r.data?.used) || 0, limit: Number(r.data?.limit) || 0 })).catch(() => {}); }, []);
   useEffect(() => { if (!step) return undefined; const id = setInterval(() => tick((n) => n + 1), 400); return () => clearInterval(id); }, [step]);
-  useEffect(() => () => own.forEach((o) => URL.revokeObjectURL(o.url)), [own]);
+  // اختيار منتج ← صوره تظهر فوراً (من بيانات المنتج، بنفس ترتيبها)
+  useEffect(() => {
+    setPhotos((l) => l.filter((x) => x.file));
+    if (!productId) return;
+    setLoadingPhotos(true);
+    api.get(`/stores/${storeId}/products/${productId}`)
+      .then(({ data }) => {
+        const p = data?.data ?? data;
+        const urls = [...(p?.imagesProduct ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((i) => i.imageUrl).filter(Boolean);
+        setPhotos((l) => [...urls.slice(0, 3).map((url, n) => ({ n, url })), ...l.filter((x) => x.file)].slice(0, 3));
+      })
+      .catch(() => {})
+      .finally(() => setLoadingPhotos(false));
+  }, [productId, storeId]);
 
   const go = (s) => { setStep(s); setStepAt(Date.now()); };
   const onPreview = ({ count, index, blob }) => setShots((p) => {
@@ -71,7 +86,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
       }
       // صفحة صور
       go('photos');
-      const files = own.length ? own.map((o) => o.file) : await fetchProductPhotos(pageId, productId);
+      const files = (await Promise.all(photos.map((x) => (x.file ? x.file : fetchProductPhoto(pageId, productId, x.n).catch(() => null))))).filter(Boolean);
       if (!files.length) throw new Error(t('lp.no_photos'));
       const tree = await generateImagePage({ pageId, files, productId, language: lang, primaryColor: color || undefined, onStep: go, onPreview });
       await finish(pageId, tree);
@@ -144,20 +159,21 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
               <div className="space-y-1.5">
                 <label className={label}>{t('lp.photos')}</label>
                 <div className="flex gap-2">
-                  {own.map((o, i) => (
-                    <span key={o.url} className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
+                  {loadingPhotos && <span className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center"><Loader2 className="w-4 h-4 animate-spin text-gray-400" /></span>}
+                  {photos.map((o, i) => (
+                    <span key={o.url} className={`relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100 ${i === 0 ? 'ring-2 ring-violet-500' : ''}`}>
                       <img src={o.url} alt="" className="w-full h-full object-cover" />
-                      <button type="button" onClick={() => setOwn((l) => l.filter((_, j) => j !== i))} className="absolute top-0.5 end-0.5 p-0.5 rounded-full bg-black/60 text-white"><X className="w-3 h-3" /></button>
+                      <button type="button" onClick={() => setPhotos((l) => l.filter((_, j) => j !== i))} className="absolute top-0.5 end-0.5 p-0.5 rounded-full bg-black/60 text-white"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-                  {own.length < 3 && (
+                  {photos.length < 3 && (
                     <button type="button" onClick={() => fileRef.current?.click()} className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 flex flex-col items-center justify-center gap-0.5 text-gray-400">
                       <ImagePlus className="w-5 h-5" /><Camera className="w-3 h-3" />
                     </button>
                   )}
                 </div>
-                <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const add = [...(e.target.files || [])].slice(0, 3 - own.length).map((file) => ({ file, url: URL.createObjectURL(file) })); setOwn((l) => [...l, ...add]); e.target.value = ''; }} />
-                <p className="text-[11px] text-gray-400">{own.length ? t('lp.own_photos') : t('lp.product_photos')}</p>
+                <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const add = [...(e.target.files || [])].slice(0, 3 - photos.length).map((file) => ({ file, url: URL.createObjectURL(file) })); setPhotos((l) => [...l, ...add]); e.target.value = ''; }} />
+                <p className="text-[11px] text-gray-400">{t('lp.photos_hint')}</p>
               </div>
             )}
 
@@ -183,7 +199,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
             <div className="space-y-1.5"><label className={label}>{t('lp.name')}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('lp.name_ph')} className={input} /></div>
 
             {mode !== 'empty' && !productId && <p className="text-[11px] text-amber-600">{t('lp.ai_need_product')}</p>}
-            <button type="button" disabled={(mode !== 'empty' && !productId) || (mode === 'empty' && !name.trim() && !productId) || limitReached || noQuota} onClick={create}
+            <button type="button" disabled={(mode !== 'empty' && !productId) || (mode === 'empty' && !name.trim() && !productId) || (mode === 'image' && (!photos.length || loadingPhotos)) || limitReached || noQuota} onClick={create}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold disabled:opacity-50">
               {mode !== 'empty' && <Sparkles className="w-4 h-4" />}{t(`lp.create_${mode}`)}
             </button>

@@ -752,6 +752,7 @@
     "step_design": "L'IA conçoit la page…",
     "step_capture": "Conversion des sections en images…",
     "step_upload": "Envoi des images…",
-    "step_save": "Enregistrement…"
+    "step_save": "Enregistrement…",
+    "photos_hint": "Les photos du produit apparaissent automatiquement — retirez-en ou ajoutez les vôtres. La première est la principale."
   }
 }

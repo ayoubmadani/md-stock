@@ -102,7 +102,11 @@ export async function generateImagePage({ pageId, files, productId, description,
   }
 }
 
-// صور المنتج عبر الخادم (R2 لا يسمح للمتصفح بقراءتها مباشرة) — حتى 3، والمفقودة تُتجاهل
+// صورة منتج برقمها (نفس ترتيب صور المنتج) عبر الخادم — R2 لا يسمح للمتصفح بقراءة بكسلاتها مباشرة
+export const fetchProductPhoto = (pageId, productId, n) =>
+  api.get(`/builder-pages/${pageId}/image-page-product-photo`, { params: { productId, n }, responseType: 'blob' }).then((r) => r.data);
+
+// صور المنتج عبر الخادم — حتى 3، والمفقودة تُتجاهل
 export const fetchProductPhotos = (pageId, productId, max = 3) => Promise.all(
   Array.from({ length: max }, (_, n) => api.get(`/builder-pages/${pageId}/image-page-product-photo`, { params: { productId, n }, responseType: 'blob' })
     .then((r) => r.data).catch(() => null)),
