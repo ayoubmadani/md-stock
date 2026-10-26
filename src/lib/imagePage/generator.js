@@ -106,6 +106,10 @@ export async function generateImagePage({ pageId, files, productId, description,
 export const fetchProductPhoto = (pageId, productId, n) =>
   api.get(`/builder-pages/${pageId}/image-page-product-photo`, { params: { productId, n }, responseType: 'blob' }).then((r) => r.data);
 
+// صورة من تخزيننا (مكتبة الصور / منتج آخر) برابطها، عبر الخادم
+export const fetchStoredPhoto = (pageId, url) =>
+  api.get(`/builder-pages/${pageId}/image-page-photo`, { params: { url }, responseType: 'blob' }).then((r) => r.data);
+
 // صور المنتج عبر الخادم — حتى 3، والمفقودة تُتجاهل
 export const fetchProductPhotos = (pageId, productId, max = 3) => Promise.all(
   Array.from({ length: max }, (_, n) => api.get(`/builder-pages/${pageId}/image-page-product-photo`, { params: { productId, n }, responseType: 'blob' })

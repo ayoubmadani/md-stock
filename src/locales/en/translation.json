@@ -762,6 +762,12 @@
     "step_save": "Saving the page…",
     "photos_hint": "Tap a photo to make it the main one, or move it with the arrows.",
     "main_photo": "Main",
-    "photos_warning": "Pick photos that show the whole product (not cropped) on a plain background — the main photo is cut out and becomes the product image on the page."
+    "photos_warning": "Pick photos that show the whole product (not cropped) on a plain background — the main photo is cut out and becomes the product image on the page.",
+    "add_device": "Camera / gallery",
+    "add_library": "Image library",
+    "add_product": "Product photos",
+    "from_product": "Product photos",
+    "add_n": "Add ({{count}})",
+    "already_added": "Added"
   }
 }

@@ -762,6 +762,12 @@
     "step_save": "Enregistrement…",
     "photos_hint": "Touchez une photo pour la rendre principale, ou déplacez-la avec les flèches.",
     "main_photo": "Principale",
-    "photos_warning": "Choisissez des photos où le produit apparaît en entier (non coupé), sur un fond simple — la photo principale est détourée et devient l'image du produit."
+    "photos_warning": "Choisissez des photos où le produit apparaît en entier (non coupé), sur un fond simple — la photo principale est détourée et devient l'image du produit.",
+    "add_device": "Caméra / galerie",
+    "add_library": "Bibliothèque",
+    "add_product": "Photos du produit",
+    "from_product": "Photos du produit",
+    "add_n": "Ajouter ({{count}})",
+    "already_added": "Ajoutée"
   }
 }

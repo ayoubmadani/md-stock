@@ -1,10 +1,11 @@
 // صفحة هبوط جديدة: صفحة صور بالذكاء الاصطناعي (الافتراضي) / صفحة نصوص بالذكاء الاصطناعي / فارغة
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Camera, ChevronLeft, ChevronRight, ImagePlus, Images, LayoutTemplate, Loader2, RotateCcw, Sparkles, Type, X } from 'lucide-react';
+import { AlertTriangle, Camera, ChevronLeft, ChevronRight, ImagePlus, Images, LayoutTemplate, Loader2, Package, RotateCcw, Sparkles, Type, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { captureAndUpload, fetchProductPhoto, generateImagePage } from '../lib/imagePage/generator';
+import { captureAndUpload, fetchProductPhoto, fetchStoredPhoto, generateImagePage } from '../lib/imagePage/generator';
+import ImageLibrary from './ImageLibrary';
 import { progressFor } from '../lib/imagePage/progress';
 import { movePhoto } from '../lib/imagePage/photos';
 import { input, label } from './product';
@@ -14,6 +15,35 @@ const MODES = [
   { id: 'blocks', icon: Type },
   { id: 'empty', icon: LayoutTemplate },
 ];
+
+// إضافة من صور نفس المنتج (كل صوره، ومنها ما حُذف): الضغط للاختيار
+function ProductPhotosPicker({ urls, chosen, max, onPick, onClose }) {
+  const { t } = useTranslation();
+  const [sel, setSel] = useState([]);
+  const toggle = (n) => setSel((l) => (l.includes(n) ? l.filter((x) => x !== n) : l.length < max ? [...l, n] : l));
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-5 space-y-3 max-h-[85dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center justify-between"><p className="font-bold">{t('lp.from_product')}</p><button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button></div>
+        {urls.length === 0 ? <p className="text-center text-xs text-gray-400 py-4">{t('lp.no_photos')}</p> : (
+          <div className="grid grid-cols-3 gap-2">
+            {urls.map((u, n) => {
+              const used = chosen.includes(n);
+              return (
+                <button key={u} type="button" disabled={used} onClick={() => toggle(n)} className={`relative aspect-square rounded-xl overflow-hidden ${sel.includes(n) ? 'ring-[3px] ring-violet-500' : ''} ${used ? 'opacity-40' : ''}`}>
+                  <img src={u} alt="" className="w-full h-full object-cover" />
+                  {sel.includes(n) && <span className="absolute top-1 end-1 w-5 h-5 rounded-full bg-violet-600 text-white text-[11px] font-black flex items-center justify-center">{sel.indexOf(n) + 1}</span>}
+                  {used && <span className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] font-bold py-0.5">{t('lp.already_added')}</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <button type="button" disabled={!sel.length} onClick={() => onPick(sel)} className="w-full py-3 rounded-xl bg-violet-600 text-white font-bold disabled:opacity-50">{t('lp.add_n', { count: sel.length })}</button>
+      </div>
+    </div>
+  );
+}
 
 export default function NewLandingSheet({ storeId, products, onClose, onDone }) {
   const { t, i18n } = useTranslation();
@@ -25,6 +55,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
   // الصور المختارة بالترتيب (الأولى رئيسية): { n, url } صورة منتج برقمها، أو { file, url } صورة من الهاتف
   const [photos, setPhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(false);
+  const [productUrls, setProductUrls] = useState([]); // كل صور المنتج بترتيبها
   const [usage, setUsage] = useState(null);
   const [step, setStep] = useState(null);
   const [stepAt, setStepAt] = useState(0);
@@ -32,20 +63,25 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
   const [shots, setShots] = useState({ count: 0, urls: [] });
   const [retry, setRetry] = useState(null); // { pageId, design } بعد فشل التصوير/الرفع
   const fileRef = useRef(null);
+  const [adder, setAdder] = useState(null); // null | 'menu' | 'library' | 'product'
+  const addStored = (urls) => { setPhotos((l) => [...l, ...urls.filter((u) => !l.some((x) => x.url === u)).map((u) => ({ stored: u, url: u }))].slice(0, 3)); setAdder(null); };
+  const addProductPhotos = (ns) => { setPhotos((l) => [...l, ...ns.map((n) => ({ n, url: productUrls[n] }))].slice(0, 3)); setAdder(null); };
   const busy = !!step;
 
   useEffect(() => { api.get('/builder-pages/image-pages/usage').then((r) => setUsage({ used: Number(r.data?.used) || 0, limit: Number(r.data?.limit) || 0 })).catch(() => {}); }, []);
   useEffect(() => { if (!step) return undefined; const id = setInterval(() => tick((n) => n + 1), 400); return () => clearInterval(id); }, [step]);
   // اختيار منتج ← صوره تظهر فوراً (من بيانات المنتج، بنفس ترتيبها)
   useEffect(() => {
-    setPhotos((l) => l.filter((x) => x.file));
+    setPhotos((l) => l.filter((x) => x.file || x.stored));
+    setProductUrls([]);
     if (!productId) return;
     setLoadingPhotos(true);
     api.get(`/stores/${storeId}/products/${productId}`)
       .then(({ data }) => {
         const p = data?.data ?? data;
         const urls = [...(p?.imagesProduct ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((i) => i.imageUrl).filter(Boolean);
-        setPhotos((l) => [...urls.slice(0, 3).map((url, n) => ({ n, url })), ...l.filter((x) => x.file)].slice(0, 3));
+        setProductUrls(urls);
+        setPhotos((l) => [...urls.slice(0, 3).map((url, n) => ({ n, url })), ...l.filter((x) => x.file || x.stored)].slice(0, 3));
       })
       .catch(() => {})
       .finally(() => setLoadingPhotos(false));
@@ -87,7 +123,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
       }
       // صفحة صور
       go('photos');
-      const files = (await Promise.all(photos.map((x) => (x.file ? x.file : fetchProductPhoto(pageId, productId, x.n).catch(() => null))))).filter(Boolean);
+      const files = (await Promise.all(photos.map((x) => (x.file ? x.file : x.stored ? fetchStoredPhoto(pageId, x.stored).catch(() => null) : fetchProductPhoto(pageId, productId, x.n).catch(() => null))))).filter(Boolean);
       if (!files.length) throw new Error(t('lp.no_photos'));
       const tree = await generateImagePage({ pageId, files, productId, language: lang, primaryColor: color || undefined, onStep: go, onPreview });
       await finish(pageId, tree);
@@ -176,12 +212,21 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
                     </div>
                   ))}
                   {photos.length < 3 && (
-                    <button type="button" onClick={() => fileRef.current?.click()} className="w-[4.5rem] h-[4.5rem] rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+                    <button type="button" onClick={() => setAdder('menu')} className="w-[4.5rem] h-[4.5rem] rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 flex flex-col items-center justify-center gap-0.5 text-gray-400">
                       <ImagePlus className="w-5 h-5" /><Camera className="w-3 h-3" />
                     </button>
                   )}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const add = [...(e.target.files || [])].slice(0, 3 - photos.length).map((file) => ({ file, url: URL.createObjectURL(file) })); setPhotos((l) => [...l, ...add]); e.target.value = ''; }} />
+                {adder === 'menu' && (
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button type="button" onClick={() => { setAdder(null); fileRef.current?.click(); }} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold"><Camera className="w-5 h-5 text-violet-500" />{t('lp.add_device')}</button>
+                    <button type="button" onClick={() => setAdder('library')} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold"><Images className="w-5 h-5 text-violet-500" />{t('lp.add_library')}</button>
+                    <button type="button" disabled={!productUrls.length} onClick={() => setAdder('product')} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold disabled:opacity-40"><Package className="w-5 h-5 text-violet-500" />{t('lp.add_product')}</button>
+                  </div>
+                )}
+                {adder === 'library' && <ImageLibrary folder="products" max={3 - photos.length} onPick={addStored} onClose={() => setAdder(null)} />}
+                {adder === 'product' && <ProductPhotosPicker urls={productUrls} chosen={photos.filter((x) => x.n !== undefined).map((x) => x.n)} max={3 - photos.length} onPick={addProductPhotos} onClose={() => setAdder(null)} />}
                 <p className="text-[11px] text-gray-400">{t('lp.photos_hint')}</p>
                 <p className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[11px] leading-relaxed"><AlertTriangle className="w-4 h-4 shrink-0" />{t('lp.photos_warning')}</p>
               </div>
