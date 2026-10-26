@@ -1,7 +1,7 @@
-// الفريق (للمالك): الأعضاء — دعوة بالبحث، المجموعة، إيقاف/تفعيل، إزالة — والمجموعات بصلاحياتها
+// الفريق: الأعضاء والمجموعات (للمالك) + الدعوات التي وصلتني للانضمام لمتاجر غيري (للجميع)
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Loader2, Pause, Pencil, Play, Plus, Power, Search, Shield, Trash2, UserMinus, UserPlus, Users, X } from 'lucide-react';
+import { Check, Loader2, Mail, Pause, Pencil, Play, Plus, Power, Search, Shield, Store, Trash2, UserMinus, UserPlus, Users, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -45,10 +45,39 @@ function GroupSheet({ group, onClose, onSave, saving }) {
   );
 }
 
+// دعوات وصلتني: قبول (يُضاف المتجر لقائمتي) أو رفض
+function Invitations({ items, onAnswer, busy }) {
+  const { t } = useTranslation();
+  if (items === null) return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
+  if (!items.length) return <div className="flex flex-col items-center gap-3 py-12 text-gray-400"><Mail className="w-10 h-10" /><p className="text-sm">{t('team.inv_empty')}</p></div>;
+  return items.map((inv) => (
+    <div key={inv.id} className={`${box} p-4 space-y-3`}>
+      <div className="flex items-start gap-3">
+        <span className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0"><Store className="w-5 h-5" /></span>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold truncate"><bdi>{inv.storeName}</bdi></p>
+          <p className="text-xs text-gray-500">{inv.groupName ? t('team.inv_by', { owner: inv.ownerName, group: inv.groupName }) : t('team.inv_by_nogroup', { owner: inv.ownerName })}</p>
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {(inv.permissions || []).map((p) => <span key={p} className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300">{t(`team.perm.${p}`)}</span>)}
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" disabled={busy === inv.id} onClick={() => onAnswer(inv, true)} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50">
+          {busy === inv.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}{t('team.accept')}
+        </button>
+        <button type="button" disabled={busy === inv.id} onClick={() => onAnswer(inv, false)} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold disabled:opacity-50"><X className="w-4 h-4" />{t('team.reject')}</button>
+      </div>
+    </div>
+  ));
+}
+
 export default function TeamPage() {
   const { t, i18n } = useTranslation();
-  const { storeId } = useAuth();
-  const [tab, setTab] = useState('members');
+  const { storeId, store, refresh } = useAuth();
+  const isOwner = store?.role === 'owner';
+  const [tab, setTab] = useState(isOwner ? 'members' : 'invitations');
+  const [invites, setInvites] = useState(null);
   const [members, setMembers] = useState(null);
   const [groups, setGroups] = useState([]);
   const [limits, setLimits] = useState(null);
@@ -62,7 +91,17 @@ export default function TeamPage() {
     api.get(`/stores/${storeId}/groups`).then((r) => setGroups(r.data ?? [])).catch(() => setGroups([])),
     api.get(`/stores/${storeId}/team/limits`).then((r) => setLimits(r.data)).catch(() => {}),
   ]), [storeId]);
-  useEffect(() => { setMembers(null); load(); }, [load]);
+  useEffect(() => { if (!isOwner) return; setMembers(null); load(); }, [load, isOwner]);
+  const loadInvites = useCallback(() => api.get('/me/invitations').then((r) => setInvites(r.data ?? [])).catch(() => setInvites([])), []);
+  useEffect(() => { loadInvites(); }, [loadInvites]);
+  const answer = async (inv, accept) => {
+    setBusy(inv.id);
+    try {
+      await api.post(`/invitations/${inv.id}/${accept ? 'accept' : 'reject'}`);
+      if (accept) { toast.success(t('team.inv_accepted', { store: inv.storeName })); await refresh(); }
+      await loadInvites();
+    } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
+  };
 
   const act = async (key, fn, ok) => {
     setBusy(key);
@@ -78,13 +117,18 @@ export default function TeamPage() {
 
   return (
     <div className="max-w-xl mx-auto space-y-3">
-      <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
-        {['members', 'groups'].map((k) => (
-          <button key={k} type="button" onClick={() => setTab(k)} className={`py-2 rounded-lg text-sm font-bold ${tab === k ? 'bg-white dark:bg-zinc-800 shadow-sm' : 'text-gray-500'}`}>{t(`team.tab_${k}`)}</button>
+      <div className={`grid ${isOwner ? 'grid-cols-3' : 'grid-cols-1'} gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900`}>
+        {(isOwner ? ['members', 'groups', 'invitations'] : ['invitations']).map((k) => (
+          <button key={k} type="button" onClick={() => setTab(k)} className={`py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-1.5 ${tab === k ? 'bg-white dark:bg-zinc-800 shadow-sm' : 'text-gray-500'}`}>
+            {t(`team.tab_${k}`)}
+            {k === 'invitations' && invites?.length > 0 && <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center">{invites.length}</span>}
+          </button>
         ))}
       </div>
 
-      {tab === 'members' && (
+      {tab === 'invitations' && <Invitations items={invites} onAnswer={answer} busy={busy} />}
+
+      {tab === 'members' && isOwner && (
         <>
           {/* الدعوة */}
           <div className={`${box} p-4 space-y-3`}>
@@ -147,7 +191,7 @@ export default function TeamPage() {
         </>
       )}
 
-      {tab === 'groups' && (
+      {tab === 'groups' && isOwner && (
         <>
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] text-gray-400 flex-1">{t('team.owner_note')}</p>

@@ -16,7 +16,7 @@ export const MORE = [
   { to: '/stores', key: 'stores', icon: Store, all: true },
   { to: '/landing', key: 'landing', icon: LayoutTemplate, owner: true },
   { to: '/messages', key: 'messages', icon: MessageSquare, owner: true },
-  { to: '/team', key: 'team', icon: Users, owner: true },
+  { to: '/team', key: 'team', icon: Users, all: true },
   { to: '/delivery', key: 'delivery', icon: Truck, owner: true },
   { to: '/confirmation', key: 'confirmation', icon: PhoneCall, owner: true },
   { to: '/themes', key: 'themes', icon: Palette, owner: true },

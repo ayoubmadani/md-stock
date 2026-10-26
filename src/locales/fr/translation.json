@@ -629,7 +629,14 @@
       "order.manage": "Gérer les commandes",
       "domain.crud": "Domaines",
       "seo.manage": "SEO"
-    }
+    },
+    "tab_invitations": "Invitations",
+    "inv_empty": "Aucune invitation",
+    "inv_by": "De {{owner}} · groupe « {{group}} »",
+    "inv_by_nogroup": "De {{owner}}",
+    "accept": "Accepter",
+    "reject": "Refuser",
+    "inv_accepted": "Vous avez rejoint {{store}} ✓ — dans « Mes boutiques »"
   },
   "delivery": {
     "add": "Connecter",

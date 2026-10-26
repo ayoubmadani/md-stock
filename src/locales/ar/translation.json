@@ -629,7 +629,14 @@
       "order.manage": "إدارة الطلبات",
       "domain.crud": "الدومينات",
       "seo.manage": "SEO (محركات البحث)"
-    }
+    },
+    "tab_invitations": "الدعوات",
+    "inv_empty": "لا دعوات جديدة",
+    "inv_by": "من {{owner}} · مجموعة «{{group}}»",
+    "inv_by_nogroup": "من {{owner}}",
+    "accept": "قبول",
+    "reject": "رفض",
+    "inv_accepted": "انضممت إلى {{store}} ✓ — تجده في «متاجري»"
   },
   "delivery": {
     "add": "ربط شركة",
