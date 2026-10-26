@@ -63,7 +63,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
   const [shots, setShots] = useState({ count: 0, urls: [] });
   const [retry, setRetry] = useState(null); // { pageId, design } بعد فشل التصوير/الرفع
   const fileRef = useRef(null);
-  const [adder, setAdder] = useState(null); // null | 'menu' | 'library' | 'product'
+  const [adder, setAdder] = useState(null); // null | 'library' | 'product'
   const addStored = (urls) => { setPhotos((l) => [...l, ...urls.filter((u) => !l.some((x) => x.url === u)).map((u) => ({ stored: u, url: u }))].slice(0, 3)); setAdder(null); };
   const addProductPhotos = (ns) => { setPhotos((l) => [...l, ...ns.map((n) => ({ n, url: productUrls[n] }))].slice(0, 3)); setAdder(null); };
   const busy = !!step;
@@ -211,18 +211,14 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
                       </div>
                     </div>
                   ))}
-                  {photos.length < 3 && (
-                    <button type="button" onClick={() => setAdder('menu')} className="w-[4.5rem] h-[4.5rem] rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 flex flex-col items-center justify-center gap-0.5 text-gray-400">
-                      <ImagePlus className="w-5 h-5" /><Camera className="w-3 h-3" />
-                    </button>
-                  )}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const add = [...(e.target.files || [])].slice(0, 3 - photos.length).map((file) => ({ file, url: URL.createObjectURL(file) })); setPhotos((l) => [...l, ...add]); e.target.value = ''; }} />
-                {adder === 'menu' && (
+                {/* طرق الإضافة ظاهرة دائماً — تتعطل عند 3 صور */}
+                {(
                   <div className="grid grid-cols-3 gap-1.5">
-                    <button type="button" onClick={() => { setAdder(null); fileRef.current?.click(); }} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold"><Camera className="w-5 h-5 text-violet-500" />{t('lp.add_device')}</button>
-                    <button type="button" onClick={() => setAdder('library')} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold"><Images className="w-5 h-5 text-violet-500" />{t('lp.add_library')}</button>
-                    <button type="button" disabled={!productUrls.length} onClick={() => setAdder('product')} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold disabled:opacity-40"><Package className="w-5 h-5 text-violet-500" />{t('lp.add_product')}</button>
+                    <button type="button" disabled={photos.length >= 3} onClick={() => { setAdder(null); fileRef.current?.click(); }} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold disabled:opacity-40"><Camera className="w-5 h-5 text-violet-500" />{t('lp.add_device')}</button>
+                    <button type="button" disabled={photos.length >= 3} onClick={() => setAdder('library')} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold disabled:opacity-40"><Images className="w-5 h-5 text-violet-500" />{t('lp.add_library')}</button>
+                    <button type="button" disabled={!productUrls.length || photos.length >= 3} onClick={() => setAdder('product')} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-[11px] font-bold disabled:opacity-40"><Package className="w-5 h-5 text-violet-500" />{t('lp.add_product')}</button>
                   </div>
                 )}
                 {adder === 'library' && <ImageLibrary folder="products" max={3 - photos.length} onPick={addStored} onClose={() => setAdder(null)} />}
