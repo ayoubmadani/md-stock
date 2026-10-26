@@ -846,6 +846,26 @@
     "thanks": "Merci de votre visite",
     "print": "Imprimer",
     "open_order": "Ouvrir la commande",
-    "next_sale": "Nouvelle vente"
+    "next_sale": "Nouvelle vente",
+    "add_as_product": "Ajouter comme produit"
+  },
+  "quick": {
+    "title": "Produit rapide",
+    "photo": "Photo",
+    "gallery": "Galerie",
+    "name": "Nom du produit",
+    "price": "Prix",
+    "qty": "Quantité",
+    "barcode": "Code-barres",
+    "generate": "Générer",
+    "cost": "Prix d'achat (optionnel — pour le profit)",
+    "options": "Tailles / couleurs (s'il y en a)",
+    "color_ph": "Couleur (ex. Rouge)",
+    "options_hint": "Une variante par taille/couleur — réglez stock et code-barres depuis la page produit.",
+    "save": "Ajouter à la boutique",
+    "created": "Produit ajouté ✓",
+    "size": "Taille",
+    "color": "Couleur",
+    "variants_next": "Produit ajouté — réglez le stock de chaque variante depuis la page produit"
   }
 }

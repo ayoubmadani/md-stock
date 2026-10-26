@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import Scanner from '../components/Scanner';
+import QuickProductSheet from '../components/QuickProductSheet';
 import { AdjustModal, StatusBadge, VariantParts, fmt } from '../components/inventory';
 
 const statusOf = (stock, threshold) => (stock <= 0 ? 'out' : stock <= threshold ? 'low' : 'ok');
@@ -24,6 +25,7 @@ export default function ScanPage() {
   const [adjust, setAdjust] = useState(null);
   const [order, setOrder] = useState(null); // طلب ممسوح: يظهر هنا مع أزرار الخطوة التالية
   const [ship, setShip] = useState(false);
+  const [quick, setQuick] = useState(false);
 
   // منتج أولاً، ثم طلب (باركود الطلب أو رقم تتبع شركة التوصيل) — حسب صلاحيات العضو
   const lookup = useCallback(async (c) => {
@@ -76,10 +78,12 @@ export default function ScanPage() {
           {!loading && hit === 'none' && (
             <div className="rounded-2xl border border-dashed border-gray-300 dark:border-zinc-700 p-6 text-center space-y-4">
               <p className="text-gray-600 dark:text-zinc-300">{t('scan.unknown')}</p>
-              {can('product.crud') && <button onClick={() => navigate(`/products/new?barcode=${encodeURIComponent(code)}`)}
+              {can('product.crud') && <button onClick={() => setQuick(true)}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-bold">
-                <PackagePlus className="w-5 h-5" />{t('scan.create')}
+                <PackagePlus className="w-5 h-5" />{t('quick.title')}
               </button>}
+              {can('product.crud') && <button onClick={() => navigate(`/products/new?barcode=${encodeURIComponent(code)}`)}
+                className="w-full text-sm font-semibold text-gray-500">{t('scan.create')}</button>}
             </div>
           )}
 
@@ -152,6 +156,7 @@ export default function ScanPage() {
           onSaved={() => { setAdjust(null); toast.success(t('inventory.saved')); lookup(code); }}
         />
       )}
+      {quick && <QuickProductSheet storeId={storeId} barcode={code} onClose={() => setQuick(false)} onCreated={() => { setQuick(false); lookup(code); }} />}
     </div>
   );
 }

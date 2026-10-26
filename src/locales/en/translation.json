@@ -846,6 +846,26 @@
     "thanks": "Thank you for your visit",
     "print": "Print",
     "open_order": "Open order",
-    "next_sale": "New sale"
+    "next_sale": "New sale",
+    "add_as_product": "Add as product"
+  },
+  "quick": {
+    "title": "Quick new product",
+    "photo": "Photo",
+    "gallery": "Gallery",
+    "name": "Product name",
+    "price": "Price",
+    "qty": "Quantity",
+    "barcode": "Barcode",
+    "generate": "Generate",
+    "cost": "Cost price (optional — for profit)",
+    "options": "Sizes / colors (if any)",
+    "color_ph": "Color (e.g. Red)",
+    "options_hint": "A variant is created per size/color — set each one's stock and barcode on the product page.",
+    "save": "Add to store",
+    "created": "Product added ✓",
+    "size": "Size",
+    "color": "Color",
+    "variants_next": "Product added — set each variant's stock on the product page"
   }
 }

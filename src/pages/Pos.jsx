@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import JsBarcode from 'jsbarcode';
-import { Check, Loader2, Minus, Package, Plus, Printer, ShoppingBag, Trash2, User } from 'lucide-react';
+import { Check, Loader2, Minus, Package, PackagePlus, Plus, Printer, ShoppingBag, Trash2, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money } from '../lib/orders';
 import { addScanned, cartTotal, saleBody, setLine } from '../lib/pos';
 import Scanner from '../components/Scanner';
+import QuickProductSheet from '../components/QuickProductSheet';
 import { input } from '../components/product';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
@@ -73,6 +74,8 @@ export default function PosPage() {
   const [looking, setLooking] = useState(false);
   const [saving, setSaving] = useState(false);
   const [receipt, setReceipt] = useState(null);
+  const [quick, setQuick] = useState(null); // null | { barcode }
+  const { can } = useAuth();
   const recent = useRef(new Map()); // آخر مسح لكل كود — لا نضيف نفس القطعة مرتين وهي أمام الكاميرا
 
   const onCode = useCallback(async (raw) => {
@@ -87,11 +90,14 @@ export default function PosPage() {
       beep(true);
     } catch (e) {
       beep(false);
-      toast.error(e.response?.status === 404 ? t('pos.unknown', { code }) : errorMessage(e, t('inventory.error')));
+      if (e.response?.status === 404) {
+        // باركود جديد: إضافته كمنتج سريع بنفس الباركود
+        toast.error(t('pos.unknown', { code }), can('product.crud') ? { action: { label: t('pos.add_as_product'), onClick: () => setQuick({ barcode: code }) }, duration: 8000 } : undefined);
+      } else toast.error(errorMessage(e, t('inventory.error')));
     } finally {
       setLooking(false);
     }
-  }, [storeId, t]);
+  }, [storeId, t, can]);
 
   const total = cartTotal(cart);
   const confirm = async () => {
@@ -112,6 +118,10 @@ export default function PosPage() {
         <Scanner onDetected={onCode} />
         {looking && <span className="absolute top-3 end-3 p-2 rounded-full bg-black/60"><Loader2 className="w-4 h-4 animate-spin text-white" /></span>}
       </div>
+
+      {can('product.crud') && (
+        <button type="button" onClick={() => setQuick({ barcode: '' })} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400"><PackagePlus className="w-4 h-4" />{t('quick.title')}</button>
+      )}
 
       {cart.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-8 text-gray-400 text-center"><ShoppingBag className="w-9 h-9" /><p className="text-sm max-w-xs">{t('pos.empty')}</p></div>
@@ -154,6 +164,16 @@ export default function PosPage() {
             </button>
           </div>
         </>
+      )}
+
+      {quick && (
+        <QuickProductSheet storeId={storeId} barcode={quick.barcode} onClose={() => setQuick(null)}
+          onCreated={(p) => {
+            setQuick(null);
+            // منتج بلا مقاسات ← يدخل السلة مباشرة؛ بمقاسات ← تُحدد كمياتها من صفحة المنتج
+            if (!p.hasVariants && p.id) setCart((c) => addScanned(c, { product: { id: p.id, name: p.name, price: p.price, image: p.image }, variant: null }));
+            else toast.message(t('quick.variants_next'));
+          }} />
       )}
     </div>
   );
