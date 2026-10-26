@@ -2,12 +2,13 @@
 // تفعيل/إيقاف، نسخ، حذف، تغيير المنتج، ربط دومين، المنصة — تصميم الصفحة نفسه في محرر اللوحة
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Copy, ExternalLink, Globe, LayoutTemplate, Loader2, Monitor, MoreVertical, Package, Plus, Power, Send, Sparkles, Trash2, X } from 'lucide-react';
+import { Copy, ExternalLink, Globe, LayoutTemplate, Loader2, Monitor, MoreVertical, Package, Plus, Power, Send, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { editorUrl, pageCr, pageUrl } from '../lib/landing-pages';
-import { Toggle, input, label } from '../components/product';
+import NewLandingSheet from '../components/NewLandingSheet';
+import { input, label } from '../components/product';
 
 const sheet = 'bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-5 space-y-3 max-h-[92dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]';
 function Sheet({ title, onClose, children }) {
@@ -18,61 +19,6 @@ function Sheet({ title, onClose, children }) {
         {children}
       </div>
     </div>
-  );
-}
-
-// صفحة جديدة: اسم + منتج + (اختياري) توليد المحتوى بالذكاء الاصطناعي ثم النشر
-function NewSheet({ storeId, products, onClose, onDone }) {
-  const { t, i18n } = useTranslation();
-  const [name, setName] = useState('');
-  const [productId, setProductId] = useState('');
-  const [ai, setAi] = useState(true);
-  const [lang, setLang] = useState(['ar', 'fr', 'en'].includes(i18n.language) ? i18n.language : 'ar');
-  const [step, setStep] = useState(null);
-
-  const create = async () => {
-    try {
-      setStep('create');
-      const { data: page } = await api.post('/builder-pages', { name: name.trim() || products.find((p) => p.id === productId)?.name || t('lp.untitled'), storeId, productId: productId || undefined });
-      if (ai && productId) {
-        setStep('ai');
-        const { data: gen } = await api.post(`/builder-pages/${page.id}/generate`, { productId, language: lang }, { timeout: 180000 });
-        if (gen?.imageFailed) toast.message(t('lp.image_failed'));
-        setStep('publish');
-        await api.post(`/builder-pages/${page.id}/publish`);
-        toast.success(t('lp.ready'));
-      } else {
-        toast.success(t('lp.created'));
-      }
-      onDone();
-    } catch (e) {
-      toast.error(errorMessage(e, t('inventory.error')));
-      setStep(null);
-    }
-  };
-
-  return (
-    <Sheet title={t('lp.new')} onClose={() => !step && onClose()}>
-      <div className="space-y-1.5"><label className={label}>{t('lp.product')}</label>
-        <select value={productId} onChange={(e) => setProductId(e.target.value)} className={input}>
-          <option value="">{t('lp.no_product')}</option>
-          {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-        </select>
-      </div>
-      <div className="space-y-1.5"><label className={label}>{t('lp.name')}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('lp.name_ph')} className={input} /></div>
-      <div className={`rounded-xl p-3 space-y-2 ${ai && productId ? 'bg-violet-50 dark:bg-violet-500/10' : 'bg-gray-50 dark:bg-zinc-800/60'}`}>
-        <span className={productId ? '' : 'opacity-50 pointer-events-none'}><Toggle checked={ai && !!productId} onChange={setAi}><span className="flex items-center gap-1.5 font-semibold"><Sparkles className="w-4 h-4 text-violet-500" />{t('lp.ai')}</span></Toggle></span>
-        {ai && productId && (
-          <div className="grid grid-cols-3 gap-1.5">
-            {['ar', 'fr', 'en'].map((l) => <button key={l} type="button" onClick={() => setLang(l)} className={`py-1.5 rounded-lg text-xs font-bold ${lang === l ? 'bg-violet-600 text-white' : 'bg-white dark:bg-zinc-900 text-gray-500'}`}>{t(`stores.lang_${l}`)}</button>)}
-          </div>
-        )}
-        <p className="text-[11px] text-gray-500">{productId ? t('lp.ai_hint') : t('lp.ai_need_product')}</p>
-      </div>
-      <button type="button" disabled={!!step || (!name.trim() && !productId)} onClick={create} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">
-        {step && <Loader2 className="w-4 h-4 animate-spin" />}{step ? t(`lp.step_${step}`) : ai && productId ? t('lp.create_ai') : t('lp.create')}
-      </button>
-    </Sheet>
   );
 }
 
@@ -188,7 +134,7 @@ export default function LandingPagesPage() {
           </div>
         )}
 
-      {creating && <NewSheet storeId={storeId} products={products} onClose={() => setCreating(false)} onDone={() => { setCreating(false); load(); }} />}
+      {creating && <NewLandingSheet storeId={storeId} products={products} onClose={() => setCreating(false)} onDone={() => { setCreating(false); load(); }} />}
       {current && <PageSheet page={current} storeId={storeId} products={products} onClose={() => setOpen(null)} onChanged={load} />}
     </div>
   );
