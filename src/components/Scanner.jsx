@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Keyboard } from 'lucide-react';
 
-export default function Scanner({ onDetected, paused = false }) {
+export default function Scanner({ onDetected, paused = false, continuous = false }) {
   const { t } = useTranslation();
   const videoRef = useRef(null);
   const doneRef = useRef(false);
@@ -13,6 +13,8 @@ export default function Scanner({ onDetected, paused = false }) {
 
   // آخر دالة من الأب في ref: إعادة رسم الأب لا تعيد تشغيل الكاميرا
   const onDetectedRef = useRef(onDetected);
+  const continuousRef = useRef(continuous);
+  continuousRef.current = continuous;
   useEffect(() => { onDetectedRef.current = onDetected; }, [onDetected]);
 
   useEffect(() => {
@@ -27,7 +29,8 @@ export default function Scanner({ onDetected, paused = false }) {
       reader
         .decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } } }, videoRef.current, (result) => {
           if (!result || doneRef.current) return;
-          doneRef.current = true; // مرة واحدة لكل مسح
+          // مرة واحدة لكل مسح — إلا في الوضع المستمر (بيع في المحل: يمنع التكرار بنفسه)
+          if (!continuousRef.current) doneRef.current = true;
           navigator.vibrate?.(60);
           onDetectedRef.current(result.getText());
         })

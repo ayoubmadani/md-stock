@@ -115,7 +115,7 @@ export default function PosPage() {
   return (
     <div className="max-w-xl mx-auto space-y-3 pb-4">
       <div className="relative">
-        <Scanner onDetected={onCode} />
+        <Scanner onDetected={onCode} continuous />
         {looking && <span className="absolute top-3 end-3 p-2 rounded-full bg-black/60"><Loader2 className="w-4 h-4 animate-spin text-white" /></span>}
       </div>
 
