@@ -22,7 +22,8 @@
     "delivery": "Delivery companies",
     "confirmation": "Confirmation companies",
     "messages": "Messages",
-    "landing": "Landing pages"
+    "landing": "Landing pages",
+    "keys": "API keys"
   },
   "login": {
     "title": "Sign in",
@@ -775,5 +776,33 @@
     "from_product": "Product photos",
     "add_n": "Add ({{count}})",
     "already_added": "Added"
+  },
+  "keys": {
+    "new": "New key",
+    "hint": "Connect your account to Claude or ChatGPT (MCP): manage stores, products, categories and landing pages by chat. Deleting a store stays in the dashboard.",
+    "empty": "No keys yet",
+    "name": "Key name",
+    "name_ph": "e.g. Claude",
+    "validity": "Validity",
+    "days": "{{count}} days",
+    "create": "Create key",
+    "created": "Key created",
+    "once": "Copy it now and keep it safe — it won't be shown again.",
+    "mcp": "Claude / ChatGPT connection link (MCP)",
+    "mcp_hint": "Paste this link in “URL” when adding a custom connector in Claude or ChatGPT, with no authentication. Do not share it.",
+    "key": "Key",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copy_failed": "Copy failed",
+    "done": "Done",
+    "status_active": "Active",
+    "status_expired": "Expired",
+    "status_revoked": "Revoked",
+    "connected_with": "Connected with {{client}}",
+    "last_used": "Last used",
+    "never": "Never",
+    "expires": "Expires",
+    "revoke": "Revoke",
+    "revoke_q": "Revoke this key? Anything using it stops immediately."
   }
 }

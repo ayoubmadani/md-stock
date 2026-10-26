@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellRing, Code2, Store, Palette, Crown, Users, Truck, PhoneCall, MessageSquare, LayoutTemplate, ChevronLeft, LogOut, Megaphone, ShoppingCart, TrendingUp, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { Bell, BellRing, Code2, Store, Palette, Crown, Users, Truck, PhoneCall, MessageSquare, LayoutTemplate, KeyRound, ChevronLeft, LogOut, Megaphone, ShoppingCart, TrendingUp, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
@@ -22,6 +22,7 @@ export const MORE = [
   { to: '/themes', key: 'themes', icon: Palette, owner: true },
   { to: '/pixels', key: 'pixels', icon: Code2, owner: true },
   { to: '/subscription', key: 'subscription', icon: Crown, owner: true },
+  { to: '/keys', key: 'keys', icon: KeyRound, owner: true },
   { to: '/wallet', key: 'wallet', icon: Wallet, owner: true },
   { to: '/alerts', key: 'alerts', icon: BellRing, perm: 'product.crud' },
   { to: '/history', key: 'history', icon: History, perm: 'product.crud' },
