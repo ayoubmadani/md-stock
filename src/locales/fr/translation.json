@@ -760,6 +760,8 @@
     "step_capture": "Conversion des sections en images…",
     "step_upload": "Envoi des images…",
     "step_save": "Enregistrement…",
-    "photos_hint": "Les photos du produit apparaissent automatiquement — retirez-en ou ajoutez les vôtres. La première est la principale."
+    "photos_hint": "Touchez une photo pour la rendre principale, ou déplacez-la avec les flèches.",
+    "main_photo": "Principale",
+    "photos_warning": "Choisissez des photos où le produit apparaît en entier (non coupé), sur un fond simple — la photo principale est détourée et devient l'image du produit."
   }
 }

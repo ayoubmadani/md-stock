@@ -1,11 +1,12 @@
 // صفحة هبوط جديدة: صفحة صور بالذكاء الاصطناعي (الافتراضي) / صفحة نصوص بالذكاء الاصطناعي / فارغة
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, ImagePlus, Images, LayoutTemplate, Loader2, RotateCcw, Sparkles, Type, X } from 'lucide-react';
+import { AlertTriangle, Camera, ChevronLeft, ChevronRight, ImagePlus, Images, LayoutTemplate, Loader2, RotateCcw, Sparkles, Type, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { captureAndUpload, fetchProductPhoto, generateImagePage } from '../lib/imagePage/generator';
 import { progressFor } from '../lib/imagePage/progress';
+import { movePhoto } from '../lib/imagePage/photos';
 import { input, label } from './product';
 
 const MODES = [
@@ -161,19 +162,28 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
                 <div className="flex gap-2">
                   {loadingPhotos && <span className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center"><Loader2 className="w-4 h-4 animate-spin text-gray-400" /></span>}
                   {photos.map((o, i) => (
-                    <span key={o.url} className={`relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100 ${i === 0 ? 'ring-2 ring-violet-500' : ''}`}>
-                      <img src={o.url} alt="" className="w-full h-full object-cover" />
-                      <button type="button" onClick={() => setPhotos((l) => l.filter((_, j) => j !== i))} className="absolute top-0.5 end-0.5 p-0.5 rounded-full bg-black/60 text-white"><X className="w-3 h-3" /></button>
-                    </span>
+                    <div key={o.url} className="flex flex-col items-center gap-1">
+                      {/* الضغط على الصورة يجعلها الرئيسية */}
+                      <button type="button" onClick={() => setPhotos((l) => movePhoto(l, i, 0))} className={`relative w-[4.5rem] h-[4.5rem] rounded-xl overflow-hidden bg-gray-100 ${i === 0 ? 'ring-2 ring-violet-500' : ''}`}>
+                        <img src={o.url} alt="" className="w-full h-full object-cover" />
+                        {i === 0 && <span className="absolute bottom-0 inset-x-0 bg-violet-600 text-white text-[9px] font-bold py-0.5">{t('lp.main_photo')}</span>}
+                      </button>
+                      <div className="flex items-center gap-0.5">
+                        <button type="button" disabled={i === 0} onClick={() => setPhotos((l) => movePhoto(l, i, i - 1))} className="p-1 rounded-md text-gray-400 disabled:opacity-20"><ChevronRight className="w-3.5 h-3.5 ltr:rotate-180" /></button>
+                        <button type="button" onClick={() => setPhotos((l) => l.filter((_, j) => j !== i))} className="p-1 rounded-md text-rose-500"><X className="w-3.5 h-3.5" /></button>
+                        <button type="button" disabled={i === photos.length - 1} onClick={() => setPhotos((l) => movePhoto(l, i, i + 1))} className="p-1 rounded-md text-gray-400 disabled:opacity-20"><ChevronLeft className="w-3.5 h-3.5 ltr:rotate-180" /></button>
+                      </div>
+                    </div>
                   ))}
                   {photos.length < 3 && (
-                    <button type="button" onClick={() => fileRef.current?.click()} className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+                    <button type="button" onClick={() => fileRef.current?.click()} className="w-[4.5rem] h-[4.5rem] rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 flex flex-col items-center justify-center gap-0.5 text-gray-400">
                       <ImagePlus className="w-5 h-5" /><Camera className="w-3 h-3" />
                     </button>
                   )}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const add = [...(e.target.files || [])].slice(0, 3 - photos.length).map((file) => ({ file, url: URL.createObjectURL(file) })); setPhotos((l) => [...l, ...add]); e.target.value = ''; }} />
                 <p className="text-[11px] text-gray-400">{t('lp.photos_hint')}</p>
+                <p className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[11px] leading-relaxed"><AlertTriangle className="w-4 h-4 shrink-0" />{t('lp.photos_warning')}</p>
               </div>
             )}
 
