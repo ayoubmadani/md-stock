@@ -1,6 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid } from 'lucide-react';
+import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store } from 'lucide-react';
 import { MORE } from '../pages/More';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
@@ -17,7 +17,7 @@ const LANGS = ['ar', 'fr', 'en'];
 
 export default function Layout() {
   const { t, i18n } = useTranslation();
-  const { stores, storeId, selectStore, logout, can } = useAuth();
+  const { stores, store, logout, can } = useAuth();
   const owner = stores.some((s) => s.role === 'owner');
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
 
@@ -55,10 +55,14 @@ export default function Layout() {
         {/* الشريط العلوي */}
         <header className="sticky top-0 z-30 flex items-center gap-2 px-4 py-3 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur border-b border-gray-100 dark:border-zinc-900">
           <img src="/icon-192.png" alt="" className="w-7 h-7 rounded-lg md:hidden" />
-          <select value={storeId || ''} onChange={(e) => selectStore(e.target.value)}
-            className="flex-1 min-w-0 md:flex-none md:w-64 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm font-semibold outline-none">
-            {stores.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          {/* المتجر الحالي — اختيار متجر آخر من صفحة «متاجري» */}
+          <Link to="/stores" className="flex-1 min-w-0 md:flex-none md:max-w-xs flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-900">
+            <span className="w-7 h-7 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shrink-0 flex items-center justify-center">
+              {store?.design?.logoUrl ? <img src={store.design.logoUrl} alt="" className="w-full h-full object-contain" /> : <Store className="w-4 h-4 text-gray-400" />}
+            </span>
+            <span className="min-w-0 truncate text-sm font-bold"><bdi>{store?.name || '—'}</bdi></span>
+            {stores.length > 1 && <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
+          </Link>
           <div className="flex-1 hidden md:block" />
           <button onClick={nextLang} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900 flex items-center gap-1 text-xs font-bold uppercase" title="Language">
             <Languages className="w-4 h-4" />{i18n.language}

@@ -531,6 +531,10 @@
     "delete": "Delete permanently",
     "delete_title": "Delete store",
     "delete_warn": "The store is deleted with all its products, orders, pages and domains. This cannot be undone.",
-    "delete_type": "To confirm, type the store name:"
+    "delete_type": "To confirm, type the store name:",
+    "favicon": "Tab icon (favicon)",
+    "favicon_hint": "Small square image shown in the browser tab",
+    "shared": "Stores I'm a member of",
+    "switched": "Switched to {{name}}"
   }
 }

@@ -20,6 +20,9 @@ describe('storePayload', () => {
     expect(p.topBar).toEqual({ enabled: true, text: 'hi', color: f.primaryColor });
     expect(p.hero.title).toBe('T');
   });
+  it('sends the logo and the favicon in design', () => {
+    expect(storePayload({ ...f, logo: 'L', favicon: 'F' }, { subdomain: 'x' }).design).toMatchObject({ logoUrl: 'L', faviconUrl: 'F' });
+  });
   it('no free shipping → no minimum amount', () => {
     expect(storePayload({ ...f, supportFreeShipping: false }, { subdomain: 'x' }).store.freeShippingMinAmount).toBeNull();
   });
@@ -27,7 +30,7 @@ describe('storePayload', () => {
 
 describe('storeToForm', () => {
   it('reads a store from the API back into the form', () => {
-    const form = storeToForm({ name: 'B', subdomain: 'b-1', currency: 'DZD', contact: { phone: '05' }, design: { logoUrl: 'L', primaryColor: '#111111' }, topBar: { enabled: false, text: 't' }, hero: { title: 'h' }, supportQty: false, freeShippingMinAmount: 3000, supportFreeShipping: true });
-    expect(form).toMatchObject({ name: 'B', phone: '05', logo: 'L', primaryColor: '#111111', showTopBar: false, topBarText: 't', heroTitle: 'h', supportQty: false, freeShippingMinAmount: '3000' });
+    const form = storeToForm({ name: 'B', subdomain: 'b-1', currency: 'DZD', contact: { phone: '05' }, design: { logoUrl: 'L', faviconUrl: 'F', primaryColor: '#111111' }, topBar: { enabled: false, text: 't' }, hero: { title: 'h' }, supportQty: false, freeShippingMinAmount: 3000, supportFreeShipping: true });
+    expect(form).toMatchObject({ name: 'B', phone: '05', logo: 'L', favicon: 'F', primaryColor: '#111111', showTopBar: false, topBarText: 't', heroTitle: 'h', supportQty: false, freeShippingMinAmount: '3000' });
   });
 });

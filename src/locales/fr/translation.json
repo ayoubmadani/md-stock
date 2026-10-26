@@ -531,6 +531,10 @@
     "delete": "Supprimer définitivement",
     "delete_title": "Supprimer la boutique",
     "delete_warn": "La boutique est supprimée avec ses produits, commandes, pages et domaines. Irréversible.",
-    "delete_type": "Pour confirmer, tapez le nom :"
+    "delete_type": "Pour confirmer, tapez le nom :",
+    "favicon": "Icône d'onglet (favicon)",
+    "favicon_hint": "Petite image carrée affichée dans l'onglet",
+    "shared": "Boutiques où je suis membre",
+    "switched": "Boutique : {{name}}"
   }
 }

@@ -1,7 +1,7 @@
 // نموذج المتجر: نفس جسم اللوحة (stores/create-full و PATCH stores/:id)
 
 export const EMPTY_STORE = {
-  name: '', logo: null, primaryColor: '#4f46e5', secondaryColor: '#f59e0b',
+  name: '', logo: null, favicon: null, primaryColor: '#4f46e5', secondaryColor: '#f59e0b',
   phone: '', whatsapp: '', email: '', wilaya: '', address: '',
   language: 'ar', currency: 'DZD', country: 'DZ',
   cart: false, supportQty: true, supportFreeShipping: false, freeShippingMinAmount: '',
@@ -24,7 +24,7 @@ export function storePayload(f, { subdomain }) {
       cart: !!f.cart, supportQty: !!f.supportQty, supportFreeShipping: !!f.supportFreeShipping,
       freeShippingMinAmount: f.supportFreeShipping && f.freeShippingMinAmount !== '' ? Number(f.freeShippingMinAmount) : null,
     },
-    design: { primaryColor: f.primaryColor, secondaryColor: f.secondaryColor, logoUrl: f.logo || null },
+    design: { primaryColor: f.primaryColor, secondaryColor: f.secondaryColor, logoUrl: f.logo || null, faviconUrl: f.favicon || null },
     topBar: { enabled: !!f.showTopBar, text: s(f.topBarText), color: f.primaryColor },
     contact: { email: s(f.email) || null, phone: s(f.phone) || null, whatsapp: s(f.whatsapp).replace(/[\s-]/g, '') || null, wilaya: f.wilaya || null, address: s(f.address) || null },
     hero: { imageUrl: f.heroImage || null, title: s(f.heroTitle), subtitle: s(f.heroSubtitle) },
@@ -33,7 +33,7 @@ export function storePayload(f, { subdomain }) {
 
 export const storeToForm = (st) => ({
   ...EMPTY_STORE,
-  name: st.name || '', logo: st.design?.logoUrl || null,
+  name: st.name || '', logo: st.design?.logoUrl || null, favicon: st.design?.faviconUrl || null,
   primaryColor: st.design?.primaryColor || EMPTY_STORE.primaryColor, secondaryColor: st.design?.secondaryColor || EMPTY_STORE.secondaryColor,
   phone: st.contact?.phone || '', whatsapp: st.contact?.whatsapp || '', email: st.contact?.email || '',
   wilaya: st.contact?.wilaya || '', address: st.contact?.address || '',

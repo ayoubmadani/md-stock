@@ -10,11 +10,11 @@ import { EMPTY_STORE, generateSubdomain, storePayload, storeToForm } from '../li
 import ImageLibrary from '../components/ImageLibrary';
 import { Section, Toggle, input, label } from '../components/product';
 
-function ImagePick({ value, onPick, onClear, wide }) {
+function ImagePick({ value, onPick, onClear, wide, small }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex items-center gap-3">
-      <button type="button" onClick={() => setOpen(true)} className={`${wide ? 'w-full aspect-[16/7]' : 'w-20 h-20'} rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center text-gray-400 bg-gray-50 dark:bg-zinc-950`}>
+      <button type="button" onClick={() => setOpen(true)} className={`${wide ? 'w-full aspect-[16/7]' : small ? 'w-12 h-12' : 'w-20 h-20'} rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center text-gray-400 bg-gray-50 dark:bg-zinc-950`}>
         {value ? <img src={value} alt="" className={`w-full h-full ${wide ? 'object-cover' : 'object-contain'}`} /> : <ImagePlus className="w-6 h-6" />}
       </button>
       {value && !wide && <button type="button" onClick={onClear} className="text-xs text-rose-500">✕</button>}
@@ -71,7 +71,7 @@ export default function StoreForm() {
   if (!f) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
 
   return (
-    <form onSubmit={save} className="max-w-xl mx-auto space-y-3 pb-24">
+    <form onSubmit={save} className="max-w-xl mx-auto space-y-3">
       <div className="flex items-center justify-between">
         <h1 className="font-bold">{isNew ? t('stores.new') : t('stores.edit')}</h1>
         <button type="button" onClick={() => nav('/stores')} className="p-2 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
@@ -84,6 +84,13 @@ export default function StoreForm() {
             <label className={label}>{t('stores.name')}</label>
             <input value={f.name} onChange={set('name')} className={input} autoFocus={isNew} />
             {!isNew && subdomain && <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{subdomain}.mdstore.top</p>}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <ImagePick value={f.favicon} onPick={set('favicon')} onClear={() => set('favicon')(null)} small />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">{t('stores.favicon')}</p>
+            <p className="text-[11px] text-gray-400">{t('stores.favicon_hint')}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -140,8 +147,9 @@ export default function StoreForm() {
         <input value={f.heroSubtitle} onChange={set('heroSubtitle')} placeholder={t('stores.hero_subtitle')} className={input} />
       </Section>
 
-      <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] inset-x-0 px-4 z-30">
-        <button disabled={saving} className="max-w-xl mx-auto w-full flex items-center justify-center gap-2 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60">
+      {/* يلتصق بأسفل الشاشة داخل عمود النموذج نفسه (فوق الشريط السفلي في الهاتف) */}
+      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20 pt-2">
+        <button disabled={saving} className="w-full flex items-center justify-center gap-2 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60">
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}{isNew ? t('stores.create') : t('inventory.save')}
         </button>
       </div>
