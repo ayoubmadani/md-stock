@@ -439,7 +439,9 @@
     "meta_on": "sur :",
     "meta_connect": "Connectez Facebook pour lier vos campagnes aux produits",
     "manual": "Publicité manuelle",
-    "meta_hint": "Les dépenses d'une campagne liée entrent automatiquement dans le profit de ce produit — ne les saisissez pas aussi manuellement."
+    "meta_hint": "Les dépenses d'une campagne liée entrent automatiquement dans le profit de ce produit — ne les saisissez pas aussi manuellement.",
+    "meta_link_other": "Lier une autre campagne ({{count}})",
+    "meta_only_linked": "Afficher seulement les liées"
   },
   "abandoned": {
     "hint": "Clients qui ont saisi leur téléphone sans valider la commande (depuis au moins 30 min). Appelez-les — une partie finalise.",

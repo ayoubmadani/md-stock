@@ -18,6 +18,7 @@ function MetaCampaigns({ storeId, product, onChanged }) {
   const [status, setStatus] = useState(null);
   const [list, setList] = useState(null);
   const [busy, setBusy] = useState(null);
+  const [showAll, setShowAll] = useState(false); // المربوطة فقط افتراضياً
 
   const load = useCallback(() => {
     const { from, to } = periodRange('30d');
@@ -50,7 +51,10 @@ function MetaCampaigns({ storeId, product, onChanged }) {
       </Link>
     );
   }
-  const rows = campaignsFor(list, product.id);
+  const all = campaignsFor(list, product.id);
+  const linkedCount = all.filter((c) => c.link === 'here').length;
+  // المربوطة بهذا المنتج فقط — والباقي عند «ربط حملة أخرى» (أو إن لم تُربط أي حملة بعد)
+  const rows = showAll || !linkedCount ? all : all.filter((c) => c.link === 'here');
   return (
     <div className="space-y-2">
       <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-500"><Facebook className="w-3.5 h-3.5 text-[#1877F2]" />{t('ads.meta_campaigns')}</p>
@@ -77,6 +81,11 @@ function MetaCampaigns({ storeId, product, onChanged }) {
             )}
           </div>
         ))}
+      {linkedCount > 0 && all.length > linkedCount && (
+        <button type="button" onClick={() => setShowAll((v) => !v)} className="w-full py-2 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+          {showAll ? t('ads.meta_only_linked') : t('ads.meta_link_other', { count: all.length - linkedCount })}
+        </button>
+      )}
       <p className="text-[11px] text-gray-400 leading-relaxed">{t('ads.meta_hint')}</p>
     </div>
   );

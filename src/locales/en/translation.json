@@ -439,7 +439,9 @@
     "meta_on": "on:",
     "meta_connect": "Connect Facebook to link your campaigns to products",
     "manual": "Manual ad",
-    "meta_hint": "A linked campaign's spend goes into this product's profit automatically — don't enter it manually too."
+    "meta_hint": "A linked campaign's spend goes into this product's profit automatically — don't enter it manually too.",
+    "meta_link_other": "Link another campaign ({{count}})",
+    "meta_only_linked": "Show linked only"
   },
   "abandoned": {
     "hint": "Customers who typed their phone in the order form but didn't finish (at least 30 min ago). Call them — some will order.",
