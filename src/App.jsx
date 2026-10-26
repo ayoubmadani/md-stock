@@ -34,6 +34,7 @@ import MessagesPage from './pages/Messages';
 import LandingPagesPage from './pages/LandingPages';
 import ApiKeysPage from './pages/ApiKeys';
 import DeliveryRatesPage from './pages/DeliveryRates';
+import PosPage from './pages/Pos';
 import RequirePerm from './components/RequirePerm';
 
 function Gate() {
@@ -86,6 +87,7 @@ export default function App() {
             <Route path="landing" element={<LandingPagesPage />} />
             <Route path="keys" element={<ApiKeysPage />} />
             <Route path="rates" element={<DeliveryRatesPage />} />
+            <Route path="pos" element={<RequirePerm perm="order.manage"><PosPage /></RequirePerm>} />
             <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
             <Route path="profit" element={<RequirePerm perm="product.crud"><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />

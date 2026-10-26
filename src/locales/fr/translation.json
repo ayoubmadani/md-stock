@@ -24,7 +24,8 @@
     "messages": "Messages",
     "landing": "Landing pages",
     "keys": "Clés API",
-    "rates": "Tarifs de livraison"
+    "rates": "Tarifs de livraison",
+    "pos": "Vente en boutique"
   },
   "login": {
     "title": "Connexion",
@@ -831,5 +832,19 @@
     "imported": "Tarifs de {{count}} wilaya(s) importés de {{account}} — vérifiez puis enregistrez",
     "import_none": "Aucune wilaya correspondante",
     "import_error": "Impossible de récupérer les tarifs"
+  },
+  "pos": {
+    "empty": "Scannez le code-barres du produit (caméra ou lecteur) — il est ajouté au panier. Rescannez pour augmenter la quantité.",
+    "unknown": "Aucun produit avec le code {{code}}",
+    "add_customer": "Ajouter le client (optionnel)",
+    "phone": "Téléphone (optionnel)",
+    "name": "Nom (optionnel)",
+    "confirm": "Valider la vente ({{count}})",
+    "done": "Vente enregistrée ✓ — stock déduit",
+    "total": "Total",
+    "thanks": "Merci de votre visite",
+    "print": "Imprimer",
+    "open_order": "Ouvrir la commande",
+    "next_sale": "Nouvelle vente"
   }
 }

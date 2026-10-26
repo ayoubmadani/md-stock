@@ -16,6 +16,7 @@
     "axios": "^1.13.5",
     "html-to-image": "^1.11.13",
     "i18next": "^25.8.4",
+    "jsbarcode": "^3.11.6",
     "lucide-react": "^0.563.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",

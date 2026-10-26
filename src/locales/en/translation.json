@@ -24,7 +24,8 @@
     "messages": "Messages",
     "landing": "Landing pages",
     "keys": "API keys",
-    "rates": "Delivery rates"
+    "rates": "Delivery rates",
+    "pos": "In-shop sale"
   },
   "login": {
     "title": "Sign in",
@@ -831,5 +832,19 @@
     "imported": "Imported rates for {{count}} wilayas from {{account}} — review then save",
     "import_none": "No wilaya matched the company rates",
     "import_error": "Couldn't fetch the company rates"
+  },
+  "pos": {
+    "empty": "Scan the product barcode with the camera or a barcode reader — it goes into the cart. Scan again to add one more.",
+    "unknown": "No product with barcode {{code}}",
+    "add_customer": "Add the customer (optional)",
+    "phone": "Phone (optional)",
+    "name": "Name (optional)",
+    "confirm": "Confirm sale ({{count}})",
+    "done": "Sold ✓ — stock deducted",
+    "total": "Total",
+    "thanks": "Thank you for your visit",
+    "print": "Print",
+    "open_order": "Open order",
+    "next_sale": "New sale"
   }
 }

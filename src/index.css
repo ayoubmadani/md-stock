@@ -18,3 +18,10 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
 /* تمرير أفقي بلا شريط ظاهر (تبويبات الحالات) */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* بيع في المحل: الطباعة تُظهر الإيصال وحده */
+@media print {
+  body * { visibility: hidden; }
+  #pos-receipt, #pos-receipt * { visibility: visible; }
+  #pos-receipt { position: absolute; inset: 0 auto auto 0; width: 100%; box-shadow: none; }
+}
