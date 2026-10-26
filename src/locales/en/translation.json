@@ -15,7 +15,8 @@
     "abandoned": "Abandoned orders",
     "meta": "Meta ads",
     "pixels": "Pixels",
-    "stores": "My stores"
+    "stores": "My stores",
+    "themes": "Themes"
   },
   "login": {
     "title": "Sign in",
@@ -536,5 +537,25 @@
     "favicon_hint": "Small square image shown in the browser tab",
     "shared": "Stores I'm a member of",
     "switched": "Switched to {{name}}"
+  },
+  "themes": {
+    "current": "Current theme",
+    "default": "Default theme",
+    "tab_my": "My themes",
+    "tab_gallery": "Gallery",
+    "all": "All",
+    "active": "Active",
+    "activate": "Activate",
+    "activated": "Theme activated ✓",
+    "install": "Install",
+    "installed_ok": "Theme installed ✓",
+    "buy": "Buy",
+    "free": "Free",
+    "in_plan": "In plan",
+    "empty": "No themes in this category",
+    "coupon": "Coupon (optional)",
+    "apply": "Apply",
+    "coupon_invalid": "Invalid coupon",
+    "wallet_note": "The price is taken from your wallet; the theme stays in “My themes” for all your stores."
   }
 }

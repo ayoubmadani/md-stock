@@ -15,7 +15,8 @@
     "abandoned": "Commandes abandonnées",
     "meta": "Publicités Meta",
     "pixels": "Pixels",
-    "stores": "Mes boutiques"
+    "stores": "Mes boutiques",
+    "themes": "Thèmes"
   },
   "login": {
     "title": "Connexion",
@@ -536,5 +537,25 @@
     "favicon_hint": "Petite image carrée affichée dans l'onglet",
     "shared": "Boutiques où je suis membre",
     "switched": "Boutique : {{name}}"
+  },
+  "themes": {
+    "current": "Thème actuel",
+    "default": "Thème par défaut",
+    "tab_my": "Mes thèmes",
+    "tab_gallery": "Galerie",
+    "all": "Tous",
+    "active": "Actif",
+    "activate": "Activer",
+    "activated": "Thème activé ✓",
+    "install": "Installer",
+    "installed_ok": "Thème installé ✓",
+    "buy": "Acheter",
+    "free": "Gratuit",
+    "in_plan": "Inclus",
+    "empty": "Aucun thème dans cette catégorie",
+    "coupon": "Coupon (optionnel)",
+    "apply": "Appliquer",
+    "coupon_invalid": "Coupon invalide",
+    "wallet_note": "Le prix est débité du portefeuille ; le thème reste dans « Mes thèmes » pour toutes vos boutiques."
   }
 }
