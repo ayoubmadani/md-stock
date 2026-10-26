@@ -23,6 +23,9 @@ function Line({ label, value, tone = '' }) {
 function ProductProfit({ r, onAds }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  // ربح القطعة قبل الإعلان (سعر البيع − سعر الشراء): إن تجاوزه إعلان القطعة فكل قطعة تُباع بخسارة
+  const unitMargin = r.units && r.cogs != null ? (r.revenue - r.cogs) / r.units : null;
+  const unitLoss = r.adPerUnit != null && unitMargin != null && r.adPerUnit > unitMargin;
   const win = r.net != null && r.net > 0;
   const loss = r.net != null && r.net < 0;
   return (
@@ -33,7 +36,9 @@ function ProductProfit({ r, onAds }) {
         </span>
         <span className="flex-1 min-w-0">
           <span className="block text-sm font-semibold truncate"><bdi>{r.name}</bdi></span>
-          <span className="block text-[11px] text-gray-400 mt-0.5">{t('profit.summary', { delivered: r.delivered, orders: r.orders })}</span>
+          <span className="block text-[11px] text-gray-400 mt-0.5">{t('profit.summary', { delivered: r.delivered, orders: r.orders })}
+            {r.adPerUnit != null && <> · <span className={`whitespace-nowrap ${unitLoss ? 'text-rose-500 font-bold' : ''}`}>{t('profit.ad_unit_short')} <b dir="ltr">{money(r.adPerUnit)}</b></span></>}
+          </span>
         </span>
         <span className="text-end shrink-0">
           {r.net == null ? <span className="text-xs text-amber-600">{t('profit.no_cost')}</span> : (
@@ -60,6 +65,8 @@ function ProductProfit({ r, onAds }) {
           <Line label={t('profit.net')} value={r.net == null ? '—' : money(r.net)} tone={win ? 'text-emerald-600' : loss ? 'text-rose-500' : ''} />
           {r.returnRate != null && <Line label={t('profit.return_rate')} value={`${r.returnRate}%`} tone={r.returnRate >= 30 ? 'text-rose-500' : ''} />}
           {r.adPerOrder != null && <Line label={t('profit.ad_per_order')} value={`${money(r.adPerOrder)} DA`} />}
+          {r.adPerUnit != null && <Line label={t('profit.ad_per_unit')} value={`${money(r.adPerUnit)} DA`} tone={unitLoss ? 'text-rose-500' : ''} />}
+          {unitLoss && <p className="text-[11px] text-rose-500 leading-relaxed">{t('profit.ad_unit_loss', { margin: `\u2066${money(unitMargin)} DA\u2069` })}</p>}
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button type="button" onClick={() => onAds(r)} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold">
               <Megaphone className="w-4 h-4" />{t('ads.title')}

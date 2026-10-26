@@ -408,7 +408,10 @@
     "set_cost": "Saisir le prix d'achat",
     "missing_cost": "{{count}} produit(s) sans prix d'achat — bénéfice inconnu. Ajoutez-le dans la fiche produit.",
     "empty": "Aucune commande ni pub sur cette période",
-    "note": "Ventes = commandes livrées uniquement, selon la date de création. Un retour coûte les frais de retour du compte de livraison."
+    "note": "Ventes = commandes livrées uniquement, selon la date de création. Un retour coûte les frais de retour du compte de livraison.",
+    "ad_per_unit": "Coût pub par pièce vendue",
+    "ad_unit_short": "pub/pièce",
+    "ad_unit_loss": "La pub coûte plus que la marge par pièce ({{margin}}) — chaque pièce est vendue à perte."
   },
   "ads": {
     "title": "Publicité",

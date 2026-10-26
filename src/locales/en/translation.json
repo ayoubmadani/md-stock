@@ -408,7 +408,10 @@
     "set_cost": "Enter the cost price",
     "missing_cost": "{{count}} product(s) without a cost price — profit unknown. Add it on the product page.",
     "empty": "No orders or ads in this period",
-    "note": "Sales = delivered orders only, by order creation date. A return costs the return fee of the delivery account."
+    "note": "Sales = delivered orders only, by order creation date. A return costs the return fee of the delivery account.",
+    "ad_per_unit": "Ad cost per unit sold",
+    "ad_unit_short": "ad/unit",
+    "ad_unit_loss": "Ads cost more than the unit margin ({{margin}}) — every unit sells at a loss."
   },
   "ads": {
     "title": "Ads",
