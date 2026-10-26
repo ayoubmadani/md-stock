@@ -23,7 +23,8 @@
     "confirmation": "Sociétés de confirmation",
     "messages": "Messages",
     "landing": "Landing pages",
-    "keys": "Clés API"
+    "keys": "Clés API",
+    "rates": "Tarifs de livraison"
   },
   "login": {
     "title": "Connexion",
@@ -804,5 +805,31 @@
     "expires": "Expire",
     "revoke": "Révoquer",
     "revoke_q": "Révoquer cette clé ? Toute connexion qui l'utilise s'arrête."
+  },
+  "rates": {
+    "profile": "Grille de tarifs",
+    "this_store": "cette boutique",
+    "use_here": "Utiliser ces tarifs pour cette boutique",
+    "assigned": "La boutique utilise « {{name}} »",
+    "empty": "Aucun tarif. Créez les tarifs de toutes les wilayas puis modifiez-les.",
+    "init": "Créer les tarifs des wilayas",
+    "search": "Rechercher une wilaya…",
+    "home": "Domicile",
+    "office": "Bureau",
+    "return": "Retour",
+    "need_one": "Gardez au moins un type de livraison — ou désactivez la wilaya",
+    "save": "Enregistrer ({{count}})",
+    "saved": "Tarifs de {{count}} wilaya(s) enregistrés ✓",
+    "bulk": "Un prix pour plusieurs wilayas",
+    "bulk_all": "S'applique à toutes les wilayas ({{count}}).",
+    "bulk_filtered": "S'applique aux wilayas filtrées ({{count}}).",
+    "bulk_hint": "Laissez vide pour ne pas changer. Rien n'est enregistré avant « Enregistrer ».",
+    "bulk_applied": "Appliqué à {{count}} wilaya(s) — appuyez sur « Enregistrer »",
+    "apply": "Appliquer",
+    "import": "Importer les tarifs du transporteur",
+    "import_hint": "Choisissez votre compte transporteur : domicile et bureau sont remplis depuis ses tarifs, puis vérifiez et enregistrez.",
+    "imported": "Tarifs de {{count}} wilaya(s) importés de {{account}} — vérifiez puis enregistrez",
+    "import_none": "Aucune wilaya correspondante",
+    "import_error": "Impossible de récupérer les tarifs"
   }
 }

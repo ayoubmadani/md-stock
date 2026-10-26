@@ -23,7 +23,8 @@
     "confirmation": "Confirmation companies",
     "messages": "Messages",
     "landing": "Landing pages",
-    "keys": "API keys"
+    "keys": "API keys",
+    "rates": "Delivery rates"
   },
   "login": {
     "title": "Sign in",
@@ -804,5 +805,31 @@
     "expires": "Expires",
     "revoke": "Revoke",
     "revoke_q": "Revoke this key? Anything using it stops immediately."
+  },
+  "rates": {
+    "profile": "Rate profile",
+    "this_store": "this store",
+    "use_here": "Use these rates for this store",
+    "assigned": "The store now uses “{{name}}”",
+    "empty": "No rates yet. Create rates for every wilaya, then edit them.",
+    "init": "Create wilaya rates",
+    "search": "Search a wilaya…",
+    "home": "Home",
+    "office": "Office",
+    "return": "Return",
+    "need_one": "Keep at least one delivery type — or disable the wilaya",
+    "save": "Save changes ({{count}})",
+    "saved": "Saved rates for {{count}} wilayas ✓",
+    "bulk": "One price for many wilayas",
+    "bulk_all": "Applies to every wilaya ({{count}}).",
+    "bulk_filtered": "Applies to the wilayas shown by the search ({{count}}).",
+    "bulk_hint": "Leave a field empty to keep its price. Nothing is saved until you tap “Save changes”.",
+    "bulk_applied": "Applied to {{count}} wilayas — tap “Save changes”",
+    "apply": "Apply",
+    "import": "Import delivery company rates",
+    "import_hint": "Pick your delivery company account: home and office prices are filled from its rates, then review and save.",
+    "imported": "Imported rates for {{count}} wilayas from {{account}} — review then save",
+    "import_none": "No wilaya matched the company rates",
+    "import_error": "Couldn't fetch the company rates"
   }
 }

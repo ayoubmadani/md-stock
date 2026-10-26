@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellRing, Code2, Store, Palette, Crown, Users, Truck, PhoneCall, MessageSquare, LayoutTemplate, KeyRound, ChevronLeft, LogOut, Megaphone, ShoppingCart, TrendingUp, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
+import { Bell, BellRing, Code2, Store, Palette, Crown, Users, Truck, PhoneCall, MessageSquare, LayoutTemplate, KeyRound, Banknote, ChevronLeft, LogOut, Megaphone, ShoppingCart, TrendingUp, Volume2, Wallet, FolderTree, Globe, History, Loader2, Share } from 'lucide-react';
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
@@ -18,6 +18,7 @@ export const MORE = [
   { to: '/messages', key: 'messages', icon: MessageSquare, owner: true },
   { to: '/team', key: 'team', icon: Users, all: true },
   { to: '/delivery', key: 'delivery', icon: Truck, owner: true },
+  { to: '/rates', key: 'rates', icon: Banknote, owner: true },
   { to: '/confirmation', key: 'confirmation', icon: PhoneCall, owner: true },
   { to: '/themes', key: 'themes', icon: Palette, owner: true },
   { to: '/pixels', key: 'pixels', icon: Code2, owner: true },
