@@ -859,13 +859,15 @@
     "barcode": "Barcode",
     "generate": "Generate",
     "cost": "Cost price (optional — for profit)",
-    "options": "Sizes / colors (if any)",
     "color_ph": "Color (e.g. Red)",
-    "options_hint": "A variant is created per size/color — set each one's stock and barcode on the product page.",
     "save": "Add to store",
     "created": "Product added ✓",
     "size": "Size",
     "color": "Color",
-    "variants_next": "Product added — set each variant's stock on the product page"
+    "options": "Options (optional)",
+    "option_name": "Option name (e.g. Weight)",
+    "value_ph": "Add a value",
+    "other_option": "Other option",
+    "short": "Quick product"
   }
 }

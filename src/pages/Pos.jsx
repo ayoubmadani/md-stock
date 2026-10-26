@@ -170,9 +170,9 @@ export default function PosPage() {
         <QuickProductSheet storeId={storeId} barcode={quick.barcode} onClose={() => setQuick(null)}
           onCreated={(p) => {
             setQuick(null);
-            // منتج بلا مقاسات ← يدخل السلة مباشرة؛ بمقاسات ← تُحدد كمياتها من صفحة المنتج
-            if (!p.hasVariants && p.id) setCart((c) => addScanned(c, { product: { id: p.id, name: p.name, price: p.price, image: p.image }, variant: null }));
-            else toast.message(t('quick.variants_next'));
+            // يدخل السلة بباركوده (بمقاسات: نسخة أول تركيبة)، وإلا كمنتج عادي
+            if (p.barcode) { recent.current.delete(p.barcode); onCode(p.barcode); }
+            else if (!p.hasVariants && p.id) setCart((c) => addScanned(c, { product: { id: p.id, name: p.name, price: p.price, image: p.image }, variant: null }));
           }} />
       )}
     </div>

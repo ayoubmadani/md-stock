@@ -859,13 +859,15 @@
     "barcode": "Code-barres",
     "generate": "Générer",
     "cost": "Prix d'achat (optionnel — pour le profit)",
-    "options": "Tailles / couleurs (s'il y en a)",
     "color_ph": "Couleur (ex. Rouge)",
-    "options_hint": "Une variante par taille/couleur — réglez stock et code-barres depuis la page produit.",
     "save": "Ajouter à la boutique",
     "created": "Produit ajouté ✓",
     "size": "Taille",
     "color": "Couleur",
-    "variants_next": "Produit ajouté — réglez le stock de chaque variante depuis la page produit"
+    "options": "Options (facultatif)",
+    "option_name": "Nom de l'option (ex. Poids)",
+    "value_ph": "Ajouter une valeur",
+    "other_option": "Autre option",
+    "short": "Produit rapide"
   }
 }

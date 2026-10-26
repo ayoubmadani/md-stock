@@ -1,17 +1,19 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Search, Plus } from 'lucide-react';
+import { Loader2, Search, Plus, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../lib/auth';
 import { useInventory } from '../lib/useInventory';
 import ProductRow from '../components/ProductRow';
+import QuickProductSheet from '../components/QuickProductSheet';
 import { AdjustModal } from '../components/inventory';
 
 export default function StockPage({ only }) {
   const { t } = useTranslation();
   const { storeId } = useAuth();
   const { data, reload } = useInventory(storeId);
+  const [quick, setQuick] = useState(false);
   const [filter, setFilter] = useState(only || 'all');
   const [q, setQ] = useState('');
   const [adjust, setAdjust] = useState(null);
@@ -35,6 +37,11 @@ export default function StockPage({ only }) {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('inventory.search')}
             className="w-full ps-9 pe-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400" />
         </div>
+        {!only && (
+          <button type="button" onClick={() => setQuick(true)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold">
+            <Zap className="w-4 h-4" />{t('quick.short')}
+          </button>
+        )}
         {!only && (
           <Link to="/products/new" className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold">
             <Plus className="w-4 h-4" />{t('product.new')}
@@ -64,6 +71,7 @@ export default function StockPage({ only }) {
         <AdjustModal target={adjust} storeId={storeId} onClose={() => setAdjust(null)}
           onSaved={() => { setAdjust(null); reload(); toast.success(t('inventory.saved')); }} />
       )}
+      {quick && <QuickProductSheet storeId={storeId} onClose={() => setQuick(false)} onCreated={() => { setQuick(false); reload(); }} />}
     </div>
   );
 }
