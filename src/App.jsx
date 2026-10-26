@@ -27,6 +27,10 @@ import StoresPage from './pages/Stores';
 import StoreForm from './pages/StoreForm';
 import ThemesPage from './pages/Themes';
 import SubscriptionPage from './pages/Subscription';
+import TeamPage from './pages/Team';
+import DeliveryPage from './pages/Delivery';
+import ConfirmationPage from './pages/Confirmation';
+import MessagesPage from './pages/Messages';
 import RequirePerm from './components/RequirePerm';
 
 function Gate() {
@@ -72,6 +76,10 @@ export default function App() {
             <Route path="stores/:id" element={<StoreForm />} />
             <Route path="themes" element={<ThemesPage />} />
             <Route path="subscription" element={<SubscriptionPage />} />
+            <Route path="team" element={<TeamPage />} />
+            <Route path="delivery" element={<DeliveryPage />} />
+            <Route path="confirmation" element={<ConfirmationPage />} />
+            <Route path="messages" element={<MessagesPage />} />
             <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
             <Route path="profit" element={<RequirePerm perm="product.crud"><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />
