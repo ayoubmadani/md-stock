@@ -59,3 +59,7 @@ export function validateProduct(form, { attributes, offers }) {
   if (offers.some((o) => !o.name?.trim() || !(Number(o.quantity) > 0) || !(Number(o.price) > 0))) errs.push('offer');
   return errs;
 }
+
+// سعر النسخة: -1 (يولّده الخادم) = سعر المنتج — يظهر الحقل فارغاً وسعر المنتج كتلميح
+export const variantPriceField = (price) => (Number(price) < 0 ? '' : String(price ?? ''));
+export const effectiveVariantPrice = (price, productPrice) => (price === '' || price == null || Number(price) < 0 ? Number(productPrice) : Number(price));

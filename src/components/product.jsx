@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { moveItem, newAttribute, newOffer, newValue } from '../lib/product-form';
+import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -253,11 +253,13 @@ export function BarcodeField({ value, onChange, onCommit, className = input, lab
   );
 }
 
-function VariantRow({ v, storeId, productId, productName, onSaved }) {
+function VariantRow({ v, storeId, productId, productName, productPrice, onSaved }) {
   const { t } = useTranslation();
-  const [f, setF] = useState({ price: String(v.price ?? ''), stock: String(v.stock ?? 0), barcode: v.barcode || '' });
+  const [f, setF] = useState({ price: variantPriceField(v.price), stock: String(v.stock ?? 0), barcode: v.barcode || '' });
   const [active, setActive] = useState(v.isActive !== false);
   const save = async (field, raw) => {
+    // سعر فارغ = يبقى سعر المنتج (-1) — لا حفظ
+    if (field === 'price' && String(raw).trim() === '') { setF((s) => ({ ...s, price: variantPriceField(v.price) })); return; }
     const value = field === 'barcode' ? (raw.trim() || null) : Number(raw);
     const old = field === 'barcode' ? (v.barcode || null) : Number(v[field]);
     if (value === old || (field !== 'barcode' && !Number.isFinite(value))) return;
@@ -268,7 +270,7 @@ function VariantRow({ v, storeId, productId, productName, onSaved }) {
       toast.success(t('inventory.saved'));
     } catch (e) {
       toast.error(errorMessage(e, t('inventory.error')));
-      setF((s) => ({ ...s, [field]: field === 'barcode' ? (v.barcode || '') : String(v[field] ?? '') }));
+      setF((s) => ({ ...s, [field]: field === 'barcode' ? (v.barcode || '') : field === 'price' ? variantPriceField(v.price) : String(v[field] ?? '') }));
     }
   };
   const toggle = async () => {
@@ -285,17 +287,17 @@ function VariantRow({ v, storeId, productId, productName, onSaved }) {
       </div>
       <div className="grid grid-cols-2 gap-2">
         <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('product.price')}</span>
-          <input type="number" inputMode="decimal" dir="ltr" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} onBlur={() => save('price', f.price)} className={`${small} w-full`} /></label>
+          <input type="number" inputMode="decimal" dir="ltr" value={f.price} placeholder={productPrice !== '' && productPrice != null ? String(productPrice) : ''} onChange={(e) => setF({ ...f, price: e.target.value })} onBlur={() => save('price', f.price)} className={`${small} w-full`} /></label>
         <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('inventory.col.stock')}</span>
           <input type="number" inputMode="numeric" dir="ltr" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} onBlur={() => save('stock', f.stock)} className={`${small} w-full`} /></label>
       </div>
       <BarcodeField value={f.barcode} onChange={(b) => setF({ ...f, barcode: b })} onCommit={(b) => save('barcode', b)} className={`${small} w-full`}
-        label={{ name: productName, variant: variantLabel(v.name), price: f.price }} />
+        label={{ name: productName, variant: variantLabel(v.name), price: effectiveVariantPrice(f.price, productPrice) }} />
     </div>
   );
 }
 
-export function VariantsEditor({ variants, storeId, productId, productName, dirty }) {
+export function VariantsEditor({ variants, storeId, productId, productName, productPrice, dirty }) {
   const { t } = useTranslation();
   const [bulk, setBulk] = useState(false);
   const [ver, setVer] = useState(0); // يعيد رسم الصفوف بعد التوليد الجماعي
@@ -327,7 +329,7 @@ export function VariantsEditor({ variants, storeId, productId, productName, dirt
           {bulk ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}{t('product.barcodes_all', { count: missing })}
         </button>
       )}
-      {variants.map((v) => <VariantRow key={`${v.id}-${ver}`} v={v} storeId={storeId} productId={productId} productName={productName} />)}
+      {variants.map((v) => <VariantRow key={`${v.id}-${ver}`} v={v} storeId={storeId} productId={productId} productName={productName} productPrice={productPrice} />)}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { productPayload, validateProduct, moveItem, newAttribute } from './product-form.js';
+import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice } from './product-form.js';
 
 const base = { name: 'قميص', price: '2500', priceOriginal: '', desc: '<p>x</p>', categoryId: '', shippingFree: false, isDigital: false, isActive: true, stock: '7', barcode: ' 123 ' };
 const attr = { id: 'att-1', type: 'size', name: 'المقاس', variants: [{ id: 'var-1', name: 'M', value: 'M' }] };
@@ -44,5 +44,18 @@ describe('newAttribute', () => {
   it('a size attribute starts with the usual sizes; colour starts empty in colour mode', () => {
     expect(newAttribute('size', 'المقاس').variants.map((v) => v.value)).toEqual(['S', 'M', 'L', 'XL', 'XXL']);
     expect(newAttribute('color', 'اللون')).toMatchObject({ type: 'color', displayMode: 'color', variants: [] });
+  });
+});
+
+describe('variant price (-1 = the product price)', () => {
+  it('a negative price shows as empty (the product price is the hint)', () => {
+    expect(variantPriceField(-1)).toBe('');
+    expect(variantPriceField(2900)).toBe('2900');
+    expect(variantPriceField(0)).toBe('0');
+  });
+  it('effective price: own price, or the product price when negative/empty', () => {
+    expect(effectiveVariantPrice('', 2500)).toBe(2500);
+    expect(effectiveVariantPrice(-1, 2500)).toBe(2500);
+    expect(effectiveVariantPrice('2900', 2500)).toBe(2900);
   });
 });

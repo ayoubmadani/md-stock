@@ -145,7 +145,7 @@ export default function ProductForm() {
 
       {!isNew && variants.length > 0 && (
         <Section title={t('product.variants_title', { count: variants.length })}>
-          <VariantsEditor variants={variants} storeId={storeId} productId={id} productName={form.name} dirty={attrsDirty} />
+          <VariantsEditor variants={variants} storeId={storeId} productId={id} productName={form.name} productPrice={form.price} dirty={attrsDirty} />
         </Section>
       )}
       {isNew && attributes.length > 0 && <p className="text-xs text-gray-400 px-1">{t('product.variants_after_save')}</p>}
