@@ -14,10 +14,26 @@ const PERIODS = ['today', '7d', '30d', 'month'];
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4';
 const ACTIVE = new Set(['ACTIVE']);
 
-function Connect({ storeId }) {
+// على الهاتف رابط facebook.com يفتح تطبيق فيسبوك ويترك الصفحة معلّقة: نجهّز الرابط مسبقاً ونفتحه
+// في نافذة متصفح مستقلة بنفس الضغطة، وعند الرجوع للتطبيق نعيد قراءة حالة الربط (الحفظ يتم في الخادم)
+function Connect({ storeId, onReturn }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
+  const [url, setUrl] = useState(null);
+  useEffect(() => {
+    const load = () => api.get(`/stores/${storeId}/meta/connect-url`, { params: { app: 'mobile' } }).then(({ data }) => setUrl(data.url)).catch(() => setUrl(null));
+    load();
+    const timer = setInterval(load, 10 * 60_000); // صلاحية الرابط 15 دقيقة
+    return () => clearInterval(timer);
+  }, [storeId]);
+  useEffect(() => {
+    const back = () => { if (document.visibilityState === 'visible') { setBusy(false); onReturn?.(); } };
+    document.addEventListener('visibilitychange', back);
+    window.addEventListener('pageshow', back);
+    return () => { document.removeEventListener('visibilitychange', back); window.removeEventListener('pageshow', back); };
+  }, [onReturn]);
   const go = async () => {
+    if (url && window.open(url, '_blank')) return;
     setBusy(true);
     try {
       const { data } = await api.get(`/stores/${storeId}/meta/connect-url`, { params: { app: 'mobile' } });
@@ -147,7 +163,7 @@ export default function MetaPage() {
   };
 
   if (!status) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
-  if (!status.connected) return <div className="max-w-xl mx-auto"><Connect storeId={storeId} /></div>;
+  if (!status.connected) return <div className="max-w-xl mx-auto"><Connect storeId={storeId} onReturn={loadStatus} /></div>;
 
   const usd = status.currency && status.currency !== 'DZD';
   return (
