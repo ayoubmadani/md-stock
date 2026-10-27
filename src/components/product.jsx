@@ -1,15 +1,16 @@
 // أجزاء نموذج المنتج للهاتف: الصور، الوصف، الخصائص، النسخ، العروض
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, ScanLine, Star, Trash2, Wand2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { moveItem, newAttribute, newOffer, newValue } from '../lib/product-form';
 import Scanner from './Scanner';
 import { randomStoreEan13 } from '../lib/barcode';
+import { printLabel } from '../lib/label';
 import { useAuth } from '../lib/auth';
 import ImageLibrary from './ImageLibrary';
-import { VariantParts } from './inventory';
+import { VariantParts, variantLabel } from './inventory';
 
 export const input = 'w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400';
 export const label = 'text-xs font-semibold text-gray-500 dark:text-zinc-400';
@@ -218,7 +219,8 @@ async function freshBarcode(storeId) {
   throw new Error('no free barcode');
 }
 
-export function BarcodeField({ value, onChange, onCommit, className = input }) {
+/** label: { name, variant, price } — يظهر زر طباعة الملصق متى وُجد باركود */
+export function BarcodeField({ value, onChange, onCommit, className = input, label }) {
   const { t } = useTranslation();
   const { storeId } = useAuth();
   const [scan, setScan] = useState(false);
@@ -243,12 +245,15 @@ export function BarcodeField({ value, onChange, onCommit, className = input }) {
         {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <Wand2 className="w-5 h-5" />}
       </button>
       <button type="button" onClick={() => setScan(true)} className="shrink-0 px-3.5 rounded-xl bg-indigo-600 text-white" title={t('scan.title')}><ScanLine className="w-5 h-5" /></button>
+      {label && value?.trim() && (
+        <button type="button" onClick={() => printLabel(value.trim(), label)} className="shrink-0 px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200" title={t('product.print_label')} aria-label={t('product.print_label')}><Printer className="w-5 h-5" /></button>
+      )}
       {scan && <ScanSheet onClose={() => setScan(false)} onCode={(c) => { onChange(c); onCommit?.(c); }} />}
     </div>
   );
 }
 
-function VariantRow({ v, storeId, productId, onSaved }) {
+function VariantRow({ v, storeId, productId, productName, onSaved }) {
   const { t } = useTranslation();
   const [f, setF] = useState({ price: String(v.price ?? ''), stock: String(v.stock ?? 0), barcode: v.barcode || '' });
   const [active, setActive] = useState(v.isActive !== false);
@@ -284,17 +289,18 @@ function VariantRow({ v, storeId, productId, onSaved }) {
         <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('inventory.col.stock')}</span>
           <input type="number" inputMode="numeric" dir="ltr" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} onBlur={() => save('stock', f.stock)} className={`${small} w-full`} /></label>
       </div>
-      <BarcodeField value={f.barcode} onChange={(b) => setF({ ...f, barcode: b })} onCommit={(b) => save('barcode', b)} className={`${small} w-full`} />
+      <BarcodeField value={f.barcode} onChange={(b) => setF({ ...f, barcode: b })} onCommit={(b) => save('barcode', b)} className={`${small} w-full`}
+        label={{ name: productName, variant: variantLabel(v.name), price: f.price }} />
     </div>
   );
 }
 
-export function VariantsEditor({ variants, storeId, productId, dirty }) {
+export function VariantsEditor({ variants, storeId, productId, productName, dirty }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-2">
       {dirty && <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 rounded-lg p-2">{t('product.variants_dirty')}</p>}
-      {variants.map((v) => <VariantRow key={v.id} v={v} storeId={storeId} productId={productId} />)}
+      {variants.map((v) => <VariantRow key={v.id} v={v} storeId={storeId} productId={productId} productName={productName} />)}
     </div>
   );
 }

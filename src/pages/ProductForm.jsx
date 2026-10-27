@@ -145,7 +145,7 @@ export default function ProductForm() {
 
       {!isNew && variants.length > 0 && (
         <Section title={t('product.variants_title', { count: variants.length })}>
-          <VariantsEditor variants={variants} storeId={storeId} productId={id} dirty={attrsDirty} />
+          <VariantsEditor variants={variants} storeId={storeId} productId={id} productName={form.name} dirty={attrsDirty} />
         </Section>
       )}
       {isNew && attributes.length > 0 && <p className="text-xs text-gray-400 px-1">{t('product.variants_after_save')}</p>}
@@ -169,7 +169,7 @@ export default function ProductForm() {
           <div className="space-y-1.5"><label className={label}>{t('inventory.col.cost')}</label><input type="number" inputMode="decimal" min={0} dir="ltr" value={form.costPrice} onChange={set('costPrice')} placeholder="—" className={input} /></div>
           <div className="space-y-1.5"><label className={label}>{t('inventory.col.threshold')}</label><input type="number" inputMode="numeric" min={0} dir="ltr" value={form.lowStockThreshold} onChange={set('lowStockThreshold')} className={input} /></div>
         </div>
-        <div className="space-y-1.5"><label className={label}>{t('product.barcode')}</label><BarcodeField value={form.barcode} onChange={set('barcode')} /></div>
+        <div className="space-y-1.5"><label className={label}>{t('product.barcode')}</label><BarcodeField value={form.barcode} onChange={set('barcode')} label={{ name: form.name, price: form.price }} /></div>
       </Section>
 
       <div className="fixed md:static bottom-16 inset-x-0 p-4 md:p-0 bg-gray-50/95 dark:bg-zinc-950/95 md:bg-transparent z-30">
