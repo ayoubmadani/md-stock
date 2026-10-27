@@ -43,11 +43,13 @@ export default function Layout() {
           <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="font-bold">{t('app_name')}</span>
         </div>
-        {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => (n.owner ? owner : !n.perm || [].concat(n.perm).some((x) => can(x)))).map((n) => (
-          <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
-        ))}
-        <div className="flex-1" />
-        <button type="button" onClick={logout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+        {/* القائمة تتمرر وحدها — زر الخروج يبقى ظاهراً في الأسفل */}
+        <nav className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-1 -mx-1 px-1">
+          {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => (n.owner ? owner : !n.perm || [].concat(n.perm).some((x) => can(x)))).map((n) => (
+            <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5 shrink-0" />{t(`nav.${n.key}`)}</NavLink>
+          ))}
+        </nav>
+        <button type="button" onClick={logout} className="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
           <LogOut className="w-5 h-5" />{t('logout')}
         </button>
       </aside>
