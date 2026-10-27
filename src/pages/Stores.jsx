@@ -66,13 +66,14 @@ export default function StoresPage() {
       ) : (
         <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
           {mine.map((s) => {
-            const logo = s.design?.logoUrl || s.logo;
+            // الأيقونة (favicon) مربعة — الشعار قد يكون عريضاً
+            const icon = s.design?.faviconUrl;
             return (
               <div key={s.id} className="p-3 space-y-2">
                 <div className="flex items-center gap-3">
                   <button type="button" onClick={() => pick(s)} className="flex-1 min-w-0 flex items-center gap-3 text-start">
                   <span className={`w-11 h-11 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center ${s.id === storeId ? 'ring-2 ring-emerald-500' : ''}`}>
-                    {logo ? <img src={logo} alt="" className="w-full h-full object-contain" /> : <Store className="w-5 h-5 text-gray-400" />}
+                    {icon ? <img src={icon} alt="" className="w-full h-full object-cover" /> : <Store className="w-5 h-5 text-gray-400" />}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className={`text-sm font-semibold truncate flex items-center gap-1.5 ${s.isActive === false ? 'text-gray-400' : ''}`}>
@@ -101,7 +102,7 @@ export default function StoresPage() {
             {shared.map((s) => (
               <button key={s.id} type="button" onClick={() => pick(s)} className="w-full flex items-center gap-3 p-3 text-start">
                 <span className={`w-11 h-11 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center ${s.id === storeId ? 'ring-2 ring-emerald-500' : ''}`}>
-                  {s.design?.logoUrl ? <img src={s.design.logoUrl} alt="" className="w-full h-full object-contain" /> : <Store className="w-5 h-5 text-gray-400" />}
+                  {s.design?.faviconUrl ? <img src={s.design.faviconUrl} alt="" className="w-full h-full object-cover" /> : <Store className="w-5 h-5 text-gray-400" />}
                 </span>
                 <span className="flex-1 min-w-0 text-sm font-semibold truncate"><bdi>{s.name}</bdi></span>
                 {s.id === storeId && <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-600"><Check className="w-3 h-3" />{t('stores.current')}</span>}

@@ -59,7 +59,7 @@ export default function Layout() {
           {/* المتجر الحالي — اختيار متجر آخر من صفحة «متاجري» */}
           <Link to="/stores" className="flex-1 min-w-0 md:flex-none md:max-w-xs flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-900">
             <span className="w-7 h-7 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shrink-0 flex items-center justify-center">
-              {store?.design?.logoUrl ? <img src={store.design.logoUrl} alt="" className="w-full h-full object-contain" /> : <Store className="w-4 h-4 text-gray-400" />}
+              {store?.design?.faviconUrl ? <img src={store.design.faviconUrl} alt="" className="w-full h-full object-cover" /> : <Store className="w-4 h-4 text-gray-400" />}
             </span>
             <span className="min-w-0 truncate text-sm font-bold"><bdi>{store?.name || '—'}</bdi></span>
             {stores.length > 1 && <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
