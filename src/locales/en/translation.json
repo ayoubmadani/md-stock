@@ -194,7 +194,9 @@
     },
     "barcode_generate": "Generate a barcode",
     "barcode_replace": "Replace the current barcode with a new one?",
-    "print_label": "Print barcode label"
+    "print_label": "Print barcode label",
+    "barcodes_all": "Generate all barcodes ({{count}})",
+    "barcodes_done": "{{count}} barcodes generated ✓"
   },
   "no_permission": "You don't have permission for this section in this store — ask the store owner",
   "orders": {

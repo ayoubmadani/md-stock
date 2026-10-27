@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { uploadImage, ACCEPT } from '../lib/upload';
 import { combos, quickErrors, quickProductBody, variantUpdates } from '../lib/quick-product';
-import { randomStoreEan13 } from '../lib/barcode';
+import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import CameraCapture from './CameraCapture';
 import Scanner from './Scanner';
 import { input, label } from './product';
@@ -156,6 +156,14 @@ export default function QuickProductSheet({ storeId, barcode = '', onClose, onCr
         </div>
 
         {/* كل تركيبة بكميتها وباركودها */}
+        {hasVariants && list.some((c) => !String(row(c.key).barcode ?? '').trim()) && (
+          <button type="button" onClick={async () => {
+            const codes = await fillMissingBarcodes(list.map((c) => c.key), Object.fromEntries(list.map((c) => [c.key, row(c.key).barcode])));
+            setRows((x) => ({ ...x, ...Object.fromEntries(Object.entries(codes).map(([k, b]) => [k, { ...row(k), barcode: b }])) }));
+          }} className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/40 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+            <Wand2 className="w-4 h-4" />{t('product.barcodes_all', { count: list.filter((c) => !String(row(c.key).barcode ?? '').trim()).length })}
+          </button>
+        )}
         {hasVariants && (
           <div className="rounded-xl border border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
             {list.map((c) => {

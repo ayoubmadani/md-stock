@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { moveItem, newAttribute, newOffer, newValue } from '../lib/product-form';
 import Scanner from './Scanner';
-import { randomStoreEan13 } from '../lib/barcode';
+import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
 import { useAuth } from '../lib/auth';
 import ImageLibrary from './ImageLibrary';
@@ -206,7 +206,7 @@ function ScanSheet({ onCode, onClose }) {
 }
 
 /** باركود جديد غير مستعمل في المتجر (404 من البحث = متاح) */
-async function freshBarcode(storeId) {
+export async function freshBarcode(storeId) {
   for (let i = 0; i < 5; i++) {
     const code = randomStoreEan13();
     try {
@@ -297,10 +297,37 @@ function VariantRow({ v, storeId, productId, productName, onSaved }) {
 
 export function VariantsEditor({ variants, storeId, productId, productName, dirty }) {
   const { t } = useTranslation();
+  const [bulk, setBulk] = useState(false);
+  const [ver, setVer] = useState(0); // يعيد رسم الصفوف بعد التوليد الجماعي
+  const missing = variants.filter((v) => !String(v.barcode ?? '').trim()).length;
+  // باركود لكل نسخة بلا باركود (القائم لا يتغير) ويُحفظ مباشرة
+  const generateAll = async () => {
+    setBulk(true);
+    try {
+      const current = Object.fromEntries(variants.map((v) => [v.id, v.barcode || '']));
+      const codes = await fillMissingBarcodes(variants.map((v) => v.id), current, () => freshBarcode(storeId));
+      for (const v of variants) {
+        if (!codes[v.id]) continue;
+        await api.patch(`/stores/${storeId}/products/${productId}/variants/${v.id}`, { barcode: codes[v.id] });
+        v.barcode = codes[v.id];
+      }
+      toast.success(t('product.barcodes_done', { count: Object.keys(codes).length }));
+    } catch (e) {
+      toast.error(errorMessage(e, t('inventory.error')));
+    } finally {
+      setVer((n) => n + 1);
+      setBulk(false);
+    }
+  };
   return (
     <div className="space-y-2">
       {dirty && <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 rounded-lg p-2">{t('product.variants_dirty')}</p>}
-      {variants.map((v) => <VariantRow key={v.id} v={v} storeId={storeId} productId={productId} productName={productName} />)}
+      {missing > 0 && (
+        <button type="button" onClick={generateAll} disabled={bulk} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/40 text-sm font-bold text-indigo-600 dark:text-indigo-400 disabled:opacity-60">
+          {bulk ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}{t('product.barcodes_all', { count: missing })}
+        </button>
+      )}
+      {variants.map((v) => <VariantRow key={`${v.id}-${ver}`} v={v} storeId={storeId} productId={productId} productName={productName} />)}
     </div>
   );
 }

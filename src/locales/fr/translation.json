@@ -194,7 +194,9 @@
     },
     "barcode_generate": "Générer un code-barres",
     "barcode_replace": "Remplacer le code-barres actuel par un nouveau ?",
-    "print_label": "Imprimer l'étiquette code-barres"
+    "print_label": "Imprimer l'étiquette code-barres",
+    "barcodes_all": "Générer les codes-barres ({{count}})",
+    "barcodes_done": "{{count}} codes-barres générés ✓"
   },
   "no_permission": "Vous n'avez pas l'autorisation pour cette section dans cette boutique — demandez-la au propriétaire",
   "orders": {
