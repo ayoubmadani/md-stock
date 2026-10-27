@@ -120,6 +120,7 @@ export default function ThemesPage() {
 
   const ctx = { activeId, myIds: (mine ?? []).map((m) => m.id), planIds };
   const active = [...(mine ?? []), ...plan].find((m) => m.id === activeId);
+  const planOnly = plan.filter((p) => !(mine ?? []).some((m) => m.id === p.id));
   const btn = 'w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold disabled:opacity-50';
   const ActiveTag = <span className={`${btn} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600`}><Check className="w-3.5 h-3.5" />{t('themes.active')}</span>;
 
@@ -158,10 +159,26 @@ export default function ThemesPage() {
       {tab === 'my' && (mine === null
         ? <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
         : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {myCard(null)}
-            {mine.map((th) => myCard(th))}
-            {plan.filter((p) => !mine.some((m) => m.id === p.id)).map((th) => myCard(th, true))}
+          // قسمان: ما يملكه التاجر (اشتراه/ثبّته) — وما تعطيه خطته (يزول بانتهاء الاشتراك)
+          <div className="space-y-4">
+            <section className="space-y-2">
+              <p className="text-sm font-bold">{t('themes.section_mine')} <span className="text-gray-400 font-semibold" dir="ltr">({mine.length + 1})</span></p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {myCard(null)}
+                {mine.map((th) => myCard(th))}
+              </div>
+            </section>
+            {planOnly.length > 0 && (
+              <section className="space-y-2">
+                <div>
+                  <p className="text-sm font-bold flex items-center gap-1.5"><Crown className="w-4 h-4 text-amber-500" />{t('themes.section_plan')} <span className="text-gray-400 font-semibold" dir="ltr">({planOnly.length})</span></p>
+                  <p className="text-[11px] text-gray-400">{t('themes.section_plan_hint')}</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {planOnly.map((th) => myCard(th, true))}
+                </div>
+              </section>
+            )}
           </div>
         ))}
 

@@ -6,13 +6,15 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { STATUS_CLS, STATUS_DOT, allowedStatuses, nextActions, statusPayload } from '../lib/orders';
 
-export const statusLabel = (t, status, isDigital) =>
-  status === 'delivered' && isDigital ? t('orders.status.delivered_digital') : t(`orders.status.${status}`);
+// order: الطلب نفسه — «مسلّم» يُسمّى «تم البيع» للبيع في المحل و«تم التسليم» للرقمي
+export const statusLabel = (t, status, order) =>
+  status === 'delivered' && order?.platform === 'pos' ? t('orders.status.delivered_pos')
+    : status === 'delivered' && order?.isDigital ? t('orders.status.delivered_digital') : t(`orders.status.${status}`);
 
 export function OrderStatusBadge({ order, onClick }) {
   const { t } = useTranslation();
   const cls = `inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap ${STATUS_CLS[order.status] || STATUS_CLS.pending}`;
-  const label = statusLabel(t, order.status, order.isDigital);
+  const label = statusLabel(t, order.status, order);
   return onClick
     ? <button type="button" onClick={onClick} className={cls}>{label}</button>
     : <span className={cls}>{label}</span>;
@@ -42,7 +44,7 @@ export function StatusSheet({ order, onClose, onChanged }) {
     setBusy(status);
     try {
       await api.patch(`/orders/${order.id}`, statusPayload(order, status));
-      toast.success(`${order.customerName || ''} ← ${statusLabel(t, status, order.isDigital)}`);
+      toast.success(`${order.customerName || ''} ← ${statusLabel(t, status, order)}`);
       onChanged(status);
     } catch (e) {
       toast.error(errorMessage(e, t('orders.save_failed')));
@@ -71,7 +73,7 @@ export function StatusSheet({ order, onClose, onChanged }) {
                 className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-sm font-semibold text-start disabled:opacity-60 ${
                   s === order.status ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-500/10' : 'border-gray-100 dark:border-zinc-800'}`}>
                 <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[s]}`} />
-                <span className="flex-1 truncate">{statusLabel(t, s, order.isDigital)}</span>
+                <span className="flex-1 truncate">{statusLabel(t, s, order)}</span>
                 {busy === s ? <Loader2 className="w-4 h-4 animate-spin" /> : s === order.status && <Check className="w-4 h-4 text-indigo-500" />}
               </button>
             ))}
@@ -173,7 +175,7 @@ export function NextStepCard({ order, onChanged, onShip, highlight = false, clas
     try {
       await api.patch(`/orders/${order.id}`, statusPayload(order, a.status));
       navigator.vibrate?.(40);
-      toast.success(`${order.customerName || ''} ← ${statusLabel(t, a.status, order.isDigital)}`);
+      toast.success(`${order.customerName || ''} ← ${statusLabel(t, a.status, order)}`);
       onChanged(a.status);
     } catch (e) {
       toast.error(errorMessage(e, t('orders.save_failed')));
@@ -191,7 +193,7 @@ export function NextStepCard({ order, onChanged, onShip, highlight = false, clas
             className={`flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold disabled:opacity-60 ${i === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800'}`}>
             {busy === a.status ? <Loader2 className="w-4 h-4 animate-spin" />
               : a.action === 'ship' ? <Truck className="w-4 h-4" /> : <span className={`w-2 h-2 rounded-full ${STATUS_DOT[a.status]}`} />}
-            {a.action === 'ship' ? t('orders.actions.ship') : statusLabel(t, a.status, order.isDigital)}
+            {a.action === 'ship' ? t('orders.actions.ship') : statusLabel(t, a.status, order)}
           </button>
         ))}
       </div>

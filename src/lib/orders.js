@@ -13,19 +13,23 @@ export const STATUS_CLS = {
   returned: 'text-rose-600 bg-rose-50 dark:bg-rose-500/10 dark:text-rose-400',
   delivered: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400',
   postponed: 'text-gray-500 bg-gray-100 dark:bg-zinc-800 dark:text-zinc-400',
+  unpaid: 'text-orange-600 bg-orange-50 dark:bg-orange-500/10 dark:text-orange-400',
 };
 
 export const STATUS_DOT = {
   pending: 'bg-amber-500', appl1: 'bg-orange-500', appl2: 'bg-orange-500', appl3: 'bg-orange-500',
   confirmed: 'bg-blue-500', shipping: 'bg-cyan-500', cancelled: 'bg-purple-500',
-  returned: 'bg-rose-500', delivered: 'bg-emerald-500', postponed: 'bg-gray-400',
+  returned: 'bg-rose-500', delivered: 'bg-emerald-500', postponed: 'bg-gray-400', unpaid: 'bg-orange-500',
 };
 
 const AFTER_CONFIRMATION = ['confirmed', 'shipping', 'delivered', 'returned'];
 const DIGITAL_HIDDEN = ['shipping', 'returned'];
+export const POS_STATUSES = ['postponed', 'unpaid', 'delivered', 'cancelled'];
 
 /** الحالات التي يستطيع التاجر اختيارها لهذا الطلب ([] = الطلب عند شركة التأكيد) */
 export function allowedStatuses(order) {
+  // بيع في المحل: مؤجل، تم البيع، ملغى فقط
+  if (order.platform === 'pos') return POS_STATUSES;
   if (order.confirmationCompanyId) {
     if (!AFTER_CONFIRMATION.includes(order.status)) return [];
     // بعد تأكيد الشركة: التسليم والإرجاع يأتيان من شركة التوصيل، التاجر يضع «قيد الشحن» فقط
@@ -75,6 +79,7 @@ const WAITING = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
 export function nextActions(order) {
   const allowed = allowedStatuses(order);
   const st = (s) => (allowed.includes(s) ? [{ status: s }] : []);
+  if (order.platform === 'pos') return order.status === 'postponed' ? [...st('delivered'), ...st('cancelled')] : [];
   if (WAITING.includes(order.status)) return [...st('confirmed'), ...st('cancelled')];
   if (order.status === 'confirmed') {
     if (order.isDigital) return st('delivered');
@@ -82,4 +87,10 @@ export function nextActions(order) {
   }
   if (order.status === 'shipping') return [...st('delivered'), ...st('returned')];
   return [];
+}
+
+/** بيع بالدين (POS): المدفوع من الدفعات والمتبقي */
+export function paymentState(order) {
+  const paid = Math.round((order?.payments || []).reduce((s, p) => s + Number(p.amount || 0), 0) * 100) / 100;
+  return { paid, remaining: Math.max(0, Math.round((Number(order?.totalPrice || 0) - paid) * 100) / 100) };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allowedStatuses, statusPayload, whatsappLink, sumCounts } from './orders.js';
+import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts } from './orders.js';
 
 describe('allowedStatuses', () => {
   it('a regular order can take any status', () => {
@@ -74,5 +74,26 @@ describe('nextActions (after scanning an order)', () => {
   });
   it('digital orders skip delivery', () => {
     expect(kinds({ status: 'confirmed', isDigital: true })).toEqual(['delivered']);
+  });
+});
+
+describe('in-shop sale (platform pos): only postponed / pay later / sold / cancelled', () => {
+  const pos = { platform: 'pos', status: 'delivered', items: [] };
+  it('the merchant can choose only these three statuses', () => {
+    expect(allowedStatuses(pos)).toEqual(['postponed', 'unpaid', 'delivered', 'cancelled']);
+  });
+  it('a postponed sale: next step is sold or cancelled; a sold one has no next step', () => {
+    expect(nextActions({ ...pos, status: 'postponed' })).toEqual([{ status: 'delivered' }, { status: 'cancelled' }]);
+    expect(nextActions(pos)).toEqual([]);
+  });
+});
+
+describe('pay later: what is paid and what is left', () => {
+  it('sums the payments; remaining never below 0; no payments = nothing paid', () => {
+    expect(paymentState({ totalPrice: 5000, payments: [{ amount: 2000 }, { amount: 500 }] })).toEqual({ paid: 2500, remaining: 2500 });
+    expect(paymentState({ totalPrice: 5000, payments: null })).toEqual({ paid: 0, remaining: 5000 });
+  });
+  it('an unpaid sale has no «next step» button — payments are recorded in the payment card', () => {
+    expect(nextActions({ platform: 'pos', status: 'unpaid', items: [] })).toEqual([]);
   });
 });

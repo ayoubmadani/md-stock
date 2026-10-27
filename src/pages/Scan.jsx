@@ -126,7 +126,7 @@ export default function ScanPage() {
                 </div>
                 <div className="space-y-1 text-sm">
                   {(order.items || []).map((it) => (
-                    <p key={it.id} className="truncate text-gray-600 dark:text-zinc-300"><span dir="ltr">{it.quantity}×</span> <bdi>{it.product?.name}</bdi></p>
+                    <p key={it.id} className="truncate text-gray-600 dark:text-zinc-300"><span dir="ltr">{it.quantity}×</span> <bdi>{it.product?.name || it.title}</bdi></p>
                   ))}
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-zinc-800">

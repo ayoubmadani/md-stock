@@ -173,6 +173,8 @@ export default function OrderForm() {
   useEffect(() => {
     if (isNew) return;
     api.get(`/orders/get-one/${id}`).then(({ data }) => {
+      // بيع في المحل: يُعدَّل في صفحة البيع
+      if (data?.platform === 'pos') return navigate(`/pos/${id}`, { replace: true });
       setOrderStore(data.store || null);
       setForm({
         ...data,

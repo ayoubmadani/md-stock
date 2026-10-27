@@ -26,7 +26,9 @@
     "keys": "API keys",
     "rates": "Delivery rates",
     "pos": "In-shop sale",
-    "pos_short": "Sell"
+    "pos_short": "Sell",
+    "customers": "Customers",
+    "tasks": "Tasks"
   },
   "login": {
     "title": "Sign in",
@@ -231,7 +233,9 @@
       "returned": "Returned",
       "delivered": "Delivered",
       "delivered_digital": "Sold",
-      "postponed": "Postponed"
+      "postponed": "Postponed",
+      "delivered_pos": "Sold",
+      "unpaid": "Pay later"
     },
     "form": {
       "new": "New order",
@@ -270,7 +274,9 @@
       "default": "Default"
     },
     "next_step": "Next step",
-    "filter_status": "Order status"
+    "filter_status": "Order status",
+    "channel_online": "Online orders",
+    "channel_shop": "In-shop sales"
   },
   "library": {
     "title_products": "Product images",
@@ -418,7 +424,8 @@
     "note": "Sales = delivered orders only, by order creation date. A return costs the return fee of the delivery account.",
     "ad_per_unit": "Ad cost per unit sold",
     "ad_unit_short": "ad/unit",
-    "ad_unit_loss": "Ads cost more than the unit margin ({{margin}}) — every unit sells at a loss."
+    "ad_unit_loss": "Ads cost more than the unit margin ({{margin}}) — every unit sells at a loss.",
+    "services": "Services (no product)"
   },
   "ads": {
     "title": "Ads",
@@ -575,7 +582,10 @@
     "coupon": "Coupon (optional)",
     "apply": "Apply",
     "coupon_invalid": "Invalid coupon",
-    "wallet_note": "The price is taken from your wallet; the theme stays in “My themes” for all your stores."
+    "wallet_note": "The price is taken from your wallet; the theme stays in “My themes” for all your stores.",
+    "section_mine": "My themes",
+    "section_plan": "Your plan themes",
+    "section_plan_hint": "Available while your subscription is active"
   },
   "sub": {
     "month": "Monthly",
@@ -858,9 +868,9 @@
     "close": "Close"
   },
   "pos": {
-    "empty": "Scan the product barcode with the camera or a barcode reader — it goes into the cart. Scan again to add one more.",
+    "empty": "Scan the product barcode (camera or scanner), or tap “Pick a product” — it goes into the cart. Scan again to add quantity.",
     "unknown": "No product with barcode {{code}}",
-    "add_customer": "Add the customer (optional)",
+    "add_customer": "Pick a customer (optional)",
     "phone": "Phone (optional)",
     "name": "Name (optional)",
     "confirm": "Confirm sale ({{count}})",
@@ -870,7 +880,47 @@
     "print": "Print",
     "open_order": "Open order",
     "next_sale": "New sale",
-    "add_as_product": "Add as product"
+    "add_as_product": "Add as product",
+    "pick": "Pick a product",
+    "pick_title": "Pick a product",
+    "pick_search": "Search by name or barcode",
+    "pick_none": "No products",
+    "pick_done": "Done",
+    "in_stock": "Stock: {{count}}",
+    "variants": "{{count}} variants — pick one",
+    "editing": "Editing sale",
+    "cancel_edit": "Cancel",
+    "save_edit": "Save changes ({{count}})",
+    "updated": "Sale updated ✓ — stock corrected",
+    "pay_later": "Pay later",
+    "pay_later_hint": "The customer takes the goods now and pays later — name and phone are required. Stock is deducted, profit counts once fully paid.",
+    "name_required": "Customer name (required)",
+    "paid_now": "Paid now (optional)",
+    "paid": "Paid",
+    "remaining": "Remaining",
+    "pay_later_confirm": "Record credit sale",
+    "done_credit": "Credit sale recorded ✓",
+    "unpaid_stamp": "Not fully paid",
+    "payments": "Payments",
+    "amount": "Amount",
+    "add_payment": "Add payment",
+    "pay_all": "Pay the rest",
+    "payment_saved": "Payment recorded ✓",
+    "settled": "Fully paid ✓ — now «Sold»",
+    "amount_invalid": "Invalid amount or more than what is left",
+    "phone_required": "Phone (required)",
+    "customer_orders": "{{count}} orders",
+    "new_customer": "New customer",
+    "pick_customer_required": "Pick the customer (required)",
+    "service": "Service",
+    "service_cost": "Cost",
+    "service_title": "Service / custom amount",
+    "service_hint": "A sale with no product: water or power bill, top-up, repair… Stock is not touched. Profit = amount − cost.",
+    "service_name": "Description (e.g. water bill)",
+    "service_price": "Amount (paid by the customer)",
+    "service_cost_opt": "Cost (optional)",
+    "service_profit": "Profit",
+    "service_add": "Add to cart"
   },
   "quick": {
     "title": "Quick new product",
@@ -951,7 +1001,8 @@
       "delivered": "Delivered",
       "cancelled": "Cancelled",
       "returned": "Returned",
-      "postponed": "Postponed"
+      "postponed": "Postponed",
+      "unpaid": "Pay later"
     },
     "col": {
       "orders": "Orders",
@@ -1002,5 +1053,41 @@
       "toggle_failed": "Failed to change status"
     },
     "stats": "Statistics"
+  },
+  "customers": {
+    "search": "Search by name or phone",
+    "new": "New customer",
+    "edit": "Edit customer",
+    "create": "Create customer",
+    "created": "Customer created ✓",
+    "saved": "Saved ✓",
+    "required": "Name and phone are required",
+    "name": "Name",
+    "phone": "Phone",
+    "phone2": "Second phone (optional)",
+    "photo": "Photo",
+    "pick": "Pick a customer",
+    "none": "No customer found",
+    "empty": "No customers yet — add them here or during an in-shop sale.",
+    "total_debt": "Total owed",
+    "debt": "Owes",
+    "orders": "Orders",
+    "no_orders": "No orders yet",
+    "orders_count": "{{count}} orders",
+    "delete_confirm": "Delete this customer? Their orders keep the name and phone.",
+    "deleted": "Customer deleted"
+  },
+  "tasks": {
+    "placeholder": "New task… (e.g. call the supplier)",
+    "add": "Add",
+    "due": "Due date",
+    "toggle": "Done / not done",
+    "delete": "Delete",
+    "due_overdue": "Overdue",
+    "due_today": "Today",
+    "due_tomorrow": "Tomorrow",
+    "empty": "No tasks — add the first one above.",
+    "all_done": "All done 🎉",
+    "done_section": "Done ({{count}})"
   }
 }

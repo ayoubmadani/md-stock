@@ -122,7 +122,19 @@ export default function ProfitPage() {
           </div>
           {tt.missingCost > 0 && <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3">{t('profit.missing_cost', { count: tt.missingCost })}</p>}
 
-          {data.products.length === 0 ? <p className="text-center text-sm text-gray-400 py-12">{t('profit.empty')}</p>
+          {/* الخدمات بلا منتج (فواتير، رصيد…): المبلغ − التكلفة */}
+          {data.services?.orders > 0 && (
+            <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-3 space-y-2">
+              <p className="text-sm font-bold">{t('profit.services')} <span className="text-gray-400 font-semibold" dir="ltr">({data.services.orders})</span></p>
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div><p className="text-gray-500">{t('profit.revenue')}</p><p className="font-bold" dir="ltr">{money(data.services.revenue)}</p></div>
+                <div><p className="text-gray-500">{t('pos.service_cost')}</p><p className="font-bold text-rose-500" dir="ltr">-{money(data.services.cost)}</p></div>
+                <div><p className="text-gray-500">{t('profit.net')}</p><p className={`font-black ${data.services.net >= 0 ? 'text-emerald-600' : 'text-rose-500'}`} dir="ltr">{money(data.services.net)}</p></div>
+              </div>
+            </div>
+          )}
+
+          {data.products.length === 0 && !data.services?.orders ? <p className="text-center text-sm text-gray-400 py-12">{t('profit.empty')}</p>
             : data.products.map((r) => <ProductProfit key={r.productId} r={r} onAds={setAds} />)}
           <p className="text-[11px] text-gray-400 leading-relaxed px-1">{t('profit.note')}</p>
         </>

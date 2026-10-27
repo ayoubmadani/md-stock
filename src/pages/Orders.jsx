@@ -2,10 +2,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronDown, Loader2, MapPin, Phone, Plus, Search, ShieldAlert, X } from 'lucide-react';
+import { Check, ChevronDown, Globe, Loader2, MapPin, Phone, Plus, Search, ShieldAlert, Store as StoreIcon, X } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { STATUSES, STATUS_DOT, money, sumCounts } from '../lib/orders';
+import { POS_STATUSES, STATUSES, STATUS_DOT, money, paymentState, sumCounts } from '../lib/orders';
 import { OrderStatusBadge, StatusSheet, timeAgo } from '../components/orders';
 
 const PAGE_SIZE = 50; // نفس حد الخادم
@@ -29,12 +29,13 @@ function OrderCard({ order, canManage, onStatus }) {
             {!order.customerId && <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" title={t('orders.suspicious')} />}
           </div>
           <p className="text-xs text-gray-500 dark:text-zinc-400 truncate mt-0.5">
-            {first ? <><span dir="ltr">{first.quantity}×</span> <bdi>{first.product?.name}</bdi></> : '—'}
+            {first ? <><span dir="ltr">{first.quantity}×</span> <bdi>{first.product?.name || first.title}</bdi></> : '—'}
             {items.length > 1 && <span className="text-indigo-500 font-semibold"> +{items.length - 1}</span>}
           </p>
         </div>
         <div className="text-end shrink-0">
           <p className="font-black text-sm text-emerald-600 dark:text-emerald-400" dir="ltr">{money(order.totalPrice)} DA</p>
+          {order.status === 'unpaid' && <p className="text-[11px] font-bold text-orange-600 dark:text-orange-400">{t('pos.remaining')}: <span dir="ltr">{money(paymentState(order).remaining)}</span></p>}
           <p className="text-[11px] text-gray-400 mt-0.5">{order.createdAt && timeAgo(order.createdAt, i18n.language)}</p>
         </div>
       </div>
@@ -59,7 +60,12 @@ export default function OrdersPage() {
   const { t } = useTranslation();
   const { storeId, can } = useAuth();
   const [params] = useSearchParams();
-  const [status, setStatus] = useState(() => (STATUSES.includes(params.get('status')) ? params.get('status') : ''));
+  const [status, setStatus] = useState(() => ([...STATUSES, 'unpaid'].includes(params.get('status')) ? params.get('status') : ''));
+  // تبويبان: طلبات الموقع (أونلاين) / البيع في المحل
+  const [channel, setChannel] = useState(() => (params.get('channel') === 'shop' ? 'shop' : 'online'));
+  const shown = channel === 'shop' ? POS_STATUSES : STATUSES;
+  // «مسلّم» في المحل = «تم البيع»
+  const label = (s) => (!s ? t('orders.all') : channel === 'shop' && s === 'delivered' ? t('orders.status.delivered_pos') : t(`orders.status.${s}`));
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [orders, setOrders] = useState(null);
@@ -79,16 +85,16 @@ export default function OrdersPage() {
   }, [search]);
 
   const loadCounts = useCallback(() => {
-    api.get(`/orders/get-count-status/${storeId}`).then((r) => setCounts(sumCounts(r.data))).catch(() => {});
-  }, [storeId]);
+    api.get(`/orders/get-count-status/${storeId}`, { params: { channel } }).then((r) => setCounts(sumCounts(r.data))).catch(() => {});
+  }, [storeId, channel]);
 
   const load = useCallback(async (p) => {
-    const { data } = await api.get(`/orders/${storeId}`, { params: { status: status || undefined, query: query || undefined, page: p } });
+    const { data } = await api.get(`/orders/${storeId}`, { params: { status: status || undefined, query: query || undefined, page: p, channel } });
     const list = Array.isArray(data) ? data : [];
     setHasMore(list.length === PAGE_SIZE);
     setPage(p);
     return list;
-  }, [storeId, status, query]);
+  }, [storeId, status, query, channel]);
 
   useEffect(() => {
     let alive = true;
@@ -118,6 +124,14 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
+        {[['online', Globe], ['shop', StoreIcon]].map(([c, Icon]) => (
+          <button key={c} type="button" onClick={() => { setChannel(c); setStatus(''); }}
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-bold ${channel === c ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500'}`}>
+            <Icon className="w-4 h-4" />{t(`orders.channel_${c}`)}
+          </button>
+        ))}
+      </div>
       <div className="flex gap-2">
       <div className="relative flex-1">
         <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -125,13 +139,13 @@ export default function OrdersPage() {
           className="w-full ps-9 pe-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400" />
       </div>
       {can('order.manage') && (
-        <Link to="/orders/new" aria-label={t('orders.form.new')} className="shrink-0 flex items-center justify-center gap-1.5 px-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold">
+        <Link to={channel === 'shop' ? '/pos' : '/orders/new'} aria-label={t('orders.form.new')} className="shrink-0 flex items-center justify-center gap-1.5 px-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold">
           <Plus className="w-4 h-4" /><span className="hidden sm:inline">{t('orders.form.new')}</span>
         </Link>
       )}
       </div>
 
-      {abandoned > 0 && (
+      {channel === 'online' && abandoned > 0 && (
         <Link to="/abandoned" className="flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm font-semibold">
           <span>{t('abandoned.banner', { count: abandoned })}</span><span aria-hidden>←</span>
         </Link>
@@ -140,7 +154,7 @@ export default function OrdersPage() {
       {/* الهاتف: زر يشبه select يفتح قائمة الحالات */}
       <button type="button" onClick={() => setStatusSheet(true)} className="md:hidden w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-sm font-bold">
         {status ? <span className={`w-2 h-2 rounded-full ${STATUS_DOT[status]}`} /> : <span className="w-2 h-2 rounded-full bg-indigo-500" />}
-        <span className="flex-1 text-start">{status ? t(`orders.status.${status}`) : t('orders.all')}</span>
+        <span className="flex-1 text-start">{label(status)}</span>
         <span className="text-xs text-gray-400" dir="ltr">{counts[status || 'all'] ?? 0}</span>
         <ChevronDown className="w-4 h-4 text-gray-400" />
       </button>
@@ -151,13 +165,13 @@ export default function OrdersPage() {
               <p className="font-bold">{t('orders.filter_status')}</p>
               <button type="button" onClick={() => setStatusSheet(false)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
             </div>
-            {['', ...STATUSES].map((s) => {
+            {['', ...shown].map((s) => {
               const active = status === s;
               return (
                 <button key={s || 'all'} type="button" onClick={() => { setStatus(s); setStatusSheet(false); }}
                   className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold ${active ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : ''}`}>
                   <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${s ? STATUS_DOT[s] : 'bg-indigo-500'}`} />
-                  <span className="flex-1 text-start">{s ? t(`orders.status.${s}`) : t('orders.all')}</span>
+                  <span className="flex-1 text-start">{label(s)}</span>
                   <span className="min-w-[2rem] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-xs text-gray-600 dark:text-zinc-300 text-center" dir="ltr">{counts[s || 'all'] ?? 0}</span>
                   {active ? <Check className="w-4 h-4" /> : <span className="w-4" />}
                 </button>
@@ -169,13 +183,13 @@ export default function OrdersPage() {
 
       {/* الكمبيوتر: تبويبات الحالات */}
       <div className="hidden md:flex gap-1.5 flex-wrap pb-1">
-        {['', ...STATUSES].map((s) => {
+        {['', ...shown].map((s) => {
           const active = status === s;
           return (
             <button key={s || 'all'} type="button" onClick={() => setStatus(s)}
               className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border ${active ? 'bg-indigo-600 text-white border-transparent' : 'border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300'}`}>
               {s && <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-white/80' : STATUS_DOT[s]}`} />}
-              {s ? t(`orders.status.${s}`) : t('orders.all')}
+              {label(s)}
               <span className="opacity-70" dir="ltr">{counts[s || 'all'] ?? 0}</span>
             </button>
           );
