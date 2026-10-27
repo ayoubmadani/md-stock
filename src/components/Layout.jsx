@@ -4,6 +4,7 @@ import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, Layou
 import { MORE } from '../pages/More';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
+import TrialOffer from './TrialOffer';
 
 // الشريط السفلي: 5 أزرار ثابتة؛ ما لا صلاحية له يظهر باهتاً ويفتح رسالة «لا صلاحية»
 const NAV = [
@@ -79,6 +80,8 @@ export default function Layout() {
         <main className="p-4 md:p-6 max-w-6xl mx-auto">
           <Outlet />
         </main>
+        {/* أول دخول لحساب جديد: تجربة مجانية للخطة */}
+        <TrialOffer />
       </div>
 
       {/* شريط سفلي على الهاتف */}

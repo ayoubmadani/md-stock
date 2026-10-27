@@ -11,7 +11,7 @@ import { Toggle, input } from '../components/product';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
 
-function Features({ f }) {
+export function Features({ f }) {
   const { t } = useTranslation();
   if (!f) return null;
   const rows = [

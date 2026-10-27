@@ -193,7 +193,8 @@
       "offer": "Complétez le nom, la quantité et le prix de chaque offre"
     },
     "barcode_generate": "Générer un code-barres",
-    "barcode_replace": "Remplacer le code-barres actuel par un nouveau ?"
+    "barcode_replace": "Remplacer le code-barres actuel par un nouveau ?",
+    "print_label": "Imprimer l'étiquette code-barres"
   },
   "no_permission": "Vous n'avez pas l'autorisation pour cette section dans cette boutique — demandez-la au propriétaire",
   "orders": {
@@ -869,5 +870,15 @@
     "value_ph": "Ajouter une valeur",
     "other_option": "Autre option",
     "short": "Produit rapide"
+  },
+  "trial": {
+    "title": "Essai gratuit de {{days}} jours",
+    "subtitle": "Choisissez le plan adapté à votre boutique. Rien n'est débité maintenant.",
+    "free_days": "{{days}} jours gratuits",
+    "start": "Commencer l'essai",
+    "skip": "Continuer avec le plan gratuit",
+    "auto_renew_hint": "Si le solde est insuffisant ou le renouvellement désactivé, votre compte repasse au plan gratuit sans aucun débit.",
+    "popular": "Le plus choisi",
+    "then": "puis {{price}} {{currency}} / mois"
   }
 }

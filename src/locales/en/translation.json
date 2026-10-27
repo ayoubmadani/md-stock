@@ -193,7 +193,8 @@
       "offer": "Complete each offer’s name, quantity and price"
     },
     "barcode_generate": "Generate a barcode",
-    "barcode_replace": "Replace the current barcode with a new one?"
+    "barcode_replace": "Replace the current barcode with a new one?",
+    "print_label": "Print barcode label"
   },
   "no_permission": "You don't have permission for this section in this store — ask the store owner",
   "orders": {
@@ -869,5 +870,15 @@
     "value_ph": "Add a value",
     "other_option": "Other option",
     "short": "Quick product"
+  },
+  "trial": {
+    "title": "Try free for {{days}} days",
+    "subtitle": "Pick the plan that fits your store. Nothing is charged now.",
+    "free_days": "{{days}} days free",
+    "start": "Start trial",
+    "skip": "Continue with the free plan",
+    "auto_renew_hint": "If your wallet balance is too low or renewal is off, your account returns to the free plan with no charge.",
+    "popular": "Most chosen",
+    "then": "then {{price}} {{currency}} / month"
   }
 }
