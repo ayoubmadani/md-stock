@@ -880,5 +880,9 @@
     "auto_renew_hint": "If your wallet balance is too low or renewal is off, your account returns to the free plan with no charge.",
     "popular": "Most chosen",
     "then": "then {{price}} {{currency}} / month"
+  },
+  "onboarding": {
+    "title": "Create your first store",
+    "subtitle": "Just a few details — you can change them later."
   }
 }

@@ -880,5 +880,9 @@
     "auto_renew_hint": "Si le solde est insuffisant ou le renouvellement désactivé, votre compte repasse au plan gratuit sans aucun débit.",
     "popular": "Le plus choisi",
     "then": "puis {{price}} {{currency}} / mois"
+  },
+  "onboarding": {
+    "title": "Créez votre première boutique",
+    "subtitle": "Quelques informations seulement — modifiables plus tard."
   }
 }

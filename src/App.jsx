@@ -36,17 +36,26 @@ import ApiKeysPage from './pages/ApiKeys';
 import DeliveryRatesPage from './pages/DeliveryRates';
 import PosPage from './pages/Pos';
 import RequirePerm from './components/RequirePerm';
+import TrialOffer from './components/TrialOffer';
 
 function Gate() {
   const { t } = useTranslation();
   const { token, stores, loading, logout } = useAuth();
   if (!token) return <Navigate to="/login" replace />;
   if (loading) return <div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-7 h-7 animate-spin text-indigo-500" /></div>;
+  // حساب جديد بلا متجر: إنشاء أول متجر مباشرة (+ عرض التجربة المجانية)
   if (!stores.length) {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-gray-600 dark:text-zinc-300 max-w-xs">{t('no_store')}</p>
-        <button onClick={logout} className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold">{t('logout')}</button>
+      <div className="min-h-dvh p-4 pb-8 space-y-4">
+        <div className="max-w-xl mx-auto flex items-start justify-between gap-3 pt-2">
+          <div>
+            <h1 className="text-xl font-black">{t('onboarding.title')}</h1>
+            <p className="text-sm text-gray-500 dark:text-zinc-400">{t('onboarding.subtitle')}</p>
+          </div>
+          <button onClick={logout} className="shrink-0 text-sm font-semibold text-gray-400">{t('logout')}</button>
+        </div>
+        <StoreForm onboarding />
+        <TrialOffer />
       </div>
     );
   }

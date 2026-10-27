@@ -23,10 +23,11 @@ function ImagePick({ value, onPick, onClear, wide, small }) {
   );
 }
 
-export default function StoreForm() {
+// onboarding: أول متجر لحساب جديد — بعد الإنشاء إلى الرئيسية
+export default function StoreForm({ onboarding = false }) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const isNew = !id;
+  const isNew = onboarding || !id;
   const nav = useNavigate();
   const { refresh, selectStore } = useAuth();
   const [f, setF] = useState(isNew ? EMPTY_STORE : null);
@@ -61,7 +62,7 @@ export default function StoreForm() {
         toast.success(t('inventory.saved'));
         await refresh();
       }
-      nav('/stores');
+      nav(onboarding ? '/' : '/stores');
     } catch (err) {
       toast.error(errorMessage(err, t('inventory.error')));
       setSaving(false);
@@ -72,10 +73,12 @@ export default function StoreForm() {
 
   return (
     <form onSubmit={save} className="max-w-xl mx-auto space-y-3">
-      <div className="flex items-center justify-between">
-        <h1 className="font-bold">{isNew ? t('stores.new') : t('stores.edit')}</h1>
-        <button type="button" onClick={() => nav('/stores')} className="p-2 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
-      </div>
+      {!onboarding && (
+        <div className="flex items-center justify-between">
+          <h1 className="font-bold">{isNew ? t('stores.new') : t('stores.edit')}</h1>
+          <button type="button" onClick={() => nav('/stores')} className="p-2 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+        </div>
+      )}
 
       <Section title={t('stores.identity')}>
         <div className="flex gap-3">
