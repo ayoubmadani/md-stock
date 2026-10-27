@@ -21,7 +21,10 @@ export default function CameraCapture({ onCapture, onClose }) {
     // تأخير صغير: React في التطوير يركّب مرتين — طلب واحد فقط للكاميرا
     const timer = setTimeout(async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1920 } }, audio: false });
+        // exact أولاً: بعض الهواتف تتجاهل ideal فلا تنقلب الكاميرا
+        const size = { width: { ideal: 1920 }, height: { ideal: 1920 } };
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: facing }, ...size }, audio: false })
+          .catch(() => navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, ...size }, audio: false }));
         if (cancelled) { stream.getTracks().forEach((tr) => tr.stop()); return; }
         videoRef.current.srcObject = stream;
         await videoRef.current.play().catch(() => {});
