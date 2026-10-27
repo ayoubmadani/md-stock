@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyBulk, applyRates, extractHomeOfficePrices, rowPayload } from './shipping-rates';
+import { applyBulk, applyRates, extractHomeOfficePrices, rowPayload, communeChanges, communeSnapshot, communesOff } from './shipping-rates';
 
 const W = [
   { id: 16, code: 16, name: 'Alger', livraisonHome: 400, livraisonOfice: 300, livraisonReturn: 200, isActive: true },
@@ -29,4 +29,16 @@ describe('bulk prices', () => {
 
 it('save payload matches the dashboard (home/office enabled unless false)', () => {
   expect(rowPayload({ ...W[0], officeEnabled: false })).toEqual({ wilayaId: 16, priceHome: 400, priceOffice: 300, priceReturn: 200, isActive: true, homeEnabled: true, officeEnabled: false });
+});
+
+describe('communes', () => {
+  const list = [{ id: 1, homeEnabled: true, officeEnabled: true }, { id: 2, homeEnabled: false, officeEnabled: true }];
+  it('sends only the communes whose home/office changed', () => {
+    const initial = communeSnapshot(list);
+    const now = [{ ...list[0], officeEnabled: false }, list[1]];
+    expect(communeChanges(now, initial)).toEqual([{ communeId: 1, homeEnabled: true, officeEnabled: false }]);
+  });
+  it('counts a commune as off when both home and office are off', () => {
+    expect(communesOff([{ homeEnabled: false, officeEnabled: false }, { homeEnabled: false, officeEnabled: true }])).toBe(1);
+  });
 });

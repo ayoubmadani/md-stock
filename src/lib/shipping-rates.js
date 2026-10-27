@@ -47,3 +47,12 @@ export const rowPayload = (w) => ({
   wilayaId: w.id, priceHome: w.livraisonHome, priceOffice: w.livraisonOfice, priceReturn: w.livraisonReturn,
   isActive: w.isActive, homeEnabled: w.homeEnabled !== false, officeEnabled: w.officeEnabled !== false,
 });
+
+// ─── البلديات: تعطيل بلدية كلياً أو للمنزل/المكتب فقط (مثل اللوحة) ───
+const communeKey = (c) => `${!!c.homeEnabled}|${!!c.officeEnabled}`;
+export const communeSnapshot = (list) => Object.fromEntries((list ?? []).map((c) => [c.id, communeKey(c)]));
+/** ما تغيّر فقط — جسم POST /shipping/communes/:wilayaId */
+export const communeChanges = (list, initial) => (list ?? [])
+  .filter((c) => initial[c.id] !== communeKey(c))
+  .map((c) => ({ communeId: c.id, homeEnabled: !!c.homeEnabled, officeEnabled: !!c.officeEnabled }));
+export const communesOff = (list) => (list ?? []).filter((c) => !c.homeEnabled && !c.officeEnabled).length;

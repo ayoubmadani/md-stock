@@ -1,11 +1,11 @@
-// أسعار التوصيل: حساب الأسعار (وتعيينه للمتجر)، لكل ولاية منزل/مكتب/إرجاع + تفعيل، سعر واحد للكل، واستيراد أسعار شركة التوصيل
+// أسعار التوصيل: حساب الأسعار (إنشاء/تسمية/حذف وتعيينه للمتجر)، البلديات المعطّلة لكل ولاية، لكل ولاية منزل/مكتب/إرجاع + تفعيل، سعر واحد للكل، واستيراد أسعار شركة التوصيل
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Building2, Check, Download, Home, Loader2, Search, Truck, Wand2, X } from 'lucide-react';
+import { Building2, Check, Download, Home, Loader2, MapPin, Pencil, Plus, Search, Trash2, Truck, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { applyBulk, applyRates, rowPayload } from '../lib/shipping-rates';
+import { applyBulk, applyRates, communeChanges, communeSnapshot, communesOff, rowPayload } from '../lib/shipping-rates';
 import { Toggle, input, label } from '../components/product';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
@@ -22,6 +22,66 @@ function Sheet({ title, onClose, children }) {
   );
 }
 
+// بلديات الولاية: تعطيل بلدية كلياً أو المنزل/المكتب فقط — لا يظهر للزبون ما عُطّل
+function CommunesSheet({ wilaya, cfg, onClose, onSaved }) {
+  const { t } = useTranslation();
+  const [list, setList] = useState(null);
+  const [initial, setInitial] = useState({});
+  const [q, setQ] = useState('');
+  const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    api.get(`/shipping/communes/${wilaya.id}`, cfg).then(({ data }) => { const rows = Array.isArray(data) ? data : []; setList(rows); setInitial(communeSnapshot(rows)); })
+      .catch((e) => { toast.error(errorMessage(e, t('inventory.error'))); setList([]); });
+  }, [wilaya.id, cfg, t]);
+  const set = (id, patch) => setList((l) => l.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+  const setAll = (on) => setList((l) => l.map((c) => ({ ...c, homeEnabled: on, officeEnabled: on })));
+  const changes = list ? communeChanges(list, initial) : [];
+  const shown = (list ?? []).filter((c) => !q.trim() || `${c.name} ${c.ar_name ?? ''}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const save = async () => {
+    if (!changes.length) return onClose();
+    setSaving(true);
+    try {
+      const { data } = await api.post(`/shipping/communes/${wilaya.id}`, { communes: changes }, cfg);
+      toast.success(t('rates.communes_saved'));
+      onSaved(wilaya.id, data?.restricted ?? 0);
+    } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); setSaving(false); }
+  };
+  return (
+    <Sheet title={t('rates.communes_title', { wilaya: wilaya.ar_name || wilaya.name })} onClose={onClose}>
+      <p className="text-xs text-gray-500">{t('rates.communes_hint')}</p>
+      {list === null ? <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div> : (
+        <>
+          <div className="flex gap-2">
+            <div className="relative flex-1"><Search className="w-4 h-4 text-gray-400 absolute top-1/2 -translate-y-1/2 start-3" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('rates.communes_search')} className={`${input} ps-9`} /></div>
+            <button type="button" onClick={() => setAll(true)} className="px-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10">{t('rates.enable_all')}</button>
+            <button type="button" onClick={() => setAll(false)} className="px-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-500 dark:bg-rose-500/10">{t('rates.disable_all')}</button>
+          </div>
+          <p className="text-[11px] text-gray-400">{t('rates.communes_off', { count: communesOff(list), total: list.length })}</p>
+          <div className="rounded-xl border border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
+            {shown.map((c) => {
+              const off = !c.homeEnabled && !c.officeEnabled;
+              return (
+                <div key={c.id} className={`flex items-center gap-2 p-2.5 ${off ? 'opacity-50' : ''}`}>
+                  <span className={`flex-1 min-w-0 text-sm font-semibold truncate ${off ? 'line-through' : ''}`}><bdi>{c.ar_name || c.name}</bdi></span>
+                  {[['homeEnabled', Home, 'home'], ['officeEnabled', Building2, 'office']].map(([f, Icon, k]) => (
+                    <button key={f} type="button" onClick={() => set(c.id, { [f]: !c[f] })} title={t(`rates.${k}`)}
+                      className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold ${c[f] ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 line-through'}`}>
+                      <Icon className="w-3.5 h-3.5" />{t(`rates.${k}`)}
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+          <button type="button" disabled={saving} onClick={save} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-60">
+            {saving && <Loader2 className="w-4 h-4 animate-spin" />}{changes.length ? t('rates.communes_save', { count: changes.length }) : t('rates.close')}
+          </button>
+        </>
+      )}
+    </Sheet>
+  );
+}
+
 export default function DeliveryRatesPage() {
   const { t } = useTranslation();
   const { storeId } = useAuth();
@@ -31,7 +91,9 @@ export default function DeliveryRatesPage() {
   const [dirty, setDirty] = useState(new Set());
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(null);
-  const [sheet, setSheet] = useState(null); // 'bulk' | 'import'
+  const [sheet, setSheet] = useState(null); // 'bulk' | 'import' | 'profile'
+  const [form, setForm] = useState({ mode: 'create', name: '' }); // إنشاء/تسمية حساب أسعار
+  const [communesOf, setCommunesOf] = useState(null); // الولاية المفتوحة بلدياتها
   const [bulk, setBulk] = useState({ home: '', office: '', ret: '' });
   const [accounts, setAccounts] = useState(null);
   const cfg = useMemo(() => ({ params: profileId ? { profileId } : undefined }), [profileId]);
@@ -78,6 +140,29 @@ export default function DeliveryRatesPage() {
     setBusy('assign');
     try { await api.post('/shipping/store-profile', { storeId, profileId }); await loadProfiles(profileId); toast.success(t('rates.assigned', { name: profile?.name })); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
   };
+  const saveProfile = async () => {
+    const name = form.name.trim();
+    if (!name) return;
+    setBusy('profile');
+    try {
+      if (form.mode === 'create') {
+        // نسخة من أسعار الحساب الحالي — تُعدّل بعدها
+        const { data } = await api.post('/shipping/profiles', { name, copyFromId: profileId || undefined, country: profile?.country || 'DZ' });
+        await loadProfiles(data?.id);
+        toast.success(t('rates.profile_created'));
+      } else {
+        await api.patch(`/shipping/profiles/${profileId}`, { name });
+        await loadProfiles(profileId);
+        toast.success(t('inventory.saved'));
+      }
+      setSheet(null);
+    } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
+  };
+  const removeProfile = async () => {
+    if (!profile || profile.isDefault || !window.confirm(t('rates.profile_delete_confirm', { name: profile.name }))) return;
+    setBusy('profile');
+    try { await api.delete(`/shipping/profiles/${profileId}`); await loadProfiles(null); toast.success(t('rates.profile_deleted')); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
+  };
   const applyBulkNow = () => {
     const ids = shown.map((w) => w.id);
     setRows((l) => applyBulk(l, ids, bulk));
@@ -105,9 +190,14 @@ export default function DeliveryRatesPage() {
       {profiles.length > 0 && (
         <div className={`${box} p-3 space-y-2`}>
           <label className={label}>{t('rates.profile')}</label>
-          <select value={profileId ?? ''} onChange={(e) => setProfileId(e.target.value)} className={input}>
-            {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}{p.stores?.some((s) => s.id === storeId) ? ` ✓ ${t('rates.this_store')}` : ''}</option>)}
-          </select>
+          <div className="flex gap-2">
+            <select value={profileId ?? ''} onChange={(e) => setProfileId(e.target.value)} className={`${input} flex-1 min-w-0`}>
+              {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}{p.stores?.some((s) => s.id === storeId) ? ` ✓ ${t('rates.this_store')}` : ''}</option>)}
+            </select>
+            <button type="button" onClick={() => { setForm({ mode: 'rename', name: profile?.name || '' }); setSheet('profile'); }} title={t('rates.profile_rename')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-500"><Pencil className="w-4 h-4" /></button>
+            {profile && !profile.isDefault && <button type="button" disabled={busy === 'profile'} onClick={removeProfile} title={t('rates.profile_delete')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-rose-500 disabled:opacity-50"><Trash2 className="w-4 h-4" /></button>}
+          </div>
+          <button type="button" onClick={() => { setForm({ mode: 'create', name: '' }); setSheet('profile'); }} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400"><Plus className="w-4 h-4" />{t('rates.profile_new')}</button>
           {!usedHere && profile && (
             <button type="button" disabled={busy === 'assign'} onClick={useForStore} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 text-sm font-bold disabled:opacity-50">
               {busy === 'assign' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}{t('rates.use_here')}
@@ -138,6 +228,11 @@ export default function DeliveryRatesPage() {
                   <div className="flex items-center gap-2">
                     <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 text-xs font-black flex items-center justify-center shrink-0" dir="ltr">{w.code ?? w.id}</span>
                     <span className="flex-1 min-w-0 text-sm font-bold truncate"><bdi>{w.ar_name || w.name}</bdi></span>
+                    {w.isActive && (
+                      <button type="button" onClick={() => setCommunesOf(w)} title={t('rates.communes')} className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold ${w.restrictedCommunes ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                        <MapPin className="w-3.5 h-3.5" />{w.restrictedCommunes ? t('rates.communes_restricted', { count: w.restrictedCommunes }) : t('rates.communes')}
+                      </button>
+                    )}
                     <span className={busy === `t-${w.id}` ? 'opacity-50 pointer-events-none' : ''}><Toggle checked={!!w.isActive} onChange={() => toggle(w, 'isActive')} /></span>
                   </div>
                   {w.isActive && (
@@ -180,6 +275,19 @@ export default function DeliveryRatesPage() {
           <p className="text-[11px] text-gray-400">{t('rates.bulk_hint')}</p>
           <button type="button" disabled={!bulk.home && !bulk.office && !bulk.ret} onClick={applyBulkNow} className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">{t('rates.apply')}</button>
         </Sheet>
+      )}
+      {sheet === 'profile' && (
+        <Sheet title={form.mode === 'create' ? t('rates.profile_new') : t('rates.profile_rename')} onClose={() => setSheet(null)}>
+          <input autoFocus value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} onKeyDown={(e) => e.key === 'Enter' && saveProfile()} maxLength={80} placeholder={t('rates.profile_name')} className={input} />
+          {form.mode === 'create' && profile && <p className="text-[11px] text-gray-400">{t('rates.profile_copy_hint', { name: profile.name })}</p>}
+          <button type="button" disabled={!form.name.trim() || busy === 'profile'} onClick={saveProfile} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">
+            {busy === 'profile' && <Loader2 className="w-4 h-4 animate-spin" />}{form.mode === 'create' ? t('rates.profile_create') : t('inventory.save')}
+          </button>
+        </Sheet>
+      )}
+      {communesOf && (
+        <CommunesSheet wilaya={communesOf} cfg={cfg} onClose={() => setCommunesOf(null)}
+          onSaved={(id, restricted) => { setRows((l) => l.map((w) => (w.id === id ? { ...w, restrictedCommunes: restricted } : w))); setCommunesOf(null); }} />
       )}
       {sheet === 'import' && (
         <Sheet title={t('rates.import')} onClose={() => setSheet(null)}>
