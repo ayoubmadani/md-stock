@@ -886,5 +886,101 @@
   "onboarding": {
     "title": "Créez votre première boutique",
     "subtitle": "Quelques informations seulement — modifiables plus tard."
+  },
+  "insights": {
+    "currency": "DA",
+    "loading": "Chargement des statistiques du produit...",
+    "load_failed": "Échec du chargement des statistiques",
+    "not_found": "Produit introuvable",
+    "retry": "Réessayer",
+    "back": "Retour aux produits",
+    "refresh": "Actualiser",
+    "edit": "Modifier",
+    "active": "Activé",
+    "inactive": "Désactivé",
+    "empty_sales": "Aucune vente sur cette période",
+    "range": {
+      "days": "{{count}} jours",
+      "all": "Tout"
+    },
+    "kpi": {
+      "orders": "Commandes",
+      "confirmed": "Confirmées",
+      "delivered": "Livrées",
+      "units": "Unités vendues",
+      "revenue": "Chiffre d'affaires",
+      "revenue_hint": "Hors commandes annulées et retournées",
+      "aov": "Panier moyen",
+      "views": "Vues",
+      "conversion": "Taux de conversion"
+    },
+    "chart": {
+      "title": "Commandes par jour",
+      "orders": "Commandes",
+      "units": "Unités",
+      "revenue": "Chiffre d'affaires"
+    },
+    "statuses_title": "Statuts des commandes",
+    "status": {
+      "pending": "En attente",
+      "appl1": "Tentative 1",
+      "appl2": "Tentative 2",
+      "appl3": "Tentative 3",
+      "confirmed": "Confirmée",
+      "shipping": "En livraison",
+      "delivered": "Livrée",
+      "cancelled": "Annulée",
+      "returned": "Retournée",
+      "postponed": "Reportée"
+    },
+    "col": {
+      "orders": "Commandes",
+      "units": "Unités",
+      "revenue": "CA",
+      "share": "Part",
+      "status": "Statut"
+    },
+    "offers": {
+      "quantity": "Quantité",
+      "free_shipping": "Livraison gratuite",
+      "title": "Offres les plus vendues",
+      "subtitle": "Une offre désactivée est masquée de la boutique et des landing pages",
+      "empty": "Ce produit n'a pas d'offres",
+      "name": "Offre",
+      "price": "Prix",
+      "qty": "{{count}} pcs"
+    },
+    "variants": {
+      "price": "Prix",
+      "by_value_hint": "Désactivez une valeur entière (ex. la couleur rouge) pour la masquer avec toutes ses combinaisons",
+      "value_units": "{{count}} unités",
+      "title": "Options les plus vendues",
+      "subtitle": "Une option désactivée est masquée de la boutique et des landing pages",
+      "empty": "Ce produit n'a pas d'options",
+      "name": "Option",
+      "stock": "Stock"
+    },
+    "pages": {
+      "title": "Landing pages qui vendent le plus",
+      "subtitle": "Triées par nombre de commandes",
+      "empty": "Ce produit n'a pas de landing page",
+      "page": "Page",
+      "views": "Visites",
+      "conversion": "Conversion",
+      "direct": "Boutique (direct)",
+      "type": {
+        "landing": "Landing page",
+        "builder": "Page de l'éditeur",
+        "store": "Sans landing page"
+      }
+    },
+    "toast": {
+      "saved": "Enregistré",
+      "save_failed": "Échec de l'enregistrement",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "toggle_failed": "Échec du changement de statut"
+    },
+    "stats": "Statistiques"
   }
 }

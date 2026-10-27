@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Loader2, Megaphone, Trash2 } from 'lucide-react';
+import { ArrowRight, BarChart3, Loader2, Megaphone, Trash2 } from 'lucide-react';
 import AdsSheet from '../components/AdsSheet';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
@@ -109,7 +109,12 @@ export default function ProductForm() {
       <div className="flex items-center justify-between">
         <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</button>
         <h1 className="font-bold">{isNew ? t('product.new') : t('product.edit')}</h1>
-        {!isNew ? <button type="button" onClick={remove} className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"><Trash2 className="w-4 h-4" /></button> : <span className="w-8" />}
+        {!isNew ? (
+          <div className="flex items-center">
+            <button type="button" onClick={() => navigate(`/products/${id}/show`)} className="p-2 rounded-xl text-indigo-600" title={t('insights.stats')}><BarChart3 className="w-4 h-4" /></button>
+            <button type="button" onClick={remove} className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"><Trash2 className="w-4 h-4" /></button>
+          </div>
+        ) : <span className="w-8" />}
       </div>
 
       <Section title={t('product.images')}>

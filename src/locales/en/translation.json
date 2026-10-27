@@ -886,5 +886,101 @@
   "onboarding": {
     "title": "Create your first store",
     "subtitle": "Just a few details — you can change them later."
+  },
+  "insights": {
+    "currency": "DA",
+    "loading": "Loading product statistics...",
+    "load_failed": "Failed to load product statistics",
+    "not_found": "Product not found",
+    "retry": "Retry",
+    "back": "Back to products",
+    "refresh": "Refresh",
+    "edit": "Edit",
+    "active": "Enabled",
+    "inactive": "Disabled",
+    "empty_sales": "No sales in this period",
+    "range": {
+      "days": "{{count}} days",
+      "all": "All"
+    },
+    "kpi": {
+      "orders": "Orders",
+      "confirmed": "Confirmed",
+      "delivered": "Delivered",
+      "units": "Units sold",
+      "revenue": "Revenue",
+      "revenue_hint": "Excludes cancelled and returned orders",
+      "aov": "Avg. order value",
+      "views": "Views",
+      "conversion": "Conversion rate"
+    },
+    "chart": {
+      "title": "Daily orders",
+      "orders": "Orders",
+      "units": "Units",
+      "revenue": "Revenue"
+    },
+    "statuses_title": "Order statuses",
+    "status": {
+      "pending": "Pending",
+      "appl1": "Attempt 1",
+      "appl2": "Attempt 2",
+      "appl3": "Attempt 3",
+      "confirmed": "Confirmed",
+      "shipping": "Shipping",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "returned": "Returned",
+      "postponed": "Postponed"
+    },
+    "col": {
+      "orders": "Orders",
+      "units": "Units",
+      "revenue": "Revenue",
+      "share": "Share",
+      "status": "Status"
+    },
+    "offers": {
+      "quantity": "Quantity",
+      "free_shipping": "Free shipping",
+      "title": "Best-selling offers",
+      "subtitle": "A disabled offer is hidden from the store and landing pages",
+      "empty": "This product has no offers",
+      "name": "Offer",
+      "price": "Price",
+      "qty": "{{count}} pcs"
+    },
+    "variants": {
+      "price": "Price",
+      "by_value_hint": "Disable a whole value (e.g. the color red) to hide it and all its combinations from the store",
+      "value_units": "{{count}} units",
+      "title": "Best-selling options",
+      "subtitle": "A disabled option is hidden from the store and landing pages",
+      "empty": "This product has no options",
+      "name": "Option",
+      "stock": "Stock"
+    },
+    "pages": {
+      "title": "Top landing pages by sales",
+      "subtitle": "Sorted by number of orders",
+      "empty": "This product has no landing pages",
+      "page": "Page",
+      "views": "Visits",
+      "conversion": "Conversion",
+      "direct": "Store (direct)",
+      "type": {
+        "landing": "Landing page",
+        "builder": "Builder page",
+        "store": "No landing page"
+      }
+    },
+    "toast": {
+      "saved": "Saved",
+      "save_failed": "Failed to save",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "toggle_failed": "Failed to change status"
+    },
+    "stats": "Statistics"
   }
 }

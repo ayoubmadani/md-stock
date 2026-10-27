@@ -12,6 +12,7 @@ import HistoryPage from './pages/History';
 import AlertsPage from './pages/Alerts';
 import ScanPage from './pages/Scan';
 import ProductForm from './pages/ProductForm';
+import ProductShow from './pages/ProductShow';
 import OrdersPage from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import OrderForm from './pages/OrderForm';
@@ -103,6 +104,7 @@ export default function App() {
             <Route path="domains" element={<RequirePerm perm="domain.crud"><DomainsPage /></RequirePerm>} />
             <Route path="products/new" element={<RequirePerm perm="product.crud"><ProductForm /></RequirePerm>} />
             <Route path="products/:id" element={<RequirePerm perm="product.crud"><ProductForm /></RequirePerm>} />
+            <Route path="products/:id/show" element={<RequirePerm perm="product.crud"><ProductShow /></RequirePerm>} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

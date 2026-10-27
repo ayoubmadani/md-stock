@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, Minus, Package, Pencil, Plus, X } from 'lucide-react';
+import { BarChart3, ChevronLeft, Minus, Package, Pencil, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
 import { stockLines } from '../lib/stock-lines';
@@ -99,6 +99,7 @@ function StockSheet({ p, storeId, onAdjust, onChanged, onClose }) {
             <p className="font-bold text-sm truncate"><bdi>{p.name}</bdi></p>
             <p className="text-xs text-gray-400 mt-0.5">{t('inventory.total')}: <b className="text-gray-900 dark:text-white" dir="ltr">{fmt(p.stock)}</b></p>
           </div>
+          <Link to={`/products/${p.id}/show`} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800" title={t('insights.stats')}><BarChart3 className="w-4 h-4" /></Link>
           <Link to={`/products/${p.id}`} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800" title={t('product.edit')}><Pencil className="w-4 h-4" /></Link>
           <button type="button" onClick={onClose} className="p-2 rounded-xl text-gray-400"><X className="w-5 h-5" /></button>
         </div>
