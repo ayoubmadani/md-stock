@@ -11,19 +11,21 @@ import { useAuth } from '../lib/auth';
 import { trialDismissKey } from '../lib/trial';
 
 
-export default function TrialOffer() {
+/** بلا props: يظهر تلقائياً أول دخول. مع data/onClose: يُفتح يدوياً (من صفحة الاشتراك لمن تخطّاه) */
+export default function TrialOffer({ data: preset = null, onClose = null }) {
   const { t } = useTranslation();
   const { token } = useAuth();
   const DISMISS_KEY = trialDismissKey(token);
-  const [offer, setOffer] = useState(null);
+  const [offer, setOffer] = useState(preset);
   const [interval, setIv] = useState('month');
   const [autoRenew, setAutoRenew] = useState(true);
   const [busy, setBusy] = useState(null);
 
   useEffect(() => {
+    if (preset) return;
     try { if (localStorage.getItem(DISMISS_KEY) === '1') return; } catch { /* وضع خاص */ }
     api.get('/subscription/trial').then(({ data }) => { if (data?.eligible && (data.plans?.length || data.freePlan)) setOffer(data); }).catch(() => {});
-  }, [DISMISS_KEY]);
+  }, [DISMISS_KEY, preset]);
 
   if (!offer) return null;
 
@@ -116,7 +118,7 @@ export default function TrialOffer() {
           </span>
         </label>
 
-        <button type="button" onClick={() => { remember(); setOffer(null); }} className="w-full text-center text-sm font-semibold text-gray-400">{t('trial.skip')}</button>
+        <button type="button" onClick={() => { if (onClose) onClose(); else { remember(); setOffer(null); } }} className="w-full text-center text-sm font-semibold text-gray-400">{t('trial.skip')}</button>
       </div>
     </div>
   );

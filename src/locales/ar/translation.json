@@ -599,6 +599,7 @@
     "upgrade_title": "ترقية الخطة",
     "subscribe": "اشترك",
     "activate_free": "تفعيل مجاناً",
+    "trial_cta": "جرّب أي خطة مدفوعة {{days}} أيام مجاناً — بدون دفع",
     "free_activated": "تم تفعيل الخطة المجانية",
     "upgrade": "ترقية",
     "success": "تم تفعيل الخطة ✓",

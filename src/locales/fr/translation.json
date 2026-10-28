@@ -599,6 +599,7 @@
     "upgrade_title": "Passer à un plan supérieur",
     "subscribe": "S'abonner",
     "activate_free": "Activer gratuitement",
+    "trial_cta": "Essayez n'importe quel plan payant {{days}} jours gratuitement — sans paiement",
     "free_activated": "Plan gratuit activé",
     "upgrade": "Mettre à niveau",
     "success": "Plan activé ✓",

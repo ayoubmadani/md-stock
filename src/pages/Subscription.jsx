@@ -2,12 +2,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Crown, Globe, Loader2, Package, Store, Tag, Users, Wallet, X, Zap } from 'lucide-react';
+import { CalendarDays, Crown, Gift, Globe, Loader2, Package, Store, Tag, Users, Wallet, X, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { money } from '../lib/orders';
 import { daysLeft, discounted, freeOption, isFree, perMonth, planPrice, upgradeable, yearlySaving } from '../lib/plans';
 import { Toggle, input } from '../components/product';
+import TrialOffer from '../components/TrialOffer';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
 
@@ -72,10 +73,14 @@ export default function SubscriptionPage() {
   const [checking, setChecking] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [activating, setActivating] = useState(false);
+  // التجربة المجانية لمن تخطّى عرضها أول دخول (ما دام الحساب مؤهلاً)
+  const [trial, setTrial] = useState(null);
+  const [trialOpen, setTrialOpen] = useState(false);
 
   const load = useCallback(() => {
     api.get('/subscription/my').then((r) => setSub(r.data || null)).catch(() => setSub(null));
   }, []);
+  useEffect(() => { api.get('/subscription/trial').then(({ data }) => setTrial(data?.eligible && data.plans?.length ? data : null)).catch(() => {}); }, []);
   useEffect(() => { load(); api.get('/plans', { params: { active: true } }).then((r) => setPlans(r.data ?? [])).catch(() => {}); }, [load]);
 
   const check = async () => {
@@ -129,6 +134,15 @@ export default function SubscriptionPage() {
       ) : (
         <div className={`${box} p-4 text-sm text-gray-500`}>{t('sub.none')}</div>
       )}
+
+      {trial && (
+        <button type="button" onClick={() => setTrialOpen(true)} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20 text-start">
+          <span className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0"><Gift className="w-5 h-5" /></span>
+          <span className="flex-1 min-w-0 text-sm font-bold text-amber-800 dark:text-amber-300">{t('sub.trial_cta', { days: trial.days })}</span>
+          <span className="shrink-0 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-black">{t('trial.start')}</span>
+        </button>
+      )}
+      {trialOpen && <TrialOffer data={trial} onClose={() => setTrialOpen(false)} />}
 
       {free && (
         <div className={`${box} p-4 space-y-3`}>
