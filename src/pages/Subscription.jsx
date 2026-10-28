@@ -71,8 +71,6 @@ export default function SubscriptionPage() {
   const [code, setCode] = useState('');
   const [coupon, setCoupon] = useState(null);
   const [checking, setChecking] = useState(false);
-  // حقل الكوبون مخفي حتى يطلبه التاجر
-  const [couponOpen, setCouponOpen] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [activating, setActivating] = useState(false);
   // التجربة المجانية لمن تخطّى عرضها أول دخول (ما دام الحساب مؤهلاً)
@@ -170,16 +168,12 @@ export default function SubscriptionPage() {
               </button>
             ))}
           </div>
-          {!couponOpen && !coupon ? (
-            <button type="button" onClick={() => setCouponOpen(true)} className="flex items-center gap-1.5 px-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400"><Tag className="w-4 h-4" />{t('sub.have_coupon')}</button>
-          ) : (
           <div className="flex gap-2">
-            <input value={code} autoFocus onChange={(e) => { setCode(e.target.value); setCoupon(null); }} placeholder={t('themes.coupon')} dir="ltr" className={input} />
+            <input value={code} onChange={(e) => { setCode(e.target.value); setCoupon(null); }} placeholder={t('themes.coupon')} dir="ltr" className={input} />
             <button type="button" disabled={!code.trim() || checking} onClick={check} className="px-4 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold disabled:opacity-50 flex items-center gap-1">
               {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}{t('themes.apply')}
             </button>
           </div>
-          )}
           {coupon && <p className="text-xs font-semibold text-emerald-600 px-1">{t('sub.coupon_ok', { v: coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : `${money(coupon.discountValue)} DZD` })}</p>}
           {options.map((p) => {
             const price = planPrice(p, period);
