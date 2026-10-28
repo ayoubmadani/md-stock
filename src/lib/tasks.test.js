@@ -41,4 +41,8 @@ describe('store to-do', () => {
     expect(forDay(l, '2026-10-28').map((x) => x.id)).toEqual([2]);
     expect(forDay(l, null)).toHaveLength(3);
   });
+  it('"other" filter: tasks outside the 7 quick days (no date, overdue, later)', () => {
+    const l = [{ id: 1, dueDate: '2026-10-27' }, { id: 2, dueDate: '2026-11-20' }, { id: 3, dueDate: null }, { id: 4, dueDate: '2026-10-20' }];
+    expect(forDay(l, 'other', quickDays(today)).map((x) => x.id)).toEqual([2, 3, 4]);
+  });
 });

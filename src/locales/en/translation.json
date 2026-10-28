@@ -1104,6 +1104,7 @@
     "new": "New task",
     "day": "Day",
     "time": "Time",
-    "added": "Task added"
+    "added": "Task added",
+    "other": "Other"
   }
 }

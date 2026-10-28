@@ -28,8 +28,12 @@ export function quickDays(today, count = 7) {
   return out;
 }
 
-/** مهام يوم معيّن (null = الكل) */
-export const forDay = (list, day) => (day ? list.filter((x) => x.dueDate === day) : list);
+/** مهام يوم معيّن (null = الكل، 'other' = خارج أيام الفلتر: بلا تاريخ، متأخرة، أو أبعد) */
+export function forDay(list, day, days = []) {
+  if (!day) return list;
+  if (day === 'other') return list.filter((x) => !days.some((d) => d.date === x.dueDate));
+  return list.filter((x) => x.dueDate === day);
+}
 
 /** سحب المهمة أفقياً (أي اتجاه) بما يكفي يؤكد الإنجاز */
 export const SWIPE_PX = 80;

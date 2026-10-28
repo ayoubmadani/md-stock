@@ -52,10 +52,7 @@ function TaskRow({ task, today, now, onToggle, onDelete, busy }) {
       <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
         style={{ transform: `translateX(${dx}px)`, touchAction: 'pan-y' }}
         className={`relative flex items-start gap-3 p-3 bg-white dark:bg-zinc-900 select-none ${dx ? '' : 'transition-transform'}`}>
-        <button type="button" disabled={busy} onClick={onToggle} aria-label={t('tasks.toggle')}
-          className={`mt-0.5 w-6 h-6 rounded-full border-2 shrink-0 flex items-center justify-center disabled:opacity-50 ${task.done ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 dark:border-zinc-600'}`}>
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : task.done && <Check className="w-3.5 h-3.5" />}
-        </button>
+        {busy && <Loader2 className="mt-0.5 w-4 h-4 animate-spin text-gray-400 shrink-0" />}
         <div className="flex-1 min-w-0">
           <p className={`text-sm break-words ${task.done ? 'line-through text-gray-400' : 'font-semibold'}`}><bdi>{task.title}</bdi></p>
           <div className="flex items-center gap-1.5 mt-1 flex-wrap">
@@ -171,7 +168,7 @@ export default function TasksPage() {
   };
 
   const all = splitTasks(list || []);
-  const { open, done } = splitTasks(forDay(list || [], day));
+  const { open, done } = splitTasks(forDay(list || [], day, days));
   const countFor = (d) => all.open.filter((x) => x.dueDate === d).length;
   const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800';
   return (
@@ -179,7 +176,7 @@ export default function TasksPage() {
       <button type="button" onClick={() => setAdding(true)} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-indigo-600 text-white font-bold">
         <Plus className="w-5 h-5" />{t('tasks.new')}
       </button>
-      {adding && <AddTaskSheet storeId={storeId} preset={day} onClose={() => setAdding(false)} onAdded={onAdded} />}
+      {adding && <AddTaskSheet storeId={storeId} preset={day === 'other' ? null : day} onClose={() => setAdding(false)} onAdded={onAdded} />}
 
       {list?.length > 0 && (
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1">
@@ -192,6 +189,14 @@ export default function TasksPage() {
               </button>
             );
           })}
+          {(() => {
+            const n = forDay(all.open, 'other', days).length;
+            return (
+              <button type="button" onClick={() => setDay(day === 'other' ? null : 'other')} className={`${chip(day === 'other')} inline-flex items-center gap-1`}>
+                {t('tasks.other')}{n > 0 && <span className={`min-w-4 px-1 rounded-full text-[10px] ${day === 'other' ? 'bg-white/25' : 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400'}`}>{n}</span>}
+              </button>
+            );
+          })()}
         </div>
       )}
 
