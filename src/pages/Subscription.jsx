@@ -169,7 +169,7 @@ export default function SubscriptionPage() {
             ))}
           </div>
           <div className="flex gap-2">
-            <input value={code} onChange={(e) => { setCode(e.target.value); setCoupon(null); }} placeholder={t('themes.coupon')} dir="ltr" className={input} />
+            <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setCoupon(null); }} autoCapitalize="characters" placeholder={t('themes.coupon')} dir="ltr" className={input} />
             <button type="button" disabled={!code.trim() || checking} onClick={check} className="px-4 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold disabled:opacity-50 flex items-center gap-1">
               {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}{t('themes.apply')}
             </button>
