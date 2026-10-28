@@ -600,6 +600,7 @@
     "subscribe": "Subscribe",
     "activate_free": "Activate for free",
     "trial_cta": "Try any paid plan free for {{days}} days — no payment",
+    "have_coupon": "Have a coupon?",
     "free_activated": "Free plan activated",
     "upgrade": "Upgrade",
     "success": "Plan activated ✓",
