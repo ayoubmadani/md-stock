@@ -7,11 +7,14 @@ import { api, errorMessage } from '../lib/api';
 import { money } from '../lib/orders';
 import { perMonth, planPrice } from '../lib/plans';
 import { Features } from '../pages/Subscription';
+import { useAuth } from '../lib/auth';
+import { trialDismissKey } from '../lib/trial';
 
-const DISMISS_KEY = 'trialOfferDismissed';
 
 export default function TrialOffer() {
   const { t } = useTranslation();
+  const { token } = useAuth();
+  const DISMISS_KEY = trialDismissKey(token);
   const [offer, setOffer] = useState(null);
   const [interval, setIv] = useState('month');
   const [autoRenew, setAutoRenew] = useState(true);
@@ -20,7 +23,7 @@ export default function TrialOffer() {
   useEffect(() => {
     try { if (localStorage.getItem(DISMISS_KEY) === '1') return; } catch { /* وضع خاص */ }
     api.get('/subscription/trial').then(({ data }) => { if (data?.eligible && (data.plans?.length || data.freePlan)) setOffer(data); }).catch(() => {});
-  }, []);
+  }, [DISMISS_KEY]);
 
   if (!offer) return null;
 
