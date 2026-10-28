@@ -1,11 +1,12 @@
 // مكتبة الصور (نفس مكتبة لوحة التاجر): الصور المرفوعة سابقاً في المجلد، رفع مع ضغط، اختيار واحد أو عدة، حذف
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, Check, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
+import { Camera, Check, ClipboardPaste, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import CameraCapture from './CameraCapture';
 import { ACCEPT, COMPRESS, compress } from '../lib/upload';
+import { clipboardImages, pastedImages } from '../lib/clipboard';
 
 const PAGE = 18;
 /**
@@ -83,6 +84,22 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
     else setSelected((s) => [...s, ...uploaded.map((u) => u.url).filter((u) => !s.includes(u))].slice(0, max));
   };
 
+  // لصق صورة منسوخة: زر «لصق» (الهاتف) أو Ctrl+V (الحاسوب)
+  const paste = async () => {
+    try {
+      const files = await clipboardImages();
+      if (files.length) upload(files); else toast.error(t('library.paste_empty'));
+    } catch { toast.error(t('library.paste_failed')); }
+  };
+  const uploadRef = useRef(upload);
+  uploadRef.current = upload;
+  useEffect(() => {
+    if (camera) return undefined;
+    const onPaste = (e) => { const files = pastedImages(e.clipboardData); if (files.length) { e.preventDefault(); uploadRef.current(files); } };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [camera]);
+
   const remove = async (img) => {
     if (!window.confirm(t('library.confirm_delete'))) return;
     try {
@@ -115,13 +132,16 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
             </div>
           ) : (
             // معرض الصور، أو التصوير مباشرة بالكاميرا الخلفية
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <label className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer">
                 <ImagePlus className="w-5 h-5" />{t('library.from_gallery')}
                 <input type="file" accept={ACCEPT} multiple={multi} hidden onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
               </label>
               <button type="button" onClick={() => setCamera(true)} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold">
                 <Camera className="w-5 h-5" />{t('library.from_camera')}
+              </button>
+              <button type="button" onClick={paste} className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                <ClipboardPaste className="w-5 h-5" />{t('library.paste')}
               </button>
             </div>
           )}

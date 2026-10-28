@@ -293,6 +293,9 @@
     "confirm_delete": "Delete this image from the library permanently?",
     "from_gallery": "Gallery",
     "from_camera": "Camera",
+    "paste": "Paste",
+    "paste_empty": "No copied image",
+    "paste_failed": "Could not read the copied image — allow clipboard access or copy the image again",
     "title_store": "Store images"
   },
   "categories": {

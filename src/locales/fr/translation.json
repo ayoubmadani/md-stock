@@ -293,6 +293,9 @@
     "confirm_delete": "Supprimer définitivement cette image de la bibliothèque ?",
     "from_gallery": "Galerie",
     "from_camera": "Appareil photo",
+    "paste": "Coller",
+    "paste_empty": "Aucune image copiée",
+    "paste_failed": "Impossible de lire l'image copiée — autorisez l'accès au presse-papiers ou recopiez l'image",
     "title_store": "Images de la boutique"
   },
   "categories": {
