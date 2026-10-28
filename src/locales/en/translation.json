@@ -1094,6 +1094,16 @@
     "due_tomorrow": "Tomorrow",
     "empty": "No tasks — add the first one above.",
     "all_done": "All done 🎉",
-    "done_section": "Done ({{count}})"
+    "done_section": "Done ({{count}})",
+    "due_after_tomorrow": "Day after tomorrow",
+    "all": "All",
+    "other_date": "Other day",
+    "other_time": "Other time",
+    "swipe_hint": "Swipe a task left or right to mark it done",
+    "none_day": "No tasks on this day",
+    "new": "New task",
+    "day": "Day",
+    "time": "Time",
+    "added": "Task added"
   }
 }

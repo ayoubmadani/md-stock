@@ -1094,6 +1094,16 @@
     "due_tomorrow": "Demain",
     "empty": "Aucune tâche — ajoutez la première ci-dessus.",
     "all_done": "Tout est fait 🎉",
-    "done_section": "Terminées ({{count}})"
+    "done_section": "Terminées ({{count}})",
+    "due_after_tomorrow": "Après-demain",
+    "all": "Tout",
+    "other_date": "Autre jour",
+    "other_time": "Autre heure",
+    "swipe_hint": "Glissez une tâche à gauche ou à droite pour la terminer",
+    "none_day": "Aucune tâche ce jour-là",
+    "new": "Nouvelle tâche",
+    "day": "Jour",
+    "time": "Heure",
+    "added": "Tâche ajoutée"
   }
 }
