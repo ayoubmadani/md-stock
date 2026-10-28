@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { daysLeft, discounted, isFree, perMonth, planPrice, upgradeable, yearlySaving } from './plans';
+import { daysLeft, discounted, isFree, perMonth, planPrice, upgradeable, yearlySaving, freeOption } from './plans';
 
 const free = { id: 'f', monthlyPrice: '0', yearlyPrice: '0' };
 const basic = { id: 'b', monthlyPrice: '1500.00', yearlyPrice: '15000.00' };
@@ -32,4 +32,16 @@ it('daysLeft never negative', () => {
   const now = new Date('2026-10-26T12:00:00Z');
   expect(daysLeft('2026-11-05T12:00:00Z', now)).toBe(10);
   expect(daysLeft('2026-10-01T00:00:00Z', now)).toBe(0);
+});
+
+describe('freeOption — الخطة المجانية يفعّلها التاجر بنفسه', () => {
+  const free = { id: 'f', monthlyPrice: '0.00', yearlyPrice: '0.00' };
+  const paid = { id: 'p', monthlyPrice: '990', yearlyPrice: '9900' };
+  it('تظهر لمن ليس عنده اشتراك', () => expect(freeOption([paid, free], null)).toBe(free));
+  it('لا تظهر لمن عنده اشتراك (مدفوع أو تجريبي أو مجاني)', () => {
+    expect(freeOption([paid, free], { plan: paid })).toBeNull();
+    expect(freeOption([paid, free], { plan: paid, isTrial: true })).toBeNull();
+    expect(freeOption([paid, free], { plan: free })).toBeNull();
+  });
+  it('لا شيء إن لم توجد خطة مجانية متاحة', () => expect(freeOption([paid], null)).toBeNull());
 });

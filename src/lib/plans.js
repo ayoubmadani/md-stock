@@ -21,3 +21,6 @@ export function upgradeable(plans, sub) {
 }
 
 export const daysLeft = (end, now = new Date()) => Math.max(0, Math.ceil((new Date(end) - now) / 86400000));
+
+/** الخطة المجانية كخيار يفعّله التاجر بنفسه — فقط لمن ليس عنده اشتراك */
+export const freeOption = (plans, sub) => (sub ? null : (plans ?? []).find(isFree) ?? null);

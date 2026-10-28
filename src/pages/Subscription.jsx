@@ -6,7 +6,7 @@ import { CalendarDays, Crown, Globe, Loader2, Package, Store, Tag, Users, Wallet
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { money } from '../lib/orders';
-import { daysLeft, discounted, isFree, perMonth, planPrice, upgradeable, yearlySaving } from '../lib/plans';
+import { daysLeft, discounted, freeOption, isFree, perMonth, planPrice, upgradeable, yearlySaving } from '../lib/plans';
 import { Toggle, input } from '../components/product';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
@@ -71,6 +71,7 @@ export default function SubscriptionPage() {
   const [coupon, setCoupon] = useState(null);
   const [checking, setChecking] = useState(false);
   const [confirm, setConfirm] = useState(null);
+  const [activating, setActivating] = useState(false);
 
   const load = useCallback(() => {
     api.get('/subscription/my').then((r) => setSub(r.data || null)).catch(() => setSub(null));
@@ -81,6 +82,11 @@ export default function SubscriptionPage() {
     setChecking(true);
     try { const { data } = await api.post('/coupons/validate', { code: code.trim(), scope: 'plan' }); setCoupon(data); } catch (e) { setCoupon(null); toast.error(errorMessage(e, t('themes.coupon_invalid'))); } finally { setChecking(false); }
   };
+  // الخطة المجانية: يفعّلها التاجر بنفسه (لا خصم من المحفظة)
+  const activateFree = async (plan) => {
+    setActivating(true);
+    try { await api.post('/subscription/subscribe', { planId: plan.id, interval: 'month' }); toast.success(t('sub.free_activated')); load(); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setActivating(false); }
+  };
   const autoRenew = async () => {
     const next = !sub.autoRenew;
     setSub((s) => ({ ...s, autoRenew: next }));
@@ -90,6 +96,7 @@ export default function SubscriptionPage() {
   if (sub === undefined) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
   const date = (d) => new Date(d).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric' });
   const options = upgradeable(plans, sub).sort((a, b) => planPrice(a, 'month') - planPrice(b, 'month'));
+  const free = freeOption(plans, sub);
   const left = sub ? daysLeft(sub.endDate) : 0;
   const total = sub ? Math.max(1, (new Date(sub.endDate) - new Date(sub.startDate)) / 86400000) : 1;
 
@@ -121,6 +128,19 @@ export default function SubscriptionPage() {
         </div>
       ) : (
         <div className={`${box} p-4 text-sm text-gray-500`}>{t('sub.none')}</div>
+      )}
+
+      {free && (
+        <div className={`${box} p-4 space-y-3`}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-black capitalize">{free.name}</p>
+            <b className="text-emerald-600">{t('themes.free')}</b>
+          </div>
+          <Features f={free.features} />
+          <button type="button" disabled={activating} onClick={() => activateFree(free)} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-60">
+            {activating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}{t('sub.activate_free')}
+          </button>
+        </div>
       )}
 
       {/* الاشتراك / الترقية */}

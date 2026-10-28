@@ -598,6 +598,8 @@
     "choose": "Choose a plan",
     "upgrade_title": "Upgrade your plan",
     "subscribe": "Subscribe",
+    "activate_free": "Activate for free",
+    "free_activated": "Free plan activated",
     "upgrade": "Upgrade",
     "success": "Plan activated ✓",
     "wallet_note": "The amount is taken from your wallet and the plan starts right away.",

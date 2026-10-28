@@ -598,6 +598,8 @@
     "choose": "Choisir un plan",
     "upgrade_title": "Passer à un plan supérieur",
     "subscribe": "S'abonner",
+    "activate_free": "Activer gratuitement",
+    "free_activated": "Plan gratuit activé",
     "upgrade": "Mettre à niveau",
     "success": "Plan activé ✓",
     "wallet_note": "Le montant est débité du portefeuille et le plan est activé immédiatement.",
