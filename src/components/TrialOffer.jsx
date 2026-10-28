@@ -19,7 +19,7 @@ export default function TrialOffer() {
 
   useEffect(() => {
     try { if (localStorage.getItem(DISMISS_KEY) === '1') return; } catch { /* وضع خاص */ }
-    api.get('/subscription/trial').then(({ data }) => { if (data?.eligible && data.plans?.length) setOffer(data); }).catch(() => {});
+    api.get('/subscription/trial').then(({ data }) => { if (data?.eligible && (data.plans?.length || data.freePlan)) setOffer(data); }).catch(() => {});
   }, []);
 
   if (!offer) return null;
@@ -32,6 +32,17 @@ export default function TrialOffer() {
       remember();
       toast.success(t('sub.success'));
       // حدود الخطة الجديدة تُقرأ من جديد في كل الصفحات
+      window.location.reload();
+    } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); setBusy(null); }
+  };
+
+  // بديل التجربة: الخطة المجانية يفعّلها التاجر بنفسه
+  const activateFree = async () => {
+    setBusy(offer.freePlan.id);
+    try {
+      await api.post('/subscription/subscribe', { planId: offer.freePlan.id, interval: 'month' });
+      remember();
+      toast.success(t('sub.free_activated'));
       window.location.reload();
     } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); setBusy(null); }
   };
@@ -79,6 +90,20 @@ export default function TrialOffer() {
             );
           })}
         </div>
+
+        {offer.freePlan && (
+          <div className="rounded-2xl border-2 border-gray-100 dark:border-zinc-800 p-4 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-black text-lg capitalize">{offer.freePlan.name}</p>
+              <p className="text-lg font-black text-emerald-500 shrink-0">{t('themes.free')}</p>
+            </div>
+            <Features f={offer.freePlan.features} />
+            <button type="button" disabled={!!busy} onClick={activateFree}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border-2 border-emerald-500 text-emerald-600 dark:text-emerald-400 disabled:opacity-50">
+              {busy === offer.freePlan.id && <Loader2 className="w-4 h-4 animate-spin" />}{t('sub.activate_free')}
+            </button>
+          </div>
+        )}
 
         <label className="flex items-start gap-3 rounded-2xl bg-gray-50 dark:bg-zinc-800/50 p-3.5">
           <input type="checkbox" checked={autoRenew} onChange={(e) => setAutoRenew(e.target.checked)} className="mt-0.5 w-4 h-4 accent-indigo-600" />

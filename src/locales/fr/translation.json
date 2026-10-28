@@ -950,8 +950,8 @@
     "subtitle": "Choisissez le plan adapté à votre boutique. Rien n'est débité maintenant.",
     "free_days": "{{days}} jours gratuits",
     "start": "Commencer l'essai",
-    "skip": "Continuer avec le plan gratuit",
-    "auto_renew_hint": "Si le solde est insuffisant ou le renouvellement désactivé, votre compte repasse au plan gratuit sans aucun débit.",
+    "skip": "Plus tard",
+    "auto_renew_hint": "Si le solde est insuffisant ou le renouvellement désactivé, l'abonnement s'arrête sans aucun débit — vous pouvez activer le plan gratuit à tout moment.",
     "popular": "Le plus choisi",
     "then": "puis {{price}} {{currency}} / mois"
   },

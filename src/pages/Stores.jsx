@@ -41,6 +41,7 @@ export default function StoresPage() {
   const { stores, storeId, selectStore, refresh } = useAuth();
   const [del, setDel] = useState(null);
   const [busy, setBusy] = useState(null);
+  // آخر متجر لا يُحذف — ينشئ التاجر متجراً آخر أولاً
   const mine = stores.filter((s) => s.role === 'owner');
   const shared = stores.filter((s) => s.role !== 'owner');
   const pick = (s) => {
@@ -87,7 +88,7 @@ export default function StoresPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button type="button" onClick={() => nav(`/stores/${s.id}`)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold"><Pencil className="w-3.5 h-3.5" />{t('stores.edit')}</button>
-                  <button type="button" onClick={() => setDel(s)} className="p-2 rounded-lg text-gray-400 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>
+                  {mine.length > 1 && <button type="button" onClick={() => setDel(s)} className="p-2 rounded-lg text-gray-400 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>}
                 </div>
               </div>
             );

@@ -950,8 +950,8 @@
     "subtitle": "Pick the plan that fits your store. Nothing is charged now.",
     "free_days": "{{days}} days free",
     "start": "Start trial",
-    "skip": "Continue with the free plan",
-    "auto_renew_hint": "If your wallet balance is too low or renewal is off, your account returns to the free plan with no charge.",
+    "skip": "Later",
+    "auto_renew_hint": "If your wallet balance is too low or renewal is off, the subscription simply ends with no charge — you can activate the free plan anytime.",
     "popular": "Most chosen",
     "then": "then {{price}} {{currency}} / month"
   },
