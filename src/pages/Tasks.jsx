@@ -170,7 +170,7 @@ export default function TasksPage() {
   const all = splitTasks(list || []);
   const { open, done } = splitTasks(forDay(list || [], day, days));
   const countFor = (d) => all.open.filter((x) => x.dueDate === d).length;
-  const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800';
+  const box = 'rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800';
   return (
     <div className="max-w-xl mx-auto space-y-3">
       <button type="button" onClick={() => setAdding(true)} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-indigo-600 text-white font-bold">
