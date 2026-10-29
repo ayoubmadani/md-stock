@@ -44,9 +44,18 @@ import TrialOffer from './components/TrialOffer';
 
 function Gate() {
   const { t } = useTranslation();
-  const { token, stores, loading, logout } = useAuth();
+  const { token, stores, loading, logout, offline, refresh } = useAuth();
   if (!token) return <Navigate to="/login" replace />;
   if (loading) return <div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-7 h-7 animate-spin text-indigo-500" /></div>;
+  if (offline) {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <p className="text-sm text-gray-500 dark:text-zinc-400">{t('login.network')}</p>
+        <button onClick={refresh} className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold">{t('login.retry')}</button>
+        <button onClick={logout} className="text-sm font-semibold text-gray-400">{t('logout')}</button>
+      </div>
+    );
+  }
   // حساب جديد بلا متجر: إنشاء أول متجر مباشرة (+ عرض التجربة المجانية)
   if (!stores.length) {
     return (

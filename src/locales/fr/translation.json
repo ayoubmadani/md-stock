@@ -42,7 +42,8 @@
     "google": "Continuer avec Google",
     "google_error": "Connexion Google impossible, réessayez",
     "no_account": "Aucun compte MD Store avec cet e-mail — créez-en un depuis le tableau de bord",
-    "network": "Impossible de joindre le serveur — vérifiez la connexion"
+    "network": "Impossible de joindre le serveur — vérifiez la connexion",
+    "retry": "Réessayer"
   },
   "handoff": {
     "loading": "Ouverture du stock...",

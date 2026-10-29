@@ -100,8 +100,6 @@ export default function StoreForm({ onboarding = false }) {
       )}
 
       <Section title={t('stores.identity')}>
-        <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>
-        {f.showStoreName && <Toggle checked={f.nameBeforeLogo} onChange={set('nameBeforeLogo')}>{t('stores.name_before_logo')}</Toggle>}
         <div className="grid grid-cols-2 gap-3">
           {[['logo', t('stores.logo')], ['favicon', t('stores.favicon'), t('stores.favicon_hint')]].map(([k, title, hint]) => (
             <div key={k} className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 p-3 text-center">
@@ -116,6 +114,8 @@ export default function StoreForm({ onboarding = false }) {
           <input value={f.name} onChange={set('name')} className={input} autoFocus={isNew} />
           {!isNew && subdomain && <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{subdomain}.mdstore.top</p>}
         </div>
+        <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>
+        {f.showStoreName && <Toggle checked={f.nameBeforeLogo} onChange={set('nameBeforeLogo')}>{t('stores.name_before_logo')}</Toggle>}
         <LogoPreview f={f} label={t('stores.site_preview')} hint={t('stores.site_preview_hint')} />
         <div className="grid grid-cols-2 gap-3">
           {['primaryColor', 'secondaryColor'].map((k) => (

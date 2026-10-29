@@ -15,10 +15,12 @@ export function AuthProvider({ children }) {
   const [stores, setStores] = useState([]);
   const [storeId, setStoreIdState] = useState(getStoreId());
   const [loading, setLoading] = useState(!!getToken());
+  const [offline, setOffline] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!getToken()) { setStores([]); setLoading(false); return; }
     setLoading(true);
+    setOffline(false);
     try {
       const { data } = await api.get('/stores/user/me');
       const list = (data?.stores || data?.data || data || []).filter?.((s) => s.selectable !== false) ?? [];
@@ -27,8 +29,10 @@ export function AuthProvider({ children }) {
       const next = keep?.id || list[0]?.id || null;
       setStoreId(next);
       setStoreIdState(next);
-    } catch {
+    } catch (err) {
       setStores([]);
+      // الخادم ردّ بخطأ (حساب محذوف، 401، 500…) → خروج إلى الدخول؛ بلا اتصال → شاشة «إعادة المحاولة» بدل «أنشئ متجرك الأول»
+      if (err?.response) { setToken(null); setTokenState(null); } else setOffline(true);
     } finally {
       setLoading(false);
     }
@@ -50,7 +54,7 @@ export function AuthProvider({ children }) {
   const selectStore = (id) => { setStoreId(id); setStoreIdState(id); };
 
   return (
-    <AuthContext.Provider value={{ token, stores, storeId, store: stores.find((s) => s.id === storeId) || null, can: (perm) => hasPerm(stores.find((s) => s.id === storeId), perm), loading, login, logout, selectStore, refresh }}>
+    <AuthContext.Provider value={{ token, stores, offline, storeId, store: stores.find((s) => s.id === storeId) || null, can: (perm) => hasPerm(stores.find((s) => s.id === storeId), perm), loading, login, logout, selectStore, refresh }}>
       {children}
     </AuthContext.Provider>
   );
