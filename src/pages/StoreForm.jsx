@@ -31,7 +31,7 @@ function LogoPreview({ f, label, hint }) {
     <div className="space-y-1.5">
       <p className="text-[11px] font-semibold text-gray-400">{label}</p>
       <div className="flex items-center justify-between gap-3 rounded-xl bg-white text-gray-900 border border-gray-200 dark:border-zinc-700 px-3 h-14">
-        <span className="flex items-center gap-2.5 min-w-0">
+        <span className={`flex items-center gap-2.5 min-w-0 ${f.nameBeforeLogo && name ? 'flex-row-reverse' : ''}`}>
           {f.logo && <img src={f.logo} alt="" className="h-8 max-w-[140px] object-contain shrink-0" />}
           {name && <span className="font-extrabold truncate">{name}</span>}
         </span>
@@ -101,6 +101,7 @@ export default function StoreForm({ onboarding = false }) {
 
       <Section title={t('stores.identity')}>
         <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>
+        {f.showStoreName && <Toggle checked={f.nameBeforeLogo} onChange={set('nameBeforeLogo')}>{t('stores.name_before_logo')}</Toggle>}
         <div className="grid grid-cols-2 gap-3">
           {[['logo', t('stores.logo')], ['favicon', t('stores.favicon'), t('stores.favicon_hint')]].map(([k, title, hint]) => (
             <div key={k} className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 p-3 text-center">

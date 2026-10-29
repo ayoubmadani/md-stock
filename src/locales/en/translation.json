@@ -571,7 +571,8 @@
     "site_preview_hint": "This is how the top of your store looks to customers. Turn on \"Show the store name next to the logo\" to show both, or off for the logo alone. Without a logo, the name shows alone.",
     "hero_desktop": "Desktop (wide)",
     "hero_mobile": "Phone (tall)",
-    "hero_mobile_hint": "Phone visitors see the phone cover, everyone else the desktop one. Without a phone cover, the desktop cover shows everywhere."
+    "hero_mobile_hint": "Phone visitors see the phone cover, everyone else the desktop one. Without a phone cover, the desktop cover shows everywhere.",
+    "name_before_logo": "Flip the order: name before the logo"
   },
   "themes": {
     "current": "Current theme",

@@ -57,3 +57,12 @@ describe('phone cover (heroImageMobile)', () => {
     expect(storeToForm({}).heroImageMobile).toBeNull();
   });
 });
+
+describe('nameBeforeLogo (قلب الترتيب بين الشعار والاسم)', () => {
+  it('off by default, sent inside design and read back', () => {
+    expect(EMPTY_STORE.nameBeforeLogo).toBe(false);
+    expect(storePayload({ ...EMPTY_STORE, nameBeforeLogo: true }, { subdomain: 'x' }).design.nameBeforeLogo).toBe(true);
+    expect(storeToForm({ design: { nameBeforeLogo: true } }).nameBeforeLogo).toBe(true);
+    expect(storeToForm({}).nameBeforeLogo).toBe(false);
+  });
+});
