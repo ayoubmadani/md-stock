@@ -1,23 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EDIT_RATIO, dragRect, fitRect, removeWhite } from './logoEdit';
-
-const px = (...rgba) => new Uint8ClampedArray(rgba);
-
-describe('removeWhite', () => {
-  it('white pixels become transparent, dark ones stay', () => {
-    const d = removeWhite(px(255, 255, 255, 255, 20, 30, 40, 255), 240);
-    expect(d[3]).toBe(0);
-    expect(d[7]).toBe(255);
-  });
-  it('near-white pixels fade instead of a hard edge', () => {
-    const a = removeWhite(px(230, 230, 230, 255), 240)[3];
-    expect(a).toBeGreaterThan(0);
-    expect(a).toBeLessThan(255);
-  });
-  it('a light colour (not grey-white) is kept', () => {
-    expect(removeWhite(px(255, 255, 120, 255), 240)[3]).toBe(255);
-  });
-});
+import { EDIT_RATIO, dragRect, fitRect } from './logoEdit';
 
 describe('dragRect', () => {
   const r = { x: 10, y: 10, w: 50, h: 40 };

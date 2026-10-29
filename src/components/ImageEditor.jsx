@@ -1,10 +1,9 @@
-// تعديل صورة قبل الرفع (شعار، أيقونة، منتج): قص يدوي (إطار بزوايا تُسحب) + إزالة الخلفية البيضاء، والناتج PNG شفاف
+// تعديل صورة قبل الرفع (شعار، أيقونة، غلاف، منتج): قص يدوي بإطار زواياه تُسحب
 // kind: logo | favicon | cover | cover_mobile | image — النسبة من EDIT_RATIO
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, RotateCcw, X } from 'lucide-react';
-import { EDIT_RATIO, dragRect, fitRect, removeWhite } from '../lib/logoEdit';
-import { Toggle } from './product';
+import { EDIT_RATIO, dragRect, fitRect } from '../lib/logoEdit';
 
 const MAX_SIDE = 1600; // نفس أقصى مقاس يحفظه الخادم
 const KEEP_PNG = ['logo', 'favicon'];
@@ -34,8 +33,6 @@ export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) 
   const { t } = useTranslation();
   const [src, setSrc] = useState(null);
   const [rect, setRect] = useState(null);
-  const [clean, setClean] = useState(false);
-  const [level, setLevel] = useState(235);
   const [saving, setSaving] = useState(false);
   const view = useRef(null);
   const box = useRef(null);
@@ -53,12 +50,7 @@ export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) 
     const ctx = v.getContext('2d');
     ctx.clearRect(0, 0, v.width, v.height);
     ctx.drawImage(src, 0, 0);
-    if (clean) {
-      const d = ctx.getImageData(0, 0, v.width, v.height);
-      removeWhite(d.data, level);
-      ctx.putImageData(d, 0, 0);
-    }
-  }, [src, clean, level]);
+  }, [src]);
 
   const down = (handle) => (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -74,8 +66,8 @@ export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) 
 
   const save = async () => {
     setSaving(true);
-    // صورة (غلاف/منتج) بلا إزالة خلفية → JPEG حتى لا تتجاوز حد الرفع؛ الشعار والأيقونة والمُزالة خلفيتها → PNG شفاف
-    const jpeg = !clean && !KEEP_PNG.includes(kind);
+    // الغلاف والمنتج → JPEG حتى لا تتجاوز حد الرفع؛ الشعار والأيقونة → PNG (تبقى شفافيتهما)
+    const jpeg = !KEEP_PNG.includes(kind);
     const out = document.createElement('canvas');
     out.width = rect.w; out.height = rect.h;
     const ctx = out.getContext('2d');
@@ -84,7 +76,7 @@ export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) 
     const type = jpeg ? 'image/jpeg' : 'image/png';
     const blob = await new Promise((res) => out.toBlob(res, type, 0.9));
     if (!blob) { setSaving(false); return; }
-    const changed = clean || rect.x !== 0 || rect.y !== 0 || rect.w !== src.width || rect.h !== src.height;
+    const changed = rect.x !== 0 || rect.y !== 0 || rect.w !== src.width || rect.h !== src.height;
     onDone(new File([blob], `${file.name.replace(/\.\w+$/, '') || 'image'}.${jpeg ? 'jpg' : 'png'}`, { type }), changed);
   };
 
@@ -112,15 +104,8 @@ export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) 
                 </div>
               </div>
             </div>
-            <Toggle checked={clean} onChange={setClean}>{t('image_editor.remove_white')}</Toggle>
-            {clean && (
-              <label className="block space-y-1">
-                <span className="text-[11px] text-gray-400">{t('image_editor.strength')}</span>
-                <input type="range" min="200" max="254" value={455 - level} onChange={(e) => setLevel(455 - Number(e.target.value))} className="w-full accent-indigo-600" dir="ltr" />
-              </label>
-            )}
             <div className="flex gap-2">
-              <button type="button" onClick={() => { setRect(fitRect(src.width, src.height, ratio)); setClean(false); }} className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-semibold">
+              <button type="button" onClick={() => setRect(fitRect(src.width, src.height, ratio))} className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-semibold">
                 <RotateCcw className="w-4 h-4" />{t('image_editor.reset')}
               </button>
               <button type="button" onClick={save} disabled={saving} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">

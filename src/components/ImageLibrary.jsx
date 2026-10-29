@@ -15,7 +15,7 @@ const PAGE = 18;
  * max: كم صورة يمكن اختيارها (1 = اختيار مباشر بالضغط)
  * onPick(urls[])
  */
-/** edit: نوع المحرر (logo | favicon | image) — قص وإزالة الخلفية قبل الرفع */
+/** edit: نوع المحرر (logo | favicon | cover | cover_mobile | image) — قص قبل الرفع */
 export default function ImageLibrary({ folder = 'products', max = 1, edit = null, onPick, onClose }) {
   const { t } = useTranslation();
   const [images, setImages] = useState(null);
@@ -58,7 +58,7 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = null
     });
   };
 
-  // asIs: صورة خرجت من المحرر (PNG شفاف) تُرفع بلا ضغط المتصفح حتى لا تُملأ الشفافية بالأبيض
+  // asIs: صورة خرجت من المحرر (مقصوصة ومضغوطة) تُرفع كما هي
   const upload = async (files, { asIs = false } = {}) => {
     const list = [...files].slice(0, multi ? 10 : 1);
     if (!list.length) return;

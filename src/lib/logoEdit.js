@@ -1,22 +1,9 @@
-// تعديل الصور قبل الرفع (شعار، أيقونة، منتجات): قص يدوي + إزالة الخلفية البيضاء (دوال خالصة، الرسم في ImageEditor)
+// تعديل الصور قبل الرفع (شعار، أيقونة، غلاف، منتجات): القص اليدوي (دوال خالصة، الرسم في ImageEditor)
 
 export const MIN_CROP = 16;
 
 /** نسبة إطار القص (عرض/ارتفاع) لكل نوع؛ غير المذكور حر */
 export const EDIT_RATIO = { favicon: 1, cover: 16 / 7, cover_mobile: 4 / 5 };
-const SOFT = 40; // عرض الحافة الناعمة تحت العتبة
-const GREY = 24; // أقصى فرق بين القنوات ليُعدّ اللون أبيض/رمادي فاتح
-
-/** يجعل البكسلات البيضاء شفافة (مع حافة ناعمة)؛ يعدّل المصفوفة ويرجعها */
-export function removeWhite(data, threshold = 240) {
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    const lo = Math.min(r, g, b);
-    if (Math.max(r, g, b) - lo > GREY || lo < threshold - SOFT) continue;
-    data[i + 3] = lo >= threshold ? 0 : Math.round(data[i + 3] * ((threshold - lo) / SOFT));
-  }
-  return data;
-}
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
