@@ -1,12 +1,12 @@
 // مكتبة الصور (نفس مكتبة لوحة التاجر): الصور المرفوعة سابقاً في المجلد، رفع مع ضغط، اختيار واحد أو عدة، حذف
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, Check, ClipboardPaste, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
+import { Camera, Check, ClipboardPaste, ImagePlus, Loader2, Trash2, X, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import CameraCapture from './CameraCapture';
 import { ACCEPT, COMPRESS, compress } from '../lib/upload';
-import LogoEditor from './LogoEditor';
+import ImageEditor from './ImageEditor';
 import { clipboardImages, pastedImages } from '../lib/clipboard';
 
 const PAGE = 18;
@@ -15,7 +15,8 @@ const PAGE = 18;
  * max: كم صورة يمكن اختيارها (1 = اختيار مباشر بالضغط)
  * onPick(urls[])
  */
-export default function ImageLibrary({ folder = 'products', max = 1, edit = false, onPick, onClose }) {
+/** edit: نوع المحرر (logo | favicon | image) — قص وإزالة الخلفية قبل الرفع */
+export default function ImageLibrary({ folder = 'products', max = 1, edit = null, onPick, onClose }) {
   const { t } = useTranslation();
   const [images, setImages] = useState(null);
   const [page, setPage] = useState(1);
@@ -57,7 +58,8 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
     });
   };
 
-  const upload = async (files) => {
+  // asIs: صورة خرجت من المحرر (PNG شفاف) تُرفع بلا ضغط المتصفح حتى لا تُملأ الشفافية بالأبيض
+  const upload = async (files, { asIs = false } = {}) => {
     const list = [...files].slice(0, multi ? 10 : 1);
     if (!list.length) return;
     setProgress({ done: 0, total: list.length, pct: 0 });
@@ -65,7 +67,7 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
     try {
       for (const [i, raw] of list.entries()) {
         const preset = folder in COMPRESS ? COMPRESS[folder] : COMPRESS.products;
-        const file = preset ? await compress(raw, preset) : raw;
+        const file = preset && !asIs ? await compress(raw, preset) : raw;
         const body = new FormData();
         body.append('file', file);
         const { data } = await api.post(`/images/upload?folder=${folder}`, body, {
@@ -85,16 +87,22 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
     else setSelected((s) => [...s, ...uploaded.map((u) => u.url).filter((u) => !s.includes(u))].slice(0, max));
   };
 
-  // edit: صورة جديدة تمرّ بمحرر الشعار (قص + إزالة الأبيض) قبل الرفع
+  // edit: صورة واحدة جديدة تمرّ بالمحرر قبل الرفع؛ editing = { file, url? } (url لصورة من المكتبة)
   const [editing, setEditing] = useState(null);
-  const receive = (files) => (edit && files?.length ? setEditing(files[0]) : upload(files));
+  const receive = (files) => (edit && files?.length === 1 ? setEditing({ file: files[0] }) : upload(files));
+  const edited = (file, changed) => {
+    const { url } = editing;
+    setEditing(null);
+    if (url && !changed) { if (!multi || !selected.includes(url)) toggle(url); return; }
+    upload([file], { asIs: true });
+  };
 
   // صورة من المكتبة: نجلب بايتاتها عبر الـ API (R2 يمنع المتصفح من قراءة البكسلات) ثم المحرر؛ إن تعذّر تُختار كما هي
   const editExisting = async (img) => {
     try {
       const { data } = await api.get(`/images/${img.id}/raw`, { responseType: 'blob' });
-      setEditing(new File([data], (img.url.split('/').pop() || 'logo').replace(/\?.*$/, ''), { type: data.type || 'image/png' }));
-    } catch { onPick([img.url]); }
+      setEditing({ url: img.url, file: new File([data], (img.url.split('/').pop() || 'image').replace(/\?.*$/, ''), { type: data.type || 'image/png' }) });
+    } catch { toggle(img.url); }
   };
 
   // لصق صورة منسوخة: زر «لصق» (الهاتف) أو Ctrl+V (الحاسوب)
@@ -171,10 +179,14 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
                     const n = selected.indexOf(img.url);
                     return (
                       <div key={img.id || img.url} className="relative aspect-square">
-                        <button type="button" onClick={() => (manage ? remove(img) : edit ? editExisting(img) : toggle(img.url))}
+                        <button type="button" onClick={() => (manage ? remove(img) : edit && !multi ? editExisting(img) : toggle(img.url))}
                           className={`w-full h-full rounded-xl overflow-hidden border-2 ${n >= 0 ? 'border-indigo-500' : 'border-transparent'}`}>
                           <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover bg-gray-100 dark:bg-zinc-800" />
                         </button>
+                        {edit && multi && !manage && (
+                          <button type="button" onClick={() => editExisting(img)} aria-label={t('image_editor.edit')}
+                            className="absolute bottom-1.5 start-1.5 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center"><Pencil className="w-3.5 h-3.5" /></button>
+                        )}
                         {manage ? (
                           <span className="pointer-events-none absolute inset-0 rounded-xl bg-rose-600/40 flex items-center justify-center"><Trash2 className="w-6 h-6 text-white" /></span>
                         ) : n >= 0 && (
@@ -196,7 +208,7 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
         </div>
 
         {camera && <CameraCapture onClose={() => setCamera(false)} onCapture={(file) => { setCamera(false); receive([file]); }} />}
-        {editing && <LogoEditor file={editing} onCancel={() => setEditing(null)} onDone={(file) => { setEditing(null); upload([file]); }} />}
+        {editing && <ImageEditor file={editing.file} kind={edit} onCancel={() => setEditing(null)} onDone={edited} />}
 
         {multi && (
           <div className="p-4 pt-0 pb-[max(1rem,env(safe-area-inset-bottom))]">

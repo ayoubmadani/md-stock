@@ -69,7 +69,7 @@ export function ImagesEditor({ images, onChange }) {
         {t('product.add_images')}
         {limit > 0 && <span dir="ltr">{images.length}/{limit}</span>}
       </button>
-      {open && <ImageLibrary folder="products" max={room} onPick={pick} onClose={() => setOpen(false)} />}
+      {open && <ImageLibrary folder="products" max={room} edit="image" onPick={pick} onClose={() => setOpen(false)} />}
       {images.map((src, i) => (
         <div key={src} className="relative shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800">
           <img src={src} alt="" className="w-full h-full object-cover" />

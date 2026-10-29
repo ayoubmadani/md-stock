@@ -1,11 +1,13 @@
-// تعديل الشعار قبل الرفع: قص يدوي (إطار بزوايا تُسحب) + إزالة الخلفية البيضاء، والناتج PNG شفاف
+// تعديل صورة قبل الرفع (شعار، أيقونة، منتج): قص يدوي (إطار بزوايا تُسحب) + إزالة الخلفية البيضاء، والناتج PNG شفاف
+// kind: logo | favicon (قص مربع) | image
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, RotateCcw, X } from 'lucide-react';
-import { dragRect, removeWhite } from '../lib/logoEdit';
+import { dragRect, fitRect, removeWhite } from '../lib/logoEdit';
 import { Toggle } from './product';
 
-const MAX_SIDE = 1600; // الشعار لا يحتاج أكبر من هذا
+const MAX_SIDE = 1600; // نفس أقصى مقاس يحفظه الخادم
+const RATIO = { favicon: 1 };
 const HANDLES = { nw: 'top-0 left-0 -translate-x-1/2 -translate-y-1/2 cursor-nwse-resize', ne: 'top-0 right-0 translate-x-1/2 -translate-y-1/2 cursor-nesw-resize', sw: 'bottom-0 left-0 -translate-x-1/2 translate-y-1/2 cursor-nesw-resize', se: 'bottom-0 right-0 translate-x-1/2 translate-y-1/2 cursor-nwse-resize' };
 const CHECKER = { backgroundImage: 'repeating-conic-gradient(#e5e7eb 0% 25%, #fff 0% 50%)', backgroundSize: '16px 16px' };
 
@@ -26,7 +28,9 @@ function loadSource(file) {
   });
 }
 
-export default function LogoEditor({ file, onDone, onCancel }) {
+/** onDone(file, changed): changed = false إذا لم يُقص ولم تُزل الخلفية */
+export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) {
+  const ratio = RATIO[kind];
   const { t } = useTranslation();
   const [src, setSrc] = useState(null);
   const [rect, setRect] = useState(null);
@@ -38,7 +42,7 @@ export default function LogoEditor({ file, onDone, onCancel }) {
   const drag = useRef(null);
 
   useEffect(() => {
-    loadSource(file).then((c) => { setSrc(c); setRect({ x: 0, y: 0, w: c.width, h: c.height }); }).catch(onCancel);
+    loadSource(file).then((c) => { setSrc(c); setRect(fitRect(c.width, c.height, ratio)); }).catch(onCancel);
   }, [file]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // المعاينة: الصورة كاملة مع إزالة الأبيض إن فُعّلت
@@ -64,7 +68,7 @@ export default function LogoEditor({ file, onDone, onCancel }) {
   const move = (e) => {
     const d = drag.current;
     if (!d) return;
-    setRect(dragRect(d.start, d.handle, Math.round((e.clientX - d.x) * d.k), Math.round((e.clientY - d.y) * d.k), src.width, src.height));
+    setRect(dragRect(d.start, d.handle, Math.round((e.clientX - d.x) * d.k), Math.round((e.clientY - d.y) * d.k), src.width, src.height, ratio));
   };
   const up = () => { drag.current = null; };
 
@@ -75,7 +79,8 @@ export default function LogoEditor({ file, onDone, onCancel }) {
     out.getContext('2d').drawImage(view.current, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
     const blob = await new Promise((res) => out.toBlob(res, 'image/png'));
     if (!blob) { setSaving(false); return; }
-    onDone(new File([blob], `${file.name.replace(/\.\w+$/, '') || 'logo'}.png`, { type: 'image/png' }));
+    const changed = clean || rect.x !== 0 || rect.y !== 0 || rect.w !== src.width || rect.h !== src.height;
+    onDone(new File([blob], `${file.name.replace(/\.\w+$/, '') || 'image'}.png`, { type: 'image/png' }), changed);
   };
 
   const pct = (v, total) => `${(v / total) * 100}%`;
@@ -83,12 +88,12 @@ export default function LogoEditor({ file, onDone, onCancel }) {
     <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 sm:p-4">
       <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg p-4 space-y-3 max-h-[92dvh] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between">
-          <p className="font-bold">{t('logo_editor.title')}</p>
+          <p className="font-bold">{t(`image_editor.title_${kind}`)}</p>
           <button type="button" onClick={onCancel} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
         </div>
         {!src ? <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div> : (
           <>
-            <p className="text-[11px] text-gray-400">{t('logo_editor.crop_hint')}</p>
+            <p className="text-[11px] text-gray-400">{t('image_editor.crop_hint')}</p>
             <div className="flex justify-center rounded-xl p-3" style={CHECKER}>
               <div ref={box} className="relative select-none touch-none" style={{ width: '100%', maxWidth: `min(100%, ${(src.width / src.height) * 300}px)` }}
                 onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
@@ -102,19 +107,19 @@ export default function LogoEditor({ file, onDone, onCancel }) {
                 </div>
               </div>
             </div>
-            <Toggle checked={clean} onChange={setClean}>{t('logo_editor.remove_white')}</Toggle>
+            <Toggle checked={clean} onChange={setClean}>{t('image_editor.remove_white')}</Toggle>
             {clean && (
               <label className="block space-y-1">
-                <span className="text-[11px] text-gray-400">{t('logo_editor.strength')}</span>
+                <span className="text-[11px] text-gray-400">{t('image_editor.strength')}</span>
                 <input type="range" min="200" max="254" value={455 - level} onChange={(e) => setLevel(455 - Number(e.target.value))} className="w-full accent-indigo-600" dir="ltr" />
               </label>
             )}
             <div className="flex gap-2">
-              <button type="button" onClick={() => { setRect({ x: 0, y: 0, w: src.width, h: src.height }); setClean(false); }} className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-semibold">
-                <RotateCcw className="w-4 h-4" />{t('logo_editor.reset')}
+              <button type="button" onClick={() => { setRect(fitRect(src.width, src.height, ratio)); setClean(false); }} className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-semibold">
+                <RotateCcw className="w-4 h-4" />{t('image_editor.reset')}
               </button>
               <button type="button" onClick={save} disabled={saving} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">
-                {saving && <Loader2 className="w-4 h-4 animate-spin" />}{t('logo_editor.save')}
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />}{t('image_editor.save')}
               </button>
             </div>
           </>

@@ -1111,8 +1111,11 @@
     "added": "Tâche ajoutée",
     "other": "Autres"
   },
-  "logo_editor": {
-    "title": "Modifier le logo",
+  "image_editor": {
+    "title_logo": "Modifier le logo",
+    "title_favicon": "Modifier l'icône",
+    "title_image": "Modifier l'image",
+    "edit": "Modifier l'image",
     "crop_hint": "Faites glisser les coins pour recadrer, ou le cadre pour le déplacer.",
     "remove_white": "Supprimer le fond blanc",
     "strength": "Intensité",

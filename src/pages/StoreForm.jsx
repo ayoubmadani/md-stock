@@ -104,7 +104,7 @@ export default function StoreForm({ onboarding = false }) {
         <div className="grid grid-cols-2 gap-3">
           {[['logo', t('stores.logo')], ['favicon', t('stores.favicon'), t('stores.favicon_hint')]].map(([k, title, hint]) => (
             <div key={k} className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 p-3 text-center">
-              <ImagePick value={f[k]} onPick={set(k)} onClear={() => set(k)(null)} fill edit={k === 'logo'} />
+              <ImagePick value={f[k]} onPick={set(k)} onClear={() => set(k)(null)} fill edit={k} />
               <p className="text-sm font-semibold">{title}</p>
               {hint && <p className="text-[11px] text-gray-400">{hint}</p>}
             </div>
