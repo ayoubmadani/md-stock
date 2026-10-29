@@ -162,7 +162,7 @@ function AttributeCard({ attr, onChange, onRemove }) {
           <button type="button" onClick={() => setLibrary(true)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
             <ImagePlus className="w-4 h-4" />{t('product.attr.add_image')}
           </button>
-          {library && <ImageLibrary folder="productVariant" max={1} onPick={([u]) => { setLibrary(false); addValue(u); }} onClose={() => setLibrary(false)} />}
+          {library && <ImageLibrary folder="productVariant" max={1} edit="image" onPick={([u]) => { setLibrary(false); addValue(u); }} onClose={() => setLibrary(false)} />}
         </>
       )}
     </div>
