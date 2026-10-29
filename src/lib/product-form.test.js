@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages, COLOR_PALETTE, replaceValue, addValues } from './product-form.js';
+import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from './product-form.js';
 
 const base = { name: 'قميص', price: '2500', priceOriginal: '', desc: '<p>x</p>', categoryId: '', shippingFree: false, isDigital: false, isActive: true, stock: '7', barcode: ' 123 ' };
 const attr = { id: 'att-1', type: 'size', name: 'المقاس', variants: [{ id: 'var-1', name: 'M', value: 'M' }] };
@@ -94,5 +94,18 @@ describe('إضافة عدة ألوان مرة واحدة', () => {
     const out = addValues(attr, ['#00ff00', '#ff0000', '#0000ff', '#00ff00']);
     expect(out.variants.map((v) => v.value)).toEqual(['#ff0000', '#00ff00', '#0000ff']);
     expect(new Set(out.variants.map((v) => v.id)).size).toBe(3);
+  });
+});
+
+describe('أسماء الخصائص لا تتكرر', () => {
+  const attrs = [{ id: 'a', name: 'اللون' }, { id: 'b', name: 'المقاس' }];
+  it('a new attribute gets a free name', () => {
+    expect(uniqueAttrName(attrs, 'الخامة')).toBe('الخامة');
+    expect(uniqueAttrName(attrs, 'اللون')).toBe('اللون 2');
+    expect(uniqueAttrName([...attrs, { id: 'c', name: 'اللون 2' }], 'اللون')).toBe('اللون 3');
+  });
+  it('flags every attribute whose name repeats (ignoring case and spaces)', () => {
+    expect([...duplicateAttrIds([...attrs, { id: 'c', name: ' اللون ' }])].sort()).toEqual(['a', 'c']);
+    expect(duplicateAttrIds(attrs).size).toBe(0);
   });
 });

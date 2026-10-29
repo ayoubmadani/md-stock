@@ -103,3 +103,21 @@ export function addValues(attr, values) {
   const fresh = values.filter((v) => !seen.has(v) && seen.add(v));
   return { ...attr, variants: [...attr.variants, ...fresh.map(newValue)] };
 }
+
+const attrKey = (n) => String(n || '').trim().toLowerCase();
+
+/** اسم غير مستعمل لخاصية جديدة: «اللون» ثم «اللون 2»، «اللون 3»… */
+export function uniqueAttrName(attributes, base) {
+  const used = new Set(attributes.map((a) => attrKey(a.name)));
+  if (!used.has(attrKey(base))) return base;
+  let i = 2;
+  while (used.has(attrKey(`${base} ${i}`))) i++;
+  return `${base} ${i}`;
+}
+
+/** معرّفات الخصائص التي يتكرر اسمها (لتنبيه التاجر قبل الحفظ) */
+export function duplicateAttrIds(attributes) {
+  const byName = {};
+  for (const a of attributes) { const k = attrKey(a.name); if (k) (byName[k] ||= []).push(a.id); }
+  return new Set(Object.values(byName).filter((ids) => ids.length > 1).flat());
+}

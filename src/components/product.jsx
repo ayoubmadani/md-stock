@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage, COLOR_PALETTE, replaceValue, addValues } from '../lib/product-form';
+import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -171,7 +171,7 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
 }
 
 /* ── خاصية واحدة وقيمها ── */
-function AttributeCard({ attr, images = [], onChange, onRemove }) {
+function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemove }) {
   const { t } = useTranslation();
   const [pickFor, setPickFor] = useState(null); // قيمة لون تُربط بصورة من صور المنتج
   const [text, setText] = useState('');
@@ -187,9 +187,10 @@ function AttributeCard({ attr, images = [], onChange, onRemove }) {
   return (
     <div className="rounded-xl border border-gray-100 dark:border-zinc-800 p-3 space-y-3">
       <div className="flex items-center gap-2">
-        <input value={attr.name} onChange={(e) => onChange({ ...attr, name: e.target.value })} placeholder={t('product.attr.name')} className={`${small} flex-1 min-w-0 font-semibold`} />
+        <input value={attr.name} onChange={(e) => onChange({ ...attr, name: e.target.value })} placeholder={t('product.attr.name')} aria-invalid={duplicate} className={`${small} flex-1 min-w-0 font-semibold ${duplicate ? '!border-rose-500' : ''}`} />
         <button type="button" onClick={onRemove} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>
       </div>
+      {duplicate && <p className="text-[11px] font-semibold text-rose-500">{t('product.attr.duplicate_name')}</p>}
       {attr.type === 'color' && (
         <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-800">
           {['color', 'image', 'text'].map((m) => (
@@ -272,12 +273,13 @@ function AttributeCard({ attr, images = [], onChange, onRemove }) {
 
 export function AttributesEditor({ attributes, images, onChange }) {
   const { t } = useTranslation();
-  const add = (type) => onChange([...attributes, newAttribute(type, t(`product.attr.default_${type}`))]);
+  const add = (type) => onChange([...attributes, newAttribute(type, uniqueAttrName(attributes, t(`product.attr.default_${type}`)))]);
+  const dups = duplicateAttrIds(attributes);
   return (
     <div className="space-y-3">
       {attributes.length === 0 && <p className="text-xs text-gray-400">{t('product.attr.none')}</p>}
       {attributes.map((a) => (
-        <AttributeCard key={a.id} attr={a} images={images} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
+        <AttributeCard key={a.id} attr={a} images={images} duplicate={dups.has(a.id)} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
       ))}
       <div className="grid grid-cols-3 gap-2">
         {['color', 'size', 'text'].map((type) => (
