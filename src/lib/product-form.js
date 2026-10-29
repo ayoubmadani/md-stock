@@ -63,3 +63,16 @@ export function validateProduct(form, { attributes, offers }) {
 // سعر النسخة: -1 (يولّده الخادم) = سعر المنتج — يظهر الحقل فارغاً وسعر المنتج كتلميح
 export const variantPriceField = (price) => (Number(price) < 0 ? '' : String(price ?? ''));
 export const effectiveVariantPrice = (price, productPrice) => (price === '' || price == null || Number(price) < 0 ? Number(productPrice) : Number(price));
+
+/** ربط قيمة (لون) بصورة من صور المنتج، أو إزالة الربط (url = null) */
+export const linkVariantImage = (attr, variantId, url) => ({
+  ...attr,
+  variants: attr.variants.map((v) => (v.id === variantId ? { ...v, imageUrl: url || null } : v)),
+});
+
+/** صورة حُذفت من المنتج لا تبقى مربوطة بلون (نفس المرجع إن لم يتغير شيء) */
+export function pruneVariantImages(attributes, images) {
+  const stale = (v) => v.imageUrl && !images.includes(v.imageUrl);
+  if (!attributes.some((a) => a.variants.some(stale))) return attributes;
+  return attributes.map((a) => ({ ...a, variants: a.variants.map((v) => (stale(v) ? { ...v, imageUrl: null } : v)) }));
+}

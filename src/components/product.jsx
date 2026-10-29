@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField } from '../lib/product-form';
+import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -107,8 +107,9 @@ export function DescEditor({ value, onChange }) {
 }
 
 /* ── خاصية واحدة وقيمها ── */
-function AttributeCard({ attr, onChange, onRemove }) {
+function AttributeCard({ attr, images = [], onChange, onRemove }) {
   const { t } = useTranslation();
+  const [pickFor, setPickFor] = useState(null); // قيمة لون تُربط بصورة من صور المنتج
   const [text, setText] = useState('');
   const [color, setColor] = useState('#000000');
   const [library, setLibrary] = useState(false);
@@ -139,10 +140,38 @@ function AttributeCard({ attr, onChange, onRemove }) {
             {mode === 'color' ? <span className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
               : mode === 'image' ? <img src={v.value} alt="" className="w-8 h-8 rounded-md object-cover" />
                 : <span className="px-1.5 font-semibold">{v.value}</span>}
+            {mode === 'color' && images.length > 0 && (
+              <button type="button" onClick={() => setPickFor(v.id)} aria-label={t('product.attr.link_image')}
+                className="w-7 h-7 rounded-md overflow-hidden border border-dashed border-gray-300 dark:border-zinc-600 flex items-center justify-center text-gray-400">
+                {v.imageUrl ? <img src={v.imageUrl} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="w-3.5 h-3.5" />}
+              </button>
+            )}
             <button type="button" onClick={() => onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== v.id) })} className="text-gray-400"><X className="w-3.5 h-3.5" /></button>
           </span>
         ))}
       </div>
+      {pickFor && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 sm:p-4" onClick={(e) => e.target === e.currentTarget && setPickFor(null)}>
+          <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between">
+              <p className="font-bold">{t('product.attr.pick_image')}</p>
+              <button type="button" onClick={() => setPickFor(null)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {images.map((src) => {
+                const on = attr.variants.find((x) => x.id === pickFor)?.imageUrl === src;
+                return (
+                  <button key={src} type="button" onClick={() => { onChange(linkVariantImage(attr, pickFor, src)); setPickFor(null); }}
+                    className={`aspect-square rounded-xl overflow-hidden border-2 ${on ? 'border-indigo-500' : 'border-transparent'}`}>
+                    <img src={src} alt="" className="w-full h-full object-cover" />
+                  </button>
+                );
+              })}
+            </div>
+            <button type="button" onClick={() => { onChange(linkVariantImage(attr, pickFor, null)); setPickFor(null); }} className="w-full py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-semibold text-gray-500">{t('product.attr.unlink_image')}</button>
+          </div>
+        </div>
+      )}
       {mode === 'text' && (
         <div className="flex gap-2">
           <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addValue(text); setText(''); } }}
@@ -169,14 +198,14 @@ function AttributeCard({ attr, onChange, onRemove }) {
   );
 }
 
-export function AttributesEditor({ attributes, onChange }) {
+export function AttributesEditor({ attributes, images, onChange }) {
   const { t } = useTranslation();
   const add = (type) => onChange([...attributes, newAttribute(type, t(`product.attr.default_${type}`))]);
   return (
     <div className="space-y-3">
       {attributes.length === 0 && <p className="text-xs text-gray-400">{t('product.attr.none')}</p>}
       {attributes.map((a) => (
-        <AttributeCard key={a.id} attr={a} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
+        <AttributeCard key={a.id} attr={a} images={images} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
       ))}
       <div className="grid grid-cols-3 gap-2">
         {['color', 'size', 'text'].map((type) => (

@@ -7,7 +7,7 @@ import AdsSheet from '../components/AdsSheet';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { productPayload, validateProduct } from '../lib/product-form';
+import { productPayload, pruneVariantImages, validateProduct } from '../lib/product-form';
 import { AttributesEditor, BarcodeField, DescEditor, ImagesEditor, OffersEditor, Section, Toggle, VariantsEditor, input, label } from '../components/product';
 
 const EMPTY = {
@@ -118,7 +118,7 @@ export default function ProductForm() {
       </div>
 
       <Section title={t('product.images')}>
-        <ImagesEditor images={images} onChange={setImages} />
+        <ImagesEditor images={images} onChange={(next) => { setImages(next); setAttributes((a) => pruneVariantImages(a, next)); }} />
       </Section>
 
       <Section title={t('product.basics')}>
@@ -145,7 +145,7 @@ export default function ProductForm() {
       </Section>
 
       <Section title={t('product.attr.title')}>
-        <AttributesEditor attributes={attributes} onChange={setAttributes} />
+        <AttributesEditor attributes={attributes} images={images} onChange={setAttributes} />
       </Section>
 
       {!isNew && variants.length > 0 && (

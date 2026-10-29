@@ -177,7 +177,10 @@
       "default_color": "Colour",
       "default_size": "Size",
       "default_text": "",
-      "duplicate_value": "This value already exists"
+      "duplicate_value": "This value already exists",
+      "link_image": "Link an image to this colour",
+      "pick_image": "Image for this colour",
+      "unlink_image": "No image"
     },
     "offer": {
       "title": "Offers",

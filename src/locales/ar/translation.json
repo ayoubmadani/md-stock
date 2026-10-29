@@ -177,7 +177,10 @@
       "default_color": "اللون",
       "default_size": "المقاس",
       "default_text": "",
-      "duplicate_value": "هذه القيمة موجودة"
+      "duplicate_value": "هذه القيمة موجودة",
+      "link_image": "اربط صورة بهذا اللون",
+      "pick_image": "صورة هذا اللون",
+      "unlink_image": "بدون صورة"
     },
     "offer": {
       "title": "العروض",

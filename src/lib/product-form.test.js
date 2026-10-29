@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice } from './product-form.js';
+import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages } from './product-form.js';
 
 const base = { name: 'قميص', price: '2500', priceOriginal: '', desc: '<p>x</p>', categoryId: '', shippingFree: false, isDigital: false, isActive: true, stock: '7', barcode: ' 123 ' };
 const attr = { id: 'att-1', type: 'size', name: 'المقاس', variants: [{ id: 'var-1', name: 'M', value: 'M' }] };
@@ -57,5 +57,18 @@ describe('variant price (-1 = the product price)', () => {
     expect(effectiveVariantPrice('', 2500)).toBe(2500);
     expect(effectiveVariantPrice(-1, 2500)).toBe(2500);
     expect(effectiveVariantPrice('2900', 2500)).toBe(2900);
+  });
+});
+
+describe('ربط اللون بصورة من صور المنتج', () => {
+  const attrs = [{ id: 'a1', type: 'color', name: 'اللون', variants: [{ id: 'v1', name: '#f00', value: '#f00' }, { id: 'v2', name: '#00f', value: '#00f', imageUrl: 'B' }] }];
+  it('links and unlinks one value', () => {
+    expect(linkVariantImage(attrs[0], 'v1', 'A').variants[0].imageUrl).toBe('A');
+    expect(linkVariantImage(attrs[0], 'v2', null).variants[1].imageUrl).toBeNull();
+  });
+  it('a removed product image is unlinked from its colour', () => {
+    const out = pruneVariantImages(attrs, ['A']);
+    expect(out[0].variants[1].imageUrl).toBeNull();
+    expect(pruneVariantImages(attrs, ['B'])).toBe(attrs); // لا تغيير → نفس المرجع
   });
 });
