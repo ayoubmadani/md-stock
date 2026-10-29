@@ -42,5 +42,6 @@ describe('cover ratios', () => {
     expect(EDIT_RATIO.cover).toBeGreaterThan(1);
     expect(EDIT_RATIO.cover_mobile).toBeLessThan(1);
     expect(EDIT_RATIO.favicon).toBe(1);
+    expect(EDIT_RATIO.image).toBe(1); // صور المنتج مربعة دائماً
   });
 });

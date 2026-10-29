@@ -3,7 +3,7 @@
 export const MIN_CROP = 16;
 
 /** نسبة إطار القص (عرض/ارتفاع) لكل نوع؛ غير المذكور حر */
-export const EDIT_RATIO = { favicon: 1, cover: 16 / 7, cover_mobile: 4 / 5 };
+export const EDIT_RATIO = { favicon: 1, image: 1, cover: 16 / 7, cover_mobile: 4 / 5 };
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
