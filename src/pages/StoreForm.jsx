@@ -81,21 +81,20 @@ export default function StoreForm({ onboarding = false }) {
       )}
 
       <Section title={t('stores.identity')}>
-        <div className="flex gap-3">
-          <ImagePick value={f.logo} onPick={set('logo')} onClear={() => set('logo')(null)} />
-          <div className="flex-1 min-w-0 space-y-1.5">
-            <label className={label}>{t('stores.name')}</label>
-            <input value={f.name} onChange={set('name')} className={input} autoFocus={isNew} />
-            {!isNew && subdomain && <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{subdomain}.mdstore.top</p>}
-          </div>
+        <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>
+        <div className="grid grid-cols-2 gap-3">
+          {[['logo', t('stores.logo')], ['favicon', t('stores.favicon'), t('stores.favicon_hint')]].map(([k, title, hint]) => (
+            <div key={k} className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 p-3 text-center">
+              <ImagePick value={f[k]} onPick={set(k)} onClear={() => set(k)(null)} />
+              <p className="text-sm font-semibold">{title}</p>
+              {hint && <p className="text-[11px] text-gray-400">{hint}</p>}
+            </div>
+          ))}
         </div>
-        {f.logo && <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>}
-        <div className="flex items-center gap-3">
-          <ImagePick value={f.favicon} onPick={set('favicon')} onClear={() => set('favicon')(null)} small />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">{t('stores.favicon')}</p>
-            <p className="text-[11px] text-gray-400">{t('stores.favicon_hint')}</p>
-          </div>
+        <div className="space-y-1.5">
+          <label className={label}>{t('stores.name')}</label>
+          <input value={f.name} onChange={set('name')} className={input} autoFocus={isNew} />
+          {!isNew && subdomain && <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{subdomain}.mdstore.top</p>}
         </div>
         <div className="grid grid-cols-2 gap-3">
           {['primaryColor', 'secondaryColor'].map((k) => (

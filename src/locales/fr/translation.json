@@ -566,7 +566,8 @@
     "favicon_hint": "Petite image carrée affichée dans l'onglet",
     "shared": "Boutiques où je suis membre",
     "switched": "Boutique : {{name}}",
-    "show_name": "Afficher le nom de la boutique à côté du logo"
+    "show_name": "Afficher le nom de la boutique à côté du logo",
+    "logo": "Logo"
   },
   "themes": {
     "current": "Thème actuel",

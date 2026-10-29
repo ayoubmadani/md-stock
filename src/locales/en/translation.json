@@ -566,7 +566,8 @@
     "favicon_hint": "Small square image shown in the browser tab",
     "shared": "Stores I'm a member of",
     "switched": "Switched to {{name}}",
-    "show_name": "Show the store name next to the logo"
+    "show_name": "Show the store name next to the logo",
+    "logo": "Logo"
   },
   "themes": {
     "current": "Current theme",
