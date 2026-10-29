@@ -567,7 +567,8 @@
     "shared": "Stores I'm a member of",
     "switched": "Switched to {{name}}",
     "show_name": "Show the store name next to the logo",
-    "logo": "Logo"
+    "logo": "Logo",
+    "site_preview": "Site header preview"
   },
   "themes": {
     "current": "Current theme",

@@ -23,6 +23,24 @@ function ImagePick({ value, onPick, onClear, wide, small, fill }) {
   );
 }
 
+// معاينة أعلى الموقع: الشعار، واسم المتجر بجانبه إذا فُعّل (أو الاسم وحده بدون شعار كما تفعل الثيمات)
+function LogoPreview({ f, label }) {
+  if (!f.logo && !f.name.trim()) return null;
+  const name = f.name.trim() && (f.showStoreName || !f.logo) ? f.name.trim() : '';
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[11px] font-semibold text-gray-400">{label}</p>
+      <div className="flex items-center justify-between gap-3 rounded-xl bg-white text-gray-900 border border-gray-200 dark:border-zinc-700 px-3 h-14">
+        <span className="flex items-center gap-2.5 min-w-0">
+          {f.logo && <img src={f.logo} alt="" className="h-8 max-w-[140px] object-contain shrink-0" />}
+          {name && <span className="font-extrabold truncate">{name}</span>}
+        </span>
+        <span className="flex gap-1.5 shrink-0">{[0, 1, 2].map((i) => <span key={i} className="w-7 h-7 rounded-lg bg-gray-100" />)}</span>
+      </div>
+    </div>
+  );
+}
+
 // onboarding: أول متجر لحساب جديد — بعد الإنشاء إلى الرئيسية
 export default function StoreForm({ onboarding = false }) {
   const { t } = useTranslation();
@@ -91,6 +109,7 @@ export default function StoreForm({ onboarding = false }) {
             </div>
           ))}
         </div>
+        <LogoPreview f={f} label={t('stores.site_preview')} />
         <div className="space-y-1.5">
           <label className={label}>{t('stores.name')}</label>
           <input value={f.name} onChange={set('name')} className={input} autoFocus={isNew} />

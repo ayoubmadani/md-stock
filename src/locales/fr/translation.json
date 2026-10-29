@@ -567,7 +567,8 @@
     "shared": "Boutiques où je suis membre",
     "switched": "Boutique : {{name}}",
     "show_name": "Afficher le nom de la boutique à côté du logo",
-    "logo": "Logo"
+    "logo": "Logo",
+    "site_preview": "Aperçu de l'en-tête du site"
   },
   "themes": {
     "current": "Thème actuel",
