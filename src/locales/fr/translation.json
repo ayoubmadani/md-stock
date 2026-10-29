@@ -569,7 +569,10 @@
     "show_name": "Afficher le nom de la boutique à côté du logo",
     "logo": "Logo",
     "site_preview": "Aperçu de l'en-tête du site",
-    "site_preview_hint": "Voici le haut de votre boutique tel que le voient vos clients. Activez « Afficher le nom de la boutique à côté du logo » pour afficher les deux, ou désactivez-le pour le logo seul. Sans logo, seul le nom s'affiche."
+    "site_preview_hint": "Voici le haut de votre boutique tel que le voient vos clients. Activez « Afficher le nom de la boutique à côté du logo » pour afficher les deux, ou désactivez-le pour le logo seul. Sans logo, seul le nom s'affiche.",
+    "hero_desktop": "Ordinateur (large)",
+    "hero_mobile": "Téléphone (vertical)",
+    "hero_mobile_hint": "Les visiteurs sur téléphone voient la couverture téléphone, les autres celle de l'ordinateur. Sans couverture téléphone, celle de l'ordinateur s'affiche partout."
   },
   "themes": {
     "current": "Thème actuel",
@@ -1120,6 +1123,8 @@
     "remove_white": "Supprimer le fond blanc",
     "strength": "Intensité",
     "reset": "Réinitialiser",
-    "save": "Enregistrer et envoyer"
+    "save": "Enregistrer et envoyer",
+    "title_cover": "Couverture ordinateur",
+    "title_cover_mobile": "Couverture téléphone"
   }
 }

@@ -46,3 +46,14 @@ describe('showStoreName (اسم المتجر بجانب الشعار)', () => {
     expect(storeToForm({ design: {} }).showStoreName).toBe(false);
   });
 });
+
+describe('phone cover (heroImageMobile)', () => {
+  it('sent as hero.mobileImageUrl, null when empty', () => {
+    expect(storePayload({ ...EMPTY_STORE, heroImageMobile: 'M' }, { subdomain: 'x' }).hero.mobileImageUrl).toBe('M');
+    expect(storePayload(EMPTY_STORE, { subdomain: 'x' }).hero.mobileImageUrl).toBeNull();
+  });
+  it('read back from the saved hero', () => {
+    expect(storeToForm({ hero: { mobileImageUrl: 'M' } }).heroImageMobile).toBe('M');
+    expect(storeToForm({}).heroImageMobile).toBeNull();
+  });
+});

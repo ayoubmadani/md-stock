@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dragRect, fitRect, removeWhite } from './logoEdit';
+import { EDIT_RATIO, dragRect, fitRect, removeWhite } from './logoEdit';
 
 const px = (...rgba) => new Uint8ClampedArray(rgba);
 
@@ -52,5 +52,13 @@ describe('dragRect with a fixed ratio (favicon = square)', () => {
   it('fitRect: the largest centred frame of that ratio', () => {
     expect(fitRect(200, 100, 1)).toEqual({ x: 50, y: 0, w: 100, h: 100 });
     expect(fitRect(200, 100)).toEqual({ x: 0, y: 0, w: 200, h: 100 });
+  });
+});
+
+describe('cover ratios', () => {
+  it('desktop cover is wide, phone cover is tall', () => {
+    expect(EDIT_RATIO.cover).toBeGreaterThan(1);
+    expect(EDIT_RATIO.cover_mobile).toBeLessThan(1);
+    expect(EDIT_RATIO.favicon).toBe(1);
   });
 });

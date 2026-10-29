@@ -10,14 +10,14 @@ import { EMPTY_STORE, generateSubdomain, storePayload, storeToForm } from '../li
 import ImageLibrary from '../components/ImageLibrary';
 import { Section, Toggle, input, label } from '../components/product';
 
-function ImagePick({ value, onPick, onClear, wide, small, fill, edit }) {
+function ImagePick({ value, onPick, onClear, wide, tall, small, fill, edit }) {
   const [open, setOpen] = useState(false);
   return (
     <div className={`relative ${fill ? 'w-full' : 'flex items-center gap-3'}`}>
-      <button type="button" onClick={() => setOpen(true)} className={`${wide ? 'w-full aspect-[16/7]' : fill ? 'w-full h-20 p-1.5' : small ? 'w-12 h-12' : 'w-20 h-20'} rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center text-gray-400 bg-gray-50 dark:bg-zinc-950`}>
-        {value ? <img src={value} alt="" className={`w-full h-full ${wide ? 'object-cover' : 'object-contain'}`} /> : <ImagePlus className="w-6 h-6" />}
+      <button type="button" onClick={() => setOpen(true)} className={`${wide ? 'w-full aspect-[16/7]' : tall ? 'w-full aspect-[4/5]' : fill ? 'w-full h-20 p-1.5' : small ? 'w-12 h-12' : 'w-20 h-20'} rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center text-gray-400 bg-gray-50 dark:bg-zinc-950`}>
+        {value ? <img src={value} alt="" className={`w-full h-full ${wide || tall ? 'object-cover' : 'object-contain'}`} /> : <ImagePlus className="w-6 h-6" />}
       </button>
-      {value && !wide && <button type="button" onClick={onClear} className={fill ? 'absolute -top-2 -end-2 w-6 h-6 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center' : 'text-xs text-rose-500'}>✕</button>}
+      {value && !wide && !tall && <button type="button" onClick={onClear} className={fill ? 'absolute -top-2 -end-2 w-6 h-6 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center' : 'text-xs text-rose-500'}>✕</button>}
       {open && <ImageLibrary folder="store" max={1} edit={edit} onPick={([u]) => { setOpen(false); onPick(u); }} onClose={() => setOpen(false)} />}
     </div>
   );
@@ -163,8 +163,16 @@ export default function StoreForm({ onboarding = false }) {
         {f.showTopBar && <input value={f.topBarText} onChange={set('topBarText')} placeholder={t('stores.top_bar_ph')} className={input} />}
         <div className="space-y-1.5">
           <label className={label}>{t('stores.hero')}</label>
-          <ImagePick wide value={f.heroImage} onPick={set('heroImage')} />
-          {f.heroImage && <button type="button" onClick={() => set('heroImage')(null)} className="text-xs text-rose-500">{t('stores.remove_image')}</button>}
+          <div className="grid grid-cols-[2fr_1fr] gap-3 items-start">
+            {[['heroImage', 'cover', t('stores.hero_desktop')], ['heroImageMobile', 'cover_mobile', t('stores.hero_mobile')]].map(([k, kind, title]) => (
+              <div key={k} className="space-y-1">
+                <ImagePick wide={kind === 'cover'} tall={kind === 'cover_mobile'} edit={kind} value={f[k]} onPick={set(k)} />
+                <p className="text-xs font-semibold">{title}</p>
+                {f[k] && <button type="button" onClick={() => set(k)(null)} className="text-xs text-rose-500">{t('stores.remove_image')}</button>}
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-400">{t('stores.hero_mobile_hint')}</p>
         </div>
         <input value={f.heroTitle} onChange={set('heroTitle')} placeholder={t('stores.hero_title')} className={input} />
         <input value={f.heroSubtitle} onChange={set('heroSubtitle')} placeholder={t('stores.hero_subtitle')} className={input} />

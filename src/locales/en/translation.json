@@ -569,7 +569,10 @@
     "show_name": "Show the store name next to the logo",
     "logo": "Logo",
     "site_preview": "Site header preview",
-    "site_preview_hint": "This is how the top of your store looks to customers. Turn on \"Show the store name next to the logo\" to show both, or off for the logo alone. Without a logo, the name shows alone."
+    "site_preview_hint": "This is how the top of your store looks to customers. Turn on \"Show the store name next to the logo\" to show both, or off for the logo alone. Without a logo, the name shows alone.",
+    "hero_desktop": "Desktop (wide)",
+    "hero_mobile": "Phone (tall)",
+    "hero_mobile_hint": "Phone visitors see the phone cover, everyone else the desktop one. Without a phone cover, the desktop cover shows everywhere."
   },
   "themes": {
     "current": "Current theme",
@@ -1120,6 +1123,8 @@
     "remove_white": "Remove white background",
     "strength": "Strength",
     "reset": "Reset",
-    "save": "Save & upload"
+    "save": "Save & upload",
+    "title_cover": "Desktop cover",
+    "title_cover_mobile": "Phone cover"
   }
 }

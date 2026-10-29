@@ -1,13 +1,13 @@
 // تعديل صورة قبل الرفع (شعار، أيقونة، منتج): قص يدوي (إطار بزوايا تُسحب) + إزالة الخلفية البيضاء، والناتج PNG شفاف
-// kind: logo | favicon (قص مربع) | image
+// kind: logo | favicon | cover | cover_mobile | image — النسبة من EDIT_RATIO
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, RotateCcw, X } from 'lucide-react';
-import { dragRect, fitRect, removeWhite } from '../lib/logoEdit';
+import { EDIT_RATIO, dragRect, fitRect, removeWhite } from '../lib/logoEdit';
 import { Toggle } from './product';
 
 const MAX_SIDE = 1600; // نفس أقصى مقاس يحفظه الخادم
-const RATIO = { favicon: 1 };
+const KEEP_PNG = ['logo', 'favicon'];
 const HANDLES = { nw: 'top-0 left-0 -translate-x-1/2 -translate-y-1/2 cursor-nwse-resize', ne: 'top-0 right-0 translate-x-1/2 -translate-y-1/2 cursor-nesw-resize', sw: 'bottom-0 left-0 -translate-x-1/2 translate-y-1/2 cursor-nesw-resize', se: 'bottom-0 right-0 translate-x-1/2 translate-y-1/2 cursor-nwse-resize' };
 const CHECKER = { backgroundImage: 'repeating-conic-gradient(#e5e7eb 0% 25%, #fff 0% 50%)', backgroundSize: '16px 16px' };
 
@@ -30,7 +30,7 @@ function loadSource(file) {
 
 /** onDone(file, changed): changed = false إذا لم يُقص ولم تُزل الخلفية */
 export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) {
-  const ratio = RATIO[kind];
+  const ratio = EDIT_RATIO[kind];
   const { t } = useTranslation();
   const [src, setSrc] = useState(null);
   const [rect, setRect] = useState(null);
@@ -74,13 +74,18 @@ export default function ImageEditor({ file, kind = 'image', onDone, onCancel }) 
 
   const save = async () => {
     setSaving(true);
+    // صورة (غلاف/منتج) بلا إزالة خلفية → JPEG حتى لا تتجاوز حد الرفع؛ الشعار والأيقونة والمُزالة خلفيتها → PNG شفاف
+    const jpeg = !clean && !KEEP_PNG.includes(kind);
     const out = document.createElement('canvas');
     out.width = rect.w; out.height = rect.h;
-    out.getContext('2d').drawImage(view.current, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-    const blob = await new Promise((res) => out.toBlob(res, 'image/png'));
+    const ctx = out.getContext('2d');
+    if (jpeg) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, rect.w, rect.h); }
+    ctx.drawImage(view.current, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+    const type = jpeg ? 'image/jpeg' : 'image/png';
+    const blob = await new Promise((res) => out.toBlob(res, type, 0.9));
     if (!blob) { setSaving(false); return; }
     const changed = clean || rect.x !== 0 || rect.y !== 0 || rect.w !== src.width || rect.h !== src.height;
-    onDone(new File([blob], `${file.name.replace(/\.\w+$/, '') || 'image'}.png`, { type: 'image/png' }), changed);
+    onDone(new File([blob], `${file.name.replace(/\.\w+$/, '') || 'image'}.${jpeg ? 'jpg' : 'png'}`, { type }), changed);
   };
 
   const pct = (v, total) => `${(v / total) * 100}%`;

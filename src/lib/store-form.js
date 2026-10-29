@@ -5,7 +5,7 @@ export const EMPTY_STORE = {
   phone: '', whatsapp: '', email: '', wilaya: '', address: '',
   language: 'ar', currency: 'DZD', country: 'DZ',
   cart: false, supportQty: true, supportFreeShipping: false, freeShippingMinAmount: '',
-  showTopBar: true, topBarText: '', heroImage: null, heroTitle: '', heroSubtitle: '',
+  showTopBar: true, topBarText: '', heroImage: null, heroImageMobile: null, heroTitle: '', heroSubtitle: '',
 };
 
 /** نطاق فرعي من الاسم + لاحقة عشوائية (الحقل لا يظهر للتاجر، كما في اللوحة) */
@@ -27,7 +27,7 @@ export function storePayload(f, { subdomain }) {
     design: { primaryColor: f.primaryColor, secondaryColor: f.secondaryColor, logoUrl: f.logo || null, faviconUrl: f.favicon || null, showStoreName: !!f.showStoreName },
     topBar: { enabled: !!f.showTopBar, text: s(f.topBarText), color: f.primaryColor },
     contact: { email: s(f.email) || null, phone: s(f.phone) || null, whatsapp: s(f.whatsapp).replace(/[\s-]/g, '') || null, wilaya: f.wilaya || null, address: s(f.address) || null },
-    hero: { imageUrl: f.heroImage || null, title: s(f.heroTitle), subtitle: s(f.heroSubtitle) },
+    hero: { imageUrl: f.heroImage || null, mobileImageUrl: f.heroImageMobile || null, title: s(f.heroTitle), subtitle: s(f.heroSubtitle) },
   };
 }
 
@@ -41,5 +41,5 @@ export const storeToForm = (st) => ({
   cart: !!st.cart, supportQty: st.supportQty ?? true, supportFreeShipping: !!st.supportFreeShipping,
   freeShippingMinAmount: st.freeShippingMinAmount == null ? '' : String(st.freeShippingMinAmount),
   showTopBar: st.topBar?.enabled ?? true, topBarText: st.topBar?.text || '',
-  heroImage: st.hero?.imageUrl || null, heroTitle: st.hero?.title || '', heroSubtitle: st.hero?.subtitle || '',
+  heroImage: st.hero?.imageUrl || null, heroImageMobile: st.hero?.mobileImageUrl || null, heroTitle: st.hero?.title || '', heroSubtitle: st.hero?.subtitle || '',
 });
