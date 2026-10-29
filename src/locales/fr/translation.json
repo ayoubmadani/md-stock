@@ -568,7 +568,8 @@
     "switched": "Boutique : {{name}}",
     "show_name": "Afficher le nom de la boutique à côté du logo",
     "logo": "Logo",
-    "site_preview": "Aperçu de l'en-tête du site"
+    "site_preview": "Aperçu de l'en-tête du site",
+    "site_preview_hint": "Voici le haut de votre boutique tel que le voient vos clients. Activez « Afficher le nom de la boutique à côté du logo » pour afficher les deux, ou désactivez-le pour le logo seul. Sans logo, seul le nom s'affiche."
   },
   "themes": {
     "current": "Thème actuel",

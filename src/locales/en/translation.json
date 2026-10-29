@@ -568,7 +568,8 @@
     "switched": "Switched to {{name}}",
     "show_name": "Show the store name next to the logo",
     "logo": "Logo",
-    "site_preview": "Site header preview"
+    "site_preview": "Site header preview",
+    "site_preview_hint": "This is how the top of your store looks to customers. Turn on \"Show the store name next to the logo\" to show both, or off for the logo alone. Without a logo, the name shows alone."
   },
   "themes": {
     "current": "Current theme",

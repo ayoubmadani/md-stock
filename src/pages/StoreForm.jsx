@@ -24,7 +24,7 @@ function ImagePick({ value, onPick, onClear, wide, small, fill }) {
 }
 
 // معاينة أعلى الموقع: الشعار، واسم المتجر بجانبه إذا فُعّل (أو الاسم وحده بدون شعار كما تفعل الثيمات)
-function LogoPreview({ f, label }) {
+function LogoPreview({ f, label, hint }) {
   if (!f.logo && !f.name.trim()) return null;
   const name = f.name.trim() && (f.showStoreName || !f.logo) ? f.name.trim() : '';
   return (
@@ -37,6 +37,7 @@ function LogoPreview({ f, label }) {
         </span>
         <span className="flex gap-1.5 shrink-0">{[0, 1, 2].map((i) => <span key={i} className="w-7 h-7 rounded-lg bg-gray-100" />)}</span>
       </div>
+      <p className="text-[11px] text-gray-400">{hint}</p>
     </div>
   );
 }
@@ -109,12 +110,12 @@ export default function StoreForm({ onboarding = false }) {
             </div>
           ))}
         </div>
-        <LogoPreview f={f} label={t('stores.site_preview')} />
         <div className="space-y-1.5">
           <label className={label}>{t('stores.name')}</label>
           <input value={f.name} onChange={set('name')} className={input} autoFocus={isNew} />
           {!isNew && subdomain && <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{subdomain}.mdstore.top</p>}
         </div>
+        <LogoPreview f={f} label={t('stores.site_preview')} hint={t('stores.site_preview_hint')} />
         <div className="grid grid-cols-2 gap-3">
           {['primaryColor', 'secondaryColor'].map((k) => (
             <label key={k} className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-zinc-800 p-2">
