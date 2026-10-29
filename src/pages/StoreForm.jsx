@@ -10,14 +10,14 @@ import { EMPTY_STORE, generateSubdomain, storePayload, storeToForm } from '../li
 import ImageLibrary from '../components/ImageLibrary';
 import { Section, Toggle, input, label } from '../components/product';
 
-function ImagePick({ value, onPick, onClear, wide, small }) {
+function ImagePick({ value, onPick, onClear, wide, small, fill }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex items-center gap-3">
-      <button type="button" onClick={() => setOpen(true)} className={`${wide ? 'w-full aspect-[16/7]' : small ? 'w-12 h-12' : 'w-20 h-20'} rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center text-gray-400 bg-gray-50 dark:bg-zinc-950`}>
+    <div className={`relative ${fill ? 'w-full' : 'flex items-center gap-3'}`}>
+      <button type="button" onClick={() => setOpen(true)} className={`${wide ? 'w-full aspect-[16/7]' : fill ? 'w-full h-20 p-1.5' : small ? 'w-12 h-12' : 'w-20 h-20'} rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center text-gray-400 bg-gray-50 dark:bg-zinc-950`}>
         {value ? <img src={value} alt="" className={`w-full h-full ${wide ? 'object-cover' : 'object-contain'}`} /> : <ImagePlus className="w-6 h-6" />}
       </button>
-      {value && !wide && <button type="button" onClick={onClear} className="text-xs text-rose-500">✕</button>}
+      {value && !wide && <button type="button" onClick={onClear} className={fill ? 'absolute -top-2 -end-2 w-6 h-6 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center' : 'text-xs text-rose-500'}>✕</button>}
       {open && <ImageLibrary folder="store" max={1} onPick={([u]) => { setOpen(false); onPick(u); }} onClose={() => setOpen(false)} />}
     </div>
   );
@@ -85,7 +85,7 @@ export default function StoreForm({ onboarding = false }) {
         <div className="grid grid-cols-2 gap-3">
           {[['logo', t('stores.logo')], ['favicon', t('stores.favicon'), t('stores.favicon_hint')]].map(([k, title, hint]) => (
             <div key={k} className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 p-3 text-center">
-              <ImagePick value={f[k]} onPick={set(k)} onClear={() => set(k)(null)} />
+              <ImagePick value={f[k]} onPick={set(k)} onClear={() => set(k)(null)} fill />
               <p className="text-sm font-semibold">{title}</p>
               {hint && <p className="text-[11px] text-gray-400">{hint}</p>}
             </div>
