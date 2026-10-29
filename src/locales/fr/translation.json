@@ -186,7 +186,8 @@
       "custom_color": "Couleur personnalisée",
       "multi_hint": "Choisissez une ou plusieurs couleurs, puis Ajouter.",
       "add_custom": "Ajouter cette couleur",
-      "add_n_colors": "Ajouter ({{count}})"
+      "add_n_colors": "Ajouter ({{count}})",
+      "none_picked": "Aucune couleur choisie"
     },
     "offer": {
       "title": "Offres",

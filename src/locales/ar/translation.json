@@ -186,7 +186,8 @@
       "custom_color": "لون مخصص",
       "multi_hint": "اختر لوناً أو أكثر ثم اضغط «أضف».",
       "add_custom": "أضف هذا اللون",
-      "add_n_colors": "أضف ({{count}})"
+      "add_n_colors": "أضف ({{count}})",
+      "none_picked": "لم تختر لوناً بعد"
     },
     "offer": {
       "title": "العروض",

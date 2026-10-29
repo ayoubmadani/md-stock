@@ -186,7 +186,8 @@
       "custom_color": "Custom colour",
       "multi_hint": "Pick one or more colours, then tap Add.",
       "add_custom": "Add this colour",
-      "add_n_colors": "Add ({{count}})"
+      "add_n_colors": "Add ({{count}})",
+      "none_picked": "No colour picked yet"
     },
     "offer": {
       "title": "Offers",

@@ -150,8 +150,10 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
               className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600"><Plus className="w-4 h-4" /></button>
           )}
         </div>
-        {!editing && picked.length > 0 && (
-          <div className="shrink-0 flex gap-1.5 overflow-x-auto" dir="ltr">
+        {!editing && (
+          // الألوان المختارة: إطار ثابت بارتفاع سطرين، وما زاد يتمرر داخله
+          <div className="shrink-0 h-[80px] p-2 rounded-xl border border-dashed border-gray-200 dark:border-zinc-700 overflow-y-auto overscroll-contain flex flex-wrap content-start gap-1.5" dir="ltr">
+            {picked.length === 0 && <span className="m-auto text-[11px] text-gray-400" dir="auto">{t('product.attr.none_picked')}</span>}
             {picked.map((c) => (
               <button key={c} type="button" onClick={() => toggle(c)} className="shrink-0 w-7 h-7 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: c }} aria-label={c} />
             ))}
