@@ -89,6 +89,14 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
   const [editing, setEditing] = useState(null);
   const receive = (files) => (edit && files?.length ? setEditing(files[0]) : upload(files));
 
+  // صورة من المكتبة: نجلب بايتاتها عبر الـ API (R2 يمنع المتصفح من قراءة البكسلات) ثم المحرر؛ إن تعذّر تُختار كما هي
+  const editExisting = async (img) => {
+    try {
+      const { data } = await api.get(`/images/${img.id}/raw`, { responseType: 'blob' });
+      setEditing(new File([data], (img.url.split('/').pop() || 'logo').replace(/\?.*$/, ''), { type: data.type || 'image/png' }));
+    } catch { onPick([img.url]); }
+  };
+
   // لصق صورة منسوخة: زر «لصق» (الهاتف) أو Ctrl+V (الحاسوب)
   const paste = async () => {
     try {
@@ -163,7 +171,7 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = fals
                     const n = selected.indexOf(img.url);
                     return (
                       <div key={img.id || img.url} className="relative aspect-square">
-                        <button type="button" onClick={() => (manage ? remove(img) : toggle(img.url))}
+                        <button type="button" onClick={() => (manage ? remove(img) : edit ? editExisting(img) : toggle(img.url))}
                           className={`w-full h-full rounded-xl overflow-hidden border-2 ${n >= 0 ? 'border-indigo-500' : 'border-transparent'}`}>
                           <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover bg-gray-100 dark:bg-zinc-800" />
                         </button>
