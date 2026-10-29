@@ -119,12 +119,14 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
   const save = () => (editing ? onSave(value) : onSave(picked.length ? picked : [value]));
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-4 space-y-3 max-h-[90dvh] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md h-[80dvh] sm:h-[640px] flex flex-col p-4 gap-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between">
           <p className="font-bold">{t(editing ? 'product.attr.edit_color' : 'product.attr.add_color_btn')}</p>
           <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
         </div>
         {!editing && <p className="text-[11px] text-gray-400">{t('product.attr.multi_hint')}</p>}
+        {/* الألوان تتمرر داخل النافذة؛ الرأس وزر الإضافة ثابتان */}
+        <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 py-1 space-y-3 overscroll-contain">
         <div className="space-y-1.5" dir="ltr">
           {COLOR_PALETTE.map((row) => (
             <div key={row[0]} className="grid grid-cols-5 gap-1.5">
@@ -154,7 +156,8 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
             ))}
           </div>
         )}
-        <div className="flex items-center gap-3">
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
           {editing && <span className="w-11 h-11 rounded-xl border border-gray-200 dark:border-zinc-700 shrink-0" style={{ backgroundColor: value }} />}
           <button type="button" onClick={save} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">
             {editing ? t('inventory.save') : t('product.attr.add_n_colors', { count: picked.length || 1 })}
