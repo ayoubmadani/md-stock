@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages } from './product-form.js';
+import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages, COLOR_PALETTE, replaceValue, addValues } from './product-form.js';
 
 const base = { name: 'قميص', price: '2500', priceOriginal: '', desc: '<p>x</p>', categoryId: '', shippingFree: false, isDigital: false, isActive: true, stock: '7', barcode: ' 123 ' };
 const attr = { id: 'att-1', type: 'size', name: 'المقاس', variants: [{ id: 'var-1', name: 'M', value: 'M' }] };
@@ -70,5 +70,29 @@ describe('ربط اللون بصورة من صور المنتج', () => {
     const out = pruneVariantImages(attrs, ['A']);
     expect(out[0].variants[1].imageUrl).toBeNull();
     expect(pruneVariantImages(attrs, ['B'])).toBe(attrs); // لا تغيير → نفس المرجع
+  });
+});
+
+describe('نافذة الألوان', () => {
+  it('palette: rows of shades, all valid hex, no duplicates', () => {
+    const all = COLOR_PALETTE.flat();
+    expect(COLOR_PALETTE.length).toBeGreaterThanOrEqual(8);
+    expect(all.every((c) => /^#[0-9a-f]{6}$/.test(c))).toBe(true);
+    expect(new Set(all).size).toBe(all.length);
+  });
+  it('replaceValue edits one value and keeps its id and linked image', () => {
+    const attr = { variants: [{ id: 'v1', name: '#ff0000', value: '#ff0000', imageUrl: 'A' }, { id: 'v2', name: '#0000ff', value: '#0000ff' }] };
+    const out = replaceValue(attr, 'v1', '#00ff00');
+    expect(out.variants[0]).toEqual({ id: 'v1', name: '#00ff00', value: '#00ff00', imageUrl: 'A' });
+    expect(replaceValue(attr, 'v1', '#0000ff')).toBeNull(); // لون موجود في قيمة أخرى
+  });
+});
+
+describe('إضافة عدة ألوان مرة واحدة', () => {
+  it('adds the new ones in order and skips existing or repeated', () => {
+    const attr = { variants: [{ id: 'v1', name: '#ff0000', value: '#ff0000' }] };
+    const out = addValues(attr, ['#00ff00', '#ff0000', '#0000ff', '#00ff00']);
+    expect(out.variants.map((v) => v.value)).toEqual(['#ff0000', '#00ff00', '#0000ff']);
+    expect(new Set(out.variants.map((v) => v.id)).size).toBe(3);
   });
 });

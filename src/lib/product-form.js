@@ -76,3 +76,30 @@ export function pruneVariantImages(attributes, images) {
   if (!attributes.some((a) => a.variants.some(stale))) return attributes;
   return attributes.map((a) => ({ ...a, variants: a.variants.map((v) => (stale(v) ? { ...v, imageUrl: null } : v)) }));
 }
+
+/** ألوان جاهزة لنافذة اختيار اللون: كل سطر درجات لون واحد (فاتح → غامق) */
+export const COLOR_PALETTE = [
+  ['#ffffff', '#e5e7eb', '#9ca3af', '#4b5563', '#000000'],
+  ['#fecaca', '#f87171', '#ef4444', '#b91c1c', '#7f1d1d'],
+  ['#fed7aa', '#fb923c', '#f97316', '#c2410c', '#7c2d12'],
+  ['#fef08a', '#facc15', '#eab308', '#a16207', '#713f12'],
+  ['#bbf7d0', '#4ade80', '#22c55e', '#15803d', '#14532d'],
+  ['#a5f3fc', '#22d3ee', '#06b6d4', '#0e7490', '#164e63'],
+  ['#bfdbfe', '#60a5fa', '#3b82f6', '#1d4ed8', '#1e3a8a'],
+  ['#ddd6fe', '#a78bfa', '#8b5cf6', '#6d28d9', '#4c1d95'],
+  ['#fbcfe8', '#f472b6', '#ec4899', '#be185d', '#831843'],
+  ['#f5e6d3', '#d4a373', '#a47148', '#7f5539', '#4a2c1a'],
+];
+
+/** تعديل قيمة (لون) مع إبقاء معرّفها وصورتها المربوطة؛ null إن كانت القيمة الجديدة لقيمة أخرى */
+export function replaceValue(attr, id, value) {
+  if (attr.variants.some((v) => v.id !== id && v.value === value)) return null;
+  return { ...attr, variants: attr.variants.map((v) => (v.id === id ? { ...v, name: value, value } : v)) };
+}
+
+/** إضافة عدة قيم دفعة واحدة (مثلاً ألوان من النافذة)، بلا تكرار */
+export function addValues(attr, values) {
+  const seen = new Set(attr.variants.map((v) => v.value));
+  const fresh = values.filter((v) => !seen.has(v) && seen.add(v));
+  return { ...attr, variants: [...attr.variants, ...fresh.map(newValue)] };
+}

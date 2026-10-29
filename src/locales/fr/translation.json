@@ -180,7 +180,13 @@
       "duplicate_value": "Cette valeur existe déjà",
       "link_image": "Associer une image à cette couleur",
       "pick_image": "Image de cette couleur",
-      "unlink_image": "Sans image"
+      "unlink_image": "Sans image",
+      "add_color_btn": "Ajouter une couleur",
+      "edit_color": "Modifier la couleur",
+      "custom_color": "Couleur personnalisée",
+      "multi_hint": "Choisissez une ou plusieurs couleurs, puis Ajouter.",
+      "add_custom": "Ajouter cette couleur",
+      "add_n_colors": "Ajouter ({{count}})"
     },
     "offer": {
       "title": "Offres",

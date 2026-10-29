@@ -180,7 +180,13 @@
       "duplicate_value": "هذه القيمة موجودة",
       "link_image": "اربط صورة بهذا اللون",
       "pick_image": "صورة هذا اللون",
-      "unlink_image": "بدون صورة"
+      "unlink_image": "بدون صورة",
+      "add_color_btn": "أضف لوناً",
+      "edit_color": "تعديل اللون",
+      "custom_color": "لون مخصص",
+      "multi_hint": "اختر لوناً أو أكثر ثم اضغط «أضف».",
+      "add_custom": "أضف هذا اللون",
+      "add_n_colors": "أضف ({{count}})"
     },
     "offer": {
       "title": "العروض",

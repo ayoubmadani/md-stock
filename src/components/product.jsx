@@ -1,10 +1,10 @@
 // أجزاء نموذج المنتج للهاتف: الصور، الوصف، الخصائص، النسخ، العروض
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage } from '../lib/product-form';
+import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage, COLOR_PALETTE, replaceValue, addValues } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -106,12 +106,71 @@ export function DescEditor({ value, onChange }) {
   );
 }
 
+/* ── نافذة الألوان: درجات جاهزة + لون مخصص. الإضافة تقبل عدة ألوان، والتعديل لوناً واحداً ── */
+function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
+  const { t } = useTranslation();
+  const [value, setValue] = useState(initial);
+  const [hex, setHex] = useState(initial);
+  const [picked, setPicked] = useState([]);
+  const setCurrent = (c) => { setValue(c); setHex(c); };
+  const toggle = (c) => setPicked((l) => (l.includes(c) ? l.filter((x) => x !== c) : [...l, c]));
+  const tap = (c) => { setCurrent(c); if (!editing) toggle(c); };
+  const on = (c) => (editing ? value === c : picked.includes(c));
+  const save = () => (editing ? onSave(value) : onSave(picked.length ? picked : [value]));
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-4 space-y-3 max-h-[90dvh] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center justify-between">
+          <p className="font-bold">{t(editing ? 'product.attr.edit_color' : 'product.attr.add_color_btn')}</p>
+          <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+        </div>
+        {!editing && <p className="text-[11px] text-gray-400">{t('product.attr.multi_hint')}</p>}
+        <div className="space-y-1.5" dir="ltr">
+          {COLOR_PALETTE.map((row) => (
+            <div key={row[0]} className="grid grid-cols-5 gap-1.5">
+              {row.map((c) => (
+                <button key={c} type="button" onClick={() => tap(c)} aria-label={c} disabled={!editing && existing.includes(c)}
+                  className={`relative h-9 rounded-lg border border-gray-200 dark:border-zinc-700 disabled:opacity-30 ${on(c) ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-zinc-900' : ''}`} style={{ backgroundColor: c }}>
+                  {on(c) && !editing && <Check className="absolute inset-0 m-auto w-4 h-4" style={{ color: ['#ffffff', '#e5e7eb', '#fef08a', '#fed7aa', '#bbf7d0', '#a5f3fc', '#f5e6d3', '#fecaca', '#bfdbfe', '#ddd6fe', '#fbcfe8', '#facc15'].includes(c) ? '#111' : '#fff' }} />}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-zinc-700 p-2">
+          <span className="text-xs font-semibold text-gray-500 flex-1">{t('product.attr.custom_color')}</span>
+          <input type="color" value={value} onChange={(e) => setCurrent(e.target.value)} className="w-10 h-9 rounded-lg bg-transparent border-0 p-0" />
+          <input value={hex} dir="ltr" maxLength={7} onChange={(e) => { const h = e.target.value.trim(); setHex(h); if (/^#[0-9a-fA-F]{6}$/.test(h)) setValue(h.toLowerCase()); }}
+            className="w-24 px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-sm font-mono" />
+          {!editing && (
+            <button type="button" onClick={() => !picked.includes(value) && !existing.includes(value) && setPicked((l) => [...l, value])} aria-label={t('product.attr.add_custom')}
+              className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600"><Plus className="w-4 h-4" /></button>
+          )}
+        </div>
+        {!editing && picked.length > 0 && (
+          <div className="flex flex-wrap gap-1.5" dir="ltr">
+            {picked.map((c) => (
+              <button key={c} type="button" onClick={() => toggle(c)} className="w-7 h-7 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: c }} aria-label={c} />
+            ))}
+          </div>
+        )}
+        <div className="flex items-center gap-3">
+          {editing && <span className="w-11 h-11 rounded-xl border border-gray-200 dark:border-zinc-700 shrink-0" style={{ backgroundColor: value }} />}
+          <button type="button" onClick={save} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">
+            {editing ? t('inventory.save') : t('product.attr.add_n_colors', { count: picked.length || 1 })}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── خاصية واحدة وقيمها ── */
 function AttributeCard({ attr, images = [], onChange, onRemove }) {
   const { t } = useTranslation();
   const [pickFor, setPickFor] = useState(null); // قيمة لون تُربط بصورة من صور المنتج
   const [text, setText] = useState('');
-  const [color, setColor] = useState('#000000');
+  const [colorSheet, setColorSheet] = useState(null); // { id?, value } — إضافة لون أو تعديله
   const [library, setLibrary] = useState(false);
   const mode = attr.type === 'color' ? attr.displayMode || 'color' : 'text';
   const addValue = (v) => {
@@ -137,7 +196,7 @@ function AttributeCard({ attr, images = [], onChange, onRemove }) {
       <div className="flex flex-wrap gap-1.5">
         {attr.variants.map((v) => (
           <span key={v.id} className="inline-flex items-center gap-1 ps-1 pe-1.5 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 text-sm">
-            {mode === 'color' ? <span className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
+            {mode === 'color' ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value })} aria-label={t('product.attr.edit_color')} className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
               : mode === 'image' ? <img src={v.value} alt="" className="w-8 h-8 rounded-md object-cover" />
                 : <span className="px-1.5 font-semibold">{v.value}</span>}
             {mode === 'color' && images.length > 0 && (
@@ -180,11 +239,18 @@ function AttributeCard({ attr, images = [], onChange, onRemove }) {
         </div>
       )}
       {mode === 'color' && (
-        <div className="flex gap-2 items-center">
-          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-12 h-10 rounded-lg border border-gray-200 dark:border-zinc-700 bg-transparent" />
-          <span className="text-xs text-gray-400 flex-1" dir="ltr">{color}</span>
-          <button type="button" onClick={() => addValue(color)} className="flex items-center gap-1 px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold"><Plus className="w-4 h-4" />{t('product.attr.add_color')}</button>
-        </div>
+        <button type="button" onClick={() => setColorSheet({ value: '#000000' })} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+          <Palette className="w-4 h-4" />{t('product.attr.add_color_btn')}
+        </button>
+      )}
+      {colorSheet && (
+        <ColorSheet initial={colorSheet.value} editing={!!colorSheet.id} existing={attr.variants.map((v) => v.value)} onClose={() => setColorSheet(null)}
+          onSave={(value) => {
+            if (!colorSheet.id) { onChange(addValues(attr, value)); setColorSheet(null); return; }
+            const next = replaceValue(attr, colorSheet.id, value);
+            if (!next) { toast.error(t('product.attr.duplicate_value')); return; }
+            onChange(next); setColorSheet(null);
+          }} />
       )}
       {mode === 'image' && (
         <>

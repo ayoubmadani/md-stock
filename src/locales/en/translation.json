@@ -180,7 +180,13 @@
       "duplicate_value": "This value already exists",
       "link_image": "Link an image to this colour",
       "pick_image": "Image for this colour",
-      "unlink_image": "No image"
+      "unlink_image": "No image",
+      "add_color_btn": "Add a colour",
+      "edit_color": "Edit colour",
+      "custom_color": "Custom colour",
+      "multi_hint": "Pick one or more colours, then tap Add.",
+      "add_custom": "Add this colour",
+      "add_n_colors": "Add ({{count}})"
     },
     "offer": {
       "title": "Offers",
