@@ -191,8 +191,8 @@ function AttributeCard({ attr, images = [], onChange, onRemove }) {
         <button type="button" onClick={onRemove} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>
       </div>
       {attr.type === 'color' && (
-        <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-800">
-          {['color', 'image'].map((m) => (
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-800">
+          {['color', 'image', 'text'].map((m) => (
             <button key={m} type="button" onClick={() => mode !== m && onChange({ ...attr, displayMode: m, variants: [] })}
               className={`py-1.5 rounded-lg text-xs font-bold ${mode === m ? 'bg-white dark:bg-zinc-900 shadow-sm' : 'text-gray-500'}`}>{t(`product.attr.mode_${m}`)}</button>
           ))}

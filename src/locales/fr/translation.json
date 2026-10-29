@@ -188,7 +188,8 @@
       "add_custom": "Ajouter cette couleur",
       "add_n_colors": "Ajouter ({{count}})",
       "none_picked": "Aucune couleur choisie",
-      "no_product_images": "Ajoutez d'abord les images du produit (section Images), puis associez chaque couleur à son image."
+      "no_product_images": "Ajoutez d'abord les images du produit (section Images), puis associez chaque couleur à son image.",
+      "mode_text": "Texte"
     },
     "offer": {
       "title": "Offres",
