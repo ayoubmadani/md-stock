@@ -2,8 +2,11 @@
 import { api } from './api';
 
 // نفس إعدادات الضغط في اللوحة: صور النسخ أصغر
-// store: شعار/غلاف المتجر يُرفع كما هو (الشعار PNG بخلفية شفافة)
-export const COMPRESS = { products: { max: 1920, quality: 0.8 }, productVariant: { max: 600, quality: 0.75 }, category: { max: 1920, quality: 0.8 }, store: null };
+// store/logo/favicon/hero: صور المتجر تُرفع كما هي (الشعار PNG بخلفية شفافة)
+export const COMPRESS = { products: { max: 1920, quality: 0.8 }, productVariant: { max: 600, quality: 0.75 }, category: { max: 1920, quality: 0.8 }, store: null, logo: null, favicon: null, hero: null };
+
+// صور المتجر: مجلد لكل نوع (نفس لوحة التاجر) حتى لا تختلط في المكتبة
+export const STORE_IMAGE_FOLDER = { logo: 'logo', favicon: 'favicon', cover: 'hero', cover_mobile: 'hero' };
 export const ACCEPT = 'image/jpeg,image/png,image/gif,image/webp';
 
 /** تصغير الصورة في المتصفح قبل الرفع (JPEG بخلفية بيضاء)؛ GIF يبقى كما هو */

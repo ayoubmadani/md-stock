@@ -11,7 +11,7 @@ import { clipboardImages, pastedImages } from '../lib/clipboard';
 
 const PAGE = 18;
 /**
- * folder: products | productVariant | category | store
+ * folder: products | productVariant | category | store | logo | favicon | hero
  * max: كم صورة يمكن اختيارها (1 = اختيار مباشر بالضغط)
  * onPick(urls[])
  */

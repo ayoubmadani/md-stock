@@ -296,7 +296,10 @@
     "paste": "Coller",
     "paste_empty": "Aucune image copiée",
     "paste_failed": "Impossible de lire l'image copiée — autorisez l'accès au presse-papiers ou recopiez l'image",
-    "title_store": "Images de la boutique"
+    "title_store": "Images de la boutique",
+    "title_logo": "Logos",
+    "title_favicon": "Favicons",
+    "title_hero": "Images de couverture"
   },
   "categories": {
     "new": "Nouvelle catégorie",

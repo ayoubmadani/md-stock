@@ -8,6 +8,7 @@ import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { EMPTY_STORE, generateSubdomain, storePayload, storeToForm } from '../lib/store-form';
 import ImageLibrary from '../components/ImageLibrary';
+import { STORE_IMAGE_FOLDER } from '../lib/upload';
 import { Section, Toggle, input, label } from '../components/product';
 
 function ImagePick({ value, onPick, onClear, wide, tall, small, fill, edit }) {
@@ -18,7 +19,7 @@ function ImagePick({ value, onPick, onClear, wide, tall, small, fill, edit }) {
         {value ? <img src={value} alt="" className={`w-full h-full ${wide || tall ? 'object-cover' : 'object-contain'}`} /> : <ImagePlus className="w-6 h-6" />}
       </button>
       {value && !wide && !tall && <button type="button" onClick={onClear} className={fill ? 'absolute -top-2 -end-2 w-6 h-6 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center' : 'text-xs text-rose-500'}>✕</button>}
-      {open && <ImageLibrary folder="store" max={1} edit={edit} onPick={([u]) => { setOpen(false); onPick(u); }} onClose={() => setOpen(false)} />}
+      {open && <ImageLibrary folder={STORE_IMAGE_FOLDER[edit] || 'store'} max={1} edit={edit} onPick={([u]) => { setOpen(false); onPick(u); }} onClose={() => setOpen(false)} />}
     </div>
   );
 }

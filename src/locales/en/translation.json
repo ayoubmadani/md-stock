@@ -296,7 +296,10 @@
     "paste": "Paste",
     "paste_empty": "No copied image",
     "paste_failed": "Could not read the copied image — allow clipboard access or copy the image again",
-    "title_store": "Store images"
+    "title_store": "Store images",
+    "title_logo": "Logos",
+    "title_favicon": "Favicons",
+    "title_hero": "Cover images"
   },
   "categories": {
     "new": "New category",
