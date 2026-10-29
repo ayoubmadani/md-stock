@@ -125,8 +125,8 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
           <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
         </div>
         {!editing && <p className="text-[11px] text-gray-400">{t('product.attr.multi_hint')}</p>}
-        {/* الألوان تتمرر داخل النافذة؛ الرأس وزر الإضافة ثابتان */}
-        <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 py-1 space-y-3 overscroll-contain">
+        {/* الألوان وحدها تتمرر؛ الرأس واللون المخصص والمختارة وزر الإضافة ثابتة */}
+        <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 py-1 overscroll-contain">
         <div className="space-y-1.5" dir="ltr">
           {COLOR_PALETTE.map((row) => (
             <div key={row[0]} className="grid grid-cols-5 gap-1.5">
@@ -139,7 +139,8 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-zinc-700 p-2">
+        </div>
+        <div className="shrink-0 flex items-center gap-2 rounded-xl border border-gray-200 dark:border-zinc-700 p-2">
           <span className="text-xs font-semibold text-gray-500 flex-1">{t('product.attr.custom_color')}</span>
           <input type="color" value={value} onChange={(e) => setCurrent(e.target.value)} className="w-10 h-9 rounded-lg bg-transparent border-0 p-0" />
           <input value={hex} dir="ltr" maxLength={7} onChange={(e) => { const h = e.target.value.trim(); setHex(h); if (/^#[0-9a-fA-F]{6}$/.test(h)) setValue(h.toLowerCase()); }}
@@ -150,13 +151,12 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
           )}
         </div>
         {!editing && picked.length > 0 && (
-          <div className="flex flex-wrap gap-1.5" dir="ltr">
+          <div className="shrink-0 flex gap-1.5 overflow-x-auto" dir="ltr">
             {picked.map((c) => (
-              <button key={c} type="button" onClick={() => toggle(c)} className="w-7 h-7 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: c }} aria-label={c} />
+              <button key={c} type="button" onClick={() => toggle(c)} className="shrink-0 w-7 h-7 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: c }} aria-label={c} />
             ))}
           </div>
         )}
-        </div>
         <div className="flex items-center gap-3 shrink-0">
           {editing && <span className="w-11 h-11 rounded-xl border border-gray-200 dark:border-zinc-700 shrink-0" style={{ backgroundColor: value }} />}
           <button type="button" onClick={save} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">
