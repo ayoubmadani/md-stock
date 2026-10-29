@@ -187,7 +187,8 @@
       "multi_hint": "Choisissez une ou plusieurs couleurs, puis Ajouter.",
       "add_custom": "Ajouter cette couleur",
       "add_n_colors": "Ajouter ({{count}})",
-      "none_picked": "Aucune couleur choisie"
+      "none_picked": "Aucune couleur choisie",
+      "no_product_images": "Ajoutez d'abord les images du produit (section Images), puis associez chaque couleur à son image."
     },
     "offer": {
       "title": "Offres",
