@@ -346,7 +346,6 @@ export function OffersEditor({ offers, onChange }) {
             <input value={o.name} onChange={(e) => set(o.id, { name: e.target.value })} placeholder={t('product.offer.name')} className={`${small} flex-1 min-w-0`} />
             <button type="button" onClick={() => onChange(offers.filter((x) => x.id !== o.id))} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>
           </div>
-          <input value={o.subTitle || ''} onChange={(e) => set(o.id, { subTitle: e.target.value })} placeholder={t('product.offer.subtitle')} className={`${small} w-full`} />
           <div className="grid grid-cols-2 gap-2">
             <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('product.offer.quantity')}</span>
               <input type="number" inputMode="numeric" dir="ltr" value={o.quantity} onChange={(e) => set(o.id, { quantity: e.target.value })} className={`${small} w-full`} /></label>

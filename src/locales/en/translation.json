@@ -181,7 +181,6 @@
     "offer": {
       "title": "Offers",
       "name": "Offer name (e.g. 2 pieces)",
-      "subtitle": "Subtitle (optional)",
       "quantity": "Quantity",
       "price": "Price",
       "add": "Add offer"
