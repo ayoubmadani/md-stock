@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import CameraCapture from './CameraCapture';
 import { ACCEPT, COMPRESS, compress } from '../lib/upload';
+import LogoEditor from './LogoEditor';
 import { clipboardImages, pastedImages } from '../lib/clipboard';
 
 const PAGE = 18;
@@ -14,7 +15,7 @@ const PAGE = 18;
  * max: كم صورة يمكن اختيارها (1 = اختيار مباشر بالضغط)
  * onPick(urls[])
  */
-export default function ImageLibrary({ folder = 'products', max = 1, onPick, onClose }) {
+export default function ImageLibrary({ folder = 'products', max = 1, edit = false, onPick, onClose }) {
   const { t } = useTranslation();
   const [images, setImages] = useState(null);
   const [page, setPage] = useState(1);
@@ -84,15 +85,19 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
     else setSelected((s) => [...s, ...uploaded.map((u) => u.url).filter((u) => !s.includes(u))].slice(0, max));
   };
 
+  // edit: صورة جديدة تمرّ بمحرر الشعار (قص + إزالة الأبيض) قبل الرفع
+  const [editing, setEditing] = useState(null);
+  const receive = (files) => (edit && files?.length ? setEditing(files[0]) : upload(files));
+
   // لصق صورة منسوخة: زر «لصق» (الهاتف) أو Ctrl+V (الحاسوب)
   const paste = async () => {
     try {
       const files = await clipboardImages();
-      if (files.length) upload(files); else toast.error(t('library.paste_empty'));
+      if (files.length) receive(files); else toast.error(t('library.paste_empty'));
     } catch { toast.error(t('library.paste_failed')); }
   };
   const uploadRef = useRef(upload);
-  uploadRef.current = upload;
+  uploadRef.current = receive;
   useEffect(() => {
     if (camera) return undefined;
     const onPaste = (e) => { const files = pastedImages(e.clipboardData); if (files.length) { e.preventDefault(); uploadRef.current(files); } };
@@ -135,7 +140,7 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
             <div className="grid grid-cols-3 gap-2">
               <label className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer">
                 <ImagePlus className="w-5 h-5" />{t('library.from_gallery')}
-                <input type="file" accept={ACCEPT} multiple={multi} hidden onChange={(e) => { upload(e.target.files); e.target.value = ''; }} />
+                <input type="file" accept={ACCEPT} multiple={multi} hidden onChange={(e) => { receive([...e.target.files]); e.target.value = ''; }} />
               </label>
               <button type="button" onClick={() => setCamera(true)} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold">
                 <Camera className="w-5 h-5" />{t('library.from_camera')}
@@ -182,7 +187,8 @@ export default function ImageLibrary({ folder = 'products', max = 1, onPick, onC
             )}
         </div>
 
-        {camera && <CameraCapture onClose={() => setCamera(false)} onCapture={(file) => { setCamera(false); upload([file]); }} />}
+        {camera && <CameraCapture onClose={() => setCamera(false)} onCapture={(file) => { setCamera(false); receive([file]); }} />}
+        {editing && <LogoEditor file={editing} onCancel={() => setEditing(null)} onDone={(file) => { setEditing(null); upload([file]); }} />}
 
         {multi && (
           <div className="p-4 pt-0 pb-[max(1rem,env(safe-area-inset-bottom))]">

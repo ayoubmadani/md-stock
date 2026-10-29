@@ -1110,5 +1110,13 @@
     "time": "Heure",
     "added": "Tâche ajoutée",
     "other": "Autres"
+  },
+  "logo_editor": {
+    "title": "Modifier le logo",
+    "crop_hint": "Faites glisser les coins pour recadrer, ou le cadre pour le déplacer.",
+    "remove_white": "Supprimer le fond blanc",
+    "strength": "Intensité",
+    "reset": "Réinitialiser",
+    "save": "Enregistrer et envoyer"
   }
 }

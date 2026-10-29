@@ -1110,5 +1110,13 @@
     "time": "Time",
     "added": "Task added",
     "other": "Other"
+  },
+  "logo_editor": {
+    "title": "Edit logo",
+    "crop_hint": "Drag the corners to crop, or drag the frame to move it.",
+    "remove_white": "Remove white background",
+    "strength": "Strength",
+    "reset": "Reset",
+    "save": "Save & upload"
   }
 }
