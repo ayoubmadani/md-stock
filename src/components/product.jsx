@@ -204,7 +204,7 @@ function AttributeCard({ attr, images = [], onChange, onRemove }) {
             {mode === 'color' ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value })} aria-label={t('product.attr.edit_color')} className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
               : mode === 'image' ? <img src={v.value} alt="" className="w-8 h-8 rounded-md object-cover" />
                 : <span className="px-1.5 font-semibold">{v.value}</span>}
-            {mode === 'color' && (
+            {attr.type === 'color' && (
               <button type="button" onClick={() => setPickFor(v.id)} aria-label={t('product.attr.link_image')}
                 className="w-7 h-7 rounded-md overflow-hidden border border-dashed border-gray-300 dark:border-zinc-600 flex items-center justify-center text-gray-400">
                 {v.imageUrl ? <img src={v.imageUrl} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="w-3.5 h-3.5" />}
