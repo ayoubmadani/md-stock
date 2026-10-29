@@ -34,3 +34,15 @@ describe('storeToForm', () => {
     expect(form).toMatchObject({ name: 'B', phone: '05', logo: 'L', favicon: 'F', primaryColor: '#111111', showTopBar: false, topBarText: 't', heroTitle: 'h', supportQty: false, freeShippingMinAmount: '3000' });
   });
 });
+
+describe('showStoreName (اسم المتجر بجانب الشعار)', () => {
+  it('off by default and sent inside design', () => {
+    expect(EMPTY_STORE.showStoreName).toBe(false);
+    expect(storePayload({ ...EMPTY_STORE, showStoreName: true }, { subdomain: 'x' }).design.showStoreName).toBe(true);
+    expect(storePayload(EMPTY_STORE, { subdomain: 'x' }).design.showStoreName).toBe(false);
+  });
+  it('read back from the saved design', () => {
+    expect(storeToForm({ design: { showStoreName: true } }).showStoreName).toBe(true);
+    expect(storeToForm({ design: {} }).showStoreName).toBe(false);
+  });
+});

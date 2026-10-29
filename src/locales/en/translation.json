@@ -565,7 +565,8 @@
     "favicon": "Tab icon (favicon)",
     "favicon_hint": "Small square image shown in the browser tab",
     "shared": "Stores I'm a member of",
-    "switched": "Switched to {{name}}"
+    "switched": "Switched to {{name}}",
+    "show_name": "Show the store name next to the logo"
   },
   "themes": {
     "current": "Current theme",

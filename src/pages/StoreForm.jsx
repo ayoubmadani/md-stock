@@ -89,6 +89,7 @@ export default function StoreForm({ onboarding = false }) {
             {!isNew && subdomain && <p className="text-[11px] text-gray-400" dir="ltr" style={{ textAlign: 'start' }}>{subdomain}.mdstore.top</p>}
           </div>
         </div>
+        {f.logo && <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>}
         <div className="flex items-center gap-3">
           <ImagePick value={f.favicon} onPick={set('favicon')} onClear={() => set('favicon')(null)} small />
           <div className="min-w-0">
