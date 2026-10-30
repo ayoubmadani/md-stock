@@ -209,16 +209,15 @@ export default function DomainsPage() {
           </button>
         ))}
       </div>
-      {shown.length === 0
-        ? <div className="flex flex-col items-center gap-2 py-8 text-gray-400"><Globe className="w-8 h-8" /><p className="text-sm">{t('domains.empty')}</p></div>
-        : (
-          <div className={`${box} divide-y divide-gray-100 dark:divide-zinc-800`}>
-            {shown.map((d) => (
-              <DomainRow key={d.id} d={d} page={pages.find((p) => p.id === d.builderPageId)} busy={busy === d.id}
-                onCheck={() => check(d)} onLink={() => setLinking(d)} onUnlink={() => unlink(d)} onRemove={() => remove(d)} />
-            ))}
-          </div>
-        )}
+      {/* صندوق ثابت الارتفاع: التمرير داخله، فلا تقفز الصفحة عند تغيير التبويب */}
+      <div className={`${box} h-[340px] overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800`}>
+        {shown.length === 0
+          ? <div className="h-full flex flex-col items-center justify-center gap-2 text-gray-400"><Globe className="w-8 h-8" /><p className="text-sm">{t('domains.empty')}</p></div>
+          : shown.map((d) => (
+            <DomainRow key={d.id} d={d} page={pages.find((p) => p.id === d.builderPageId)} busy={busy === d.id}
+              onCheck={() => check(d)} onLink={() => setLinking(d)} onUnlink={() => unlink(d)} onRemove={() => remove(d)} />
+          ))}
+      </div>
 
       {full ? (
         <p className="rounded-xl bg-gray-100 dark:bg-zinc-900 px-4 py-3 text-center text-xs text-gray-500">
