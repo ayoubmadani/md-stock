@@ -147,7 +147,7 @@ export default function ProductRow({ p, storeId, onAdjust, onChanged, selecting,
           <span className="block font-semibold text-sm truncate"><bdi>{p.name}</bdi></span>
           <span className="flex items-center gap-1.5 mt-1">
             {off
-              ? <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${state === 'off' ? 'bg-red-50 text-red-600 dark:bg-red-500/10' : 'bg-gray-200 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300'}`}>{t(`inventory.state.${state}`)}</span>
+              ? <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${state === 'store_off' ? 'bg-red-50 text-red-600 dark:bg-red-500/10' : 'bg-gray-200 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300'}`}>{t(`inventory.state.${state}`)}</span>
               : <StatusBadge status={p.status} />}
             {p.variants.length > 0 && (
               <span className="text-[11px] text-gray-400 truncate">

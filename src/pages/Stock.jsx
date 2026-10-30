@@ -110,8 +110,8 @@ export default function StockPage({ only }) {
           <div className="grid grid-cols-3 gap-1.5">
             {[
               ['active', Power, 'bg-emerald-600 text-white'],
-              ['store_off', Store, 'bg-gray-100 dark:bg-zinc-800'],
-              ['off', Ban, 'bg-red-50 text-red-600 dark:bg-red-500/10'],
+              ['store_off', Store, 'bg-red-50 text-red-600 dark:bg-red-500/10'],
+              ['off', Ban, 'bg-gray-100 dark:bg-zinc-800'],
             ].map(([state, Icon, cls]) => (
               <button key={state} type="button" disabled={!picked.length || busy} onClick={() => setState(state)}
                 className={`flex flex-col items-center gap-1 px-1 py-2 rounded-xl text-xs font-bold disabled:opacity-40 ${cls}`}>
