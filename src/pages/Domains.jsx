@@ -1,13 +1,13 @@
 // الدومين: معلومات الربط في الأعلى، ثم تبويبات (روابط المتجر / المخصصة / صفحات الهبوط) بأزرار تحقق، ربط، فسخ، حذف
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronDown, Copy, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
+import { Check, Copy, Search, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { normalizeDomain } from '../lib/store-setup';
-import { DNS_RECORD, groupDomains } from '../lib/domains';
+import { DNS_RECORD, filterDomains, groupDomains } from '../lib/domains';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
 
@@ -82,9 +82,8 @@ export default function DomainsPage() {
   const [tab, setTab] = useState('store');
   const [pages, setPages] = useState([]);
   const [linking, setLinking] = useState(null); // الدومين الذي نختار له صفحة هبوط
-  // معلومات الربط: تُخفى وتُظهر، والاختيار يُحفظ على هذا الجهاز
-  const [infoOpen, setInfoOpen] = useState(() => { try { return localStorage.getItem('domains_info') !== 'hidden'; } catch { return true; } });
-  const toggleInfo = () => setInfoOpen((o) => { try { localStorage.setItem('domains_info', o ? 'hidden' : 'shown'); } catch { /* وضع خاص */ } return !o; });
+  const [info, setInfo] = useState(false); // نافذة معلومات الربط
+  const [q, setQ] = useState('');
 
   const load = useCallback(() => {
     api.get(`/domain/store/${storeId}`).then((r) => setDomains(r.data || [])).catch(() => setDomains([]));
@@ -169,7 +168,7 @@ export default function DomainsPage() {
   };
 
   if (!domains) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
-  const groups = groupDomains(domains);
+  const groups = groupDomains(filterDomains(domains, q, pages));
   const shown = groups[tab];
 
   return (
@@ -179,26 +178,11 @@ export default function DomainsPage() {
         {limit != null && <span className={`text-xs font-bold px-2 py-1 rounded-lg ${full ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`} dir="ltr">{domains.length} / {limit}</span>}
       </div>
 
-      {/* معلومات الربط: نفس السجل لكل الدومينات */}
-      <div className={`${box} border-indigo-200 dark:border-indigo-500/30 bg-gradient-to-b from-indigo-50/60 dark:from-indigo-500/10 p-4 space-y-3`}>
-        <button type="button" onClick={toggleInfo} aria-expanded={infoOpen} className="w-full flex items-start gap-3 text-start">
-          <span className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0"><Link2 className="w-5 h-5" /></span>
-          <span className="flex-1 min-w-0">
-            <span className="block font-bold">{t('domains.connect_title')}</span>
-            {infoOpen && <span className="block text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t('domains.connect_desc')}</span>}
-          </span>
-          <span className="shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100/70 dark:bg-indigo-500/15">
-            {infoOpen ? t('domains.hide_info') : t('domains.show_info')}<ChevronDown className={`w-3.5 h-3.5 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
-          </span>
-        </button>
-        {infoOpen && (
-          <>
-            <div className="rounded-xl bg-white dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
-              {DNS_RECORD.map(([k, v]) => <CopyRow key={k} label={t(`domains.field_${k}`)} value={v} />)}
-            </div>
-            <p className="text-[11px] text-gray-400">{t('domains.dns_note')}</p>
-          </>
-        )}
+      {/* معلومات الربط: سطر صغير، وزر «إظهار» يفتح نافذة السجل */}
+      <div className={`${box} border-indigo-200 dark:border-indigo-500/30 bg-gradient-to-b from-indigo-50/60 dark:from-indigo-500/10 px-3 py-2.5 flex items-center gap-3`}>
+        <span className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0"><Link2 className="w-4 h-4" /></span>
+        <p className="flex-1 font-bold text-sm">{t('domains.connect_title')}</p>
+        <button type="button" onClick={() => setInfo(true)} className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100/70 dark:bg-indigo-500/15">{t('domains.show_info')}</button>
       </div>
 
       {/* تبويبات القائمة */}
@@ -209,6 +193,12 @@ export default function DomainsPage() {
           </button>
         ))}
       </div>
+      <div className="relative">
+        <Search className="w-4 h-4 text-gray-400 absolute top-1/2 -translate-y-1/2 start-3 pointer-events-none" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} type="search" placeholder={t('domains.search')}
+          className="w-full ps-9 pe-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400" />
+      </div>
+
       {/* صندوق ثابت الارتفاع: التمرير داخله، فلا تقفز الصفحة عند تغيير التبويب */}
       <div className={`${box} h-[260px] overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800`}>
         {shown.length === 0
@@ -229,6 +219,24 @@ export default function DomainsPage() {
         </button>
       )}
 
+      {info && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && setInfo(false)}>
+          <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-start gap-3">
+              <span className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0"><Link2 className="w-5 h-5" /></span>
+              <div className="flex-1">
+                <p className="font-bold">{t('domains.connect_title')}</p>
+                <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t('domains.connect_desc')}</p>
+              </div>
+              <button type="button" onClick={() => setInfo(false)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
+              {DNS_RECORD.map(([k, v]) => <CopyRow key={k} label={t(`domains.field_${k}`)} value={v} />)}
+            </div>
+            <p className="text-[11px] text-gray-400">{t('domains.dns_note')}</p>
+          </div>
+        </div>
+      )}
       {linking && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && setLinking(null)}>
           <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[80dvh] flex flex-col pb-[max(1rem,env(safe-area-inset-bottom))]">

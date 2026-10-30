@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupDomains, DNS_RECORD } from './domains';
+import { groupDomains, filterDomains, DNS_RECORD } from './domains';
 
 describe('groupDomains', () => {
   const list = [
@@ -21,5 +21,19 @@ describe('groupDomains', () => {
 describe('DNS_RECORD', () => {
   it('has the four fields the registrar asks for', () => {
     expect(DNS_RECORD).toEqual([['type', 'CNAME'], ['host', '@'], ['value', 'mdstore.top'], ['ttl', 'Auto']]);
+  });
+});
+
+describe('filterDomains', () => {
+  const list = [
+    { id: 'a', domain: 'b4.mdstore.top', builderPageId: 'p1' },
+    { id: 'b', domain: 'coussin.mdstore.top' },
+    { id: 'c', domain: 'bebe-shop.com' },
+  ];
+  const pages = [{ id: 'p1', name: 'وسادة الرضيع' }];
+  it('matches the domain or its landing page name, ignoring case and spaces', () => {
+    expect(filterDomains(list, ' COUSSIN ', pages).map((d) => d.id)).toEqual(['b']);
+    expect(filterDomains(list, 'وسادة', pages).map((d) => d.id)).toEqual(['a']);
+    expect(filterDomains(list, '', pages)).toBe(list);
   });
 });

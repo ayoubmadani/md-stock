@@ -407,7 +407,8 @@
     "confirm_unlink": "Délier {{domain}} de la landing page ? Il affichera la boutique.",
     "hide_info": "Masquer",
     "show_info": "Afficher",
-    "copy": "Copier le lien"
+    "copy": "Copier le lien",
+    "search": "Rechercher un domaine ou une page…"
   },
   "camera": {
     "fallback": "Ouverture de l'appareil photo du téléphone…",

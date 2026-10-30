@@ -13,3 +13,11 @@ export function groupDomains(list) {
     pages: list.filter(isPage),
   };
 }
+
+/** بحث في الدومين أو اسم صفحة الهبوط المربوطة */
+export function filterDomains(list, q, pages = []) {
+  const s = String(q ?? '').trim().toLowerCase();
+  if (!s) return list;
+  const name = (d) => pages.find((p) => p.id === d.builderPageId)?.name ?? '';
+  return list.filter((d) => d.domain.toLowerCase().includes(s) || name(d).toLowerCase().includes(s));
+}
