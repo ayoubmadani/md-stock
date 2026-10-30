@@ -84,6 +84,7 @@ export default function DomainsPage() {
   const [linking, setLinking] = useState(null); // الدومين الذي نختار له صفحة هبوط
   const [info, setInfo] = useState(false); // نافذة معلومات الربط
   const [q, setQ] = useState('');
+  const [target, setTarget] = useState(''); // دومين جديد: '' = المتجر، وإلا معرّف صفحة الهبوط
 
   const load = useCallback(() => {
     api.get(`/domain/store/${storeId}`).then((r) => setDomains(r.data || [])).catch(() => setDomains([]));
@@ -100,10 +101,17 @@ export default function DomainsPage() {
     if (!domain) return toast.error(t('domains.invalid'));
     setAdding(true);
     try {
-      const { data } = await api.post('/domain', { domain, storeId });
+      let { data } = await api.post('/domain', { domain, storeId });
+      // لصفحة هبوط: يُربط بها مباشرة بعد الإنشاء
+      if (target) {
+        const r = await api.patch(`/domain/${data.id}/assign-page`, { builderPageId: target, storeId });
+        data = { ...data, ...r.data, scope: 'landing_page', builderPageId: target };
+      }
       setDomains((l) => [data, ...(l || [])]);
       setValue('');
       setSheet(false);
+      setTab(target ? 'pages' : data.domain.endsWith('.mdstore.top') ? 'store' : 'custom');
+      setTarget('');
       toast.success(t('domains.added'));
     } catch (err) {
       toast.error(errorMessage(err, t('inventory.error')));
@@ -268,6 +276,23 @@ export default function DomainsPage() {
             <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} dir="ltr" placeholder="example.com" inputMode="url" autoCapitalize="none" autoCorrect="off"
               className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
             <p className="text-[11px] text-gray-400">{t('domains.add_hint')}</p>
+            {/* لمن الدومين: المتجر أو صفحة هبوط */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-bold text-gray-500">{t('domains.target')}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[['', t('domains.target_store')], ['page', t('domains.target_page')]].map(([k, l]) => (
+                  <button key={k} type="button" onClick={() => setTarget(k === 'page' ? (pages[0]?.id ?? '') : '')} disabled={k === 'page' && !pages.length}
+                    className={`py-2.5 rounded-xl text-sm font-bold border disabled:opacity-40 ${(k === 'page') === !!target ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300' : 'border-gray-200 dark:border-zinc-800 text-gray-500'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              {target && (
+                <select value={target} onChange={(e) => setTarget(e.target.value)} className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400">
+                  {pages.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              )}
+            </div>
             <button disabled={adding || !value.trim()} className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold disabled:opacity-50">
               {adding && <Loader2 className="w-3.5 h-3.5 animate-spin" />}{t('domains.add')}
             </button>

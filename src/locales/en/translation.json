@@ -408,7 +408,10 @@
     "hide_info": "Hide",
     "show_info": "Show",
     "copy": "Copy link",
-    "search": "Search a domain or page…"
+    "search": "Search a domain or page…",
+    "target": "Shows",
+    "target_store": "The store",
+    "target_page": "A landing page"
   },
   "camera": {
     "fallback": "Opening the phone camera…",
