@@ -30,6 +30,7 @@ export default function Layout() {
   };
   const nextLang = () => i18n.changeLanguage(LANGS[(LANGS.indexOf(i18n.language) + 1) % LANGS.length]);
 
+  const bottomNav = NAV.filter((n) => navVisible(n, { can, isOwner, ownsAnyStore: owner }));
   const navCls = ({ isActive }) =>
     `flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-[11px] md:text-sm font-semibold transition-colors ${
       isActive ? 'text-indigo-600 dark:text-indigo-400 md:bg-indigo-50 md:dark:bg-indigo-500/10' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
@@ -87,13 +88,14 @@ export default function Layout() {
       </div>
 
       {/* شريط سفلي على الهاتف */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-gray-100 dark:border-zinc-900 pb-[env(safe-area-inset-bottom)]">
-        {NAV.map((n) => n.primary ? (
+      {/* ما ليس للعضو صلاحيته لا يظهر (المسح: المنتجات أو الطلبات) */}
+      <nav style={{ gridTemplateColumns: `repeat(${bottomNav.length}, minmax(0, 1fr))` }} className="md:hidden fixed bottom-0 inset-x-0 z-40 grid bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-gray-100 dark:border-zinc-900 pb-[env(safe-area-inset-bottom)]">
+        {bottomNav.map((n) => n.primary ? (
           <NavLink key={n.to} to={n.to} className="flex flex-col items-center justify-center -mt-5">
             <span className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30"><n.icon className="w-6 h-6" /></span>
           </NavLink>
         ) : (
-          <NavLink key={n.to} to={n.to} end={n.end} className={(a) => `${navCls(a)} ${n.perm && ![].concat(n.perm).some((x) => can(x)) ? 'opacity-40' : ''}`}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
+          <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
         ))}
       </nav>
     </div>

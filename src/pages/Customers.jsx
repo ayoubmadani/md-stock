@@ -23,7 +23,7 @@ export default function CustomersPage() {
           <input value={q} onChange={(e) => setQ(e.target.value)} type="search" placeholder={t('customers.search')}
             className="w-full ps-9 pe-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400" />
         </div>
-        {can('order.manage') && (
+        {can('pos.sell') && (
           <button type="button" onClick={() => setCreating(true)} aria-label={t('customers.new')} className="shrink-0 flex items-center justify-center gap-1.5 px-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold">
             <Plus className="w-4 h-4" /><span className="hidden sm:inline">{t('customers.new')}</span>
           </button>

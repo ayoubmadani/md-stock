@@ -100,20 +100,20 @@ export default function App() {
             <Route path="stores" element={<StoresPage />} />
             <Route path="stores/new" element={<StoreForm />} />
             <Route path="stores/:id" element={<StoreForm />} />
-            <Route path="themes" element={<ThemesPage />} />
+            <Route path="themes" element={<RequirePerm owner><ThemesPage /></RequirePerm>} />
             <Route path="subscription" element={<RequirePerm owner><SubscriptionPage /></RequirePerm>} />
             <Route path="team" element={<TeamPage />} />
             <Route path="delivery" element={<RequirePerm perm="delivery.account"><DeliveryPage /></RequirePerm>} />
-            <Route path="confirmation" element={<ConfirmationPage />} />
+            <Route path="confirmation" element={<RequirePerm owner><ConfirmationPage /></RequirePerm>} />
             <Route path="messages" element={<RequirePerm perm="messages.read"><MessagesPage /></RequirePerm>} />
-            <Route path="landing" element={<LandingPagesPage />} />
+            <Route path="landing" element={<RequirePerm owner><LandingPagesPage /></RequirePerm>} />
             <Route path="keys" element={<RequirePerm owner><ApiKeysPage /></RequirePerm>} />
             <Route path="rates" element={<RequirePerm perm="delivery.rates"><DeliveryRatesPage /></RequirePerm>} />
             <Route path="pos" element={<RequirePerm perm="pos.sell"><PosPage /></RequirePerm>} />
             <Route path="pos/:orderId" element={<RequirePerm perm="pos.sell"><PosPage /></RequirePerm>} />
             <Route path="tasks" element={<TasksPage />} />
-            <Route path="customers" element={<RequirePerm perm={['order.view', 'pos.sell']}><CustomersPage /></RequirePerm>} />
-            <Route path="customers/:id" element={<RequirePerm perm={['order.view', 'pos.sell']}><CustomerDetail /></RequirePerm>} />
+            <Route path="customers" element={<RequirePerm perm="pos.sell"><CustomersPage /></RequirePerm>} />
+            <Route path="customers/:id" element={<RequirePerm perm="pos.sell"><CustomerDetail /></RequirePerm>} />
             <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
             <Route path="profit" element={<RequirePerm owner><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />

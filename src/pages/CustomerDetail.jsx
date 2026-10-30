@@ -36,7 +36,7 @@ export default function CustomerDetail() {
     <div className="max-w-xl mx-auto space-y-3">
       <div className="flex items-center justify-between">
         <Link to="/customers" className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</Link>
-        {can('order.manage') && (
+        {can('pos.sell') && (
           <div className="flex items-center gap-1">
             <button type="button" onClick={() => setEditing(true)} className="p-2 rounded-lg text-gray-500"><Pencil className="w-4 h-4" /></button>
             <button type="button" disabled={deleting} onClick={remove} className="p-2 rounded-lg text-rose-500 disabled:opacity-50">{deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}</button>
