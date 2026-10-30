@@ -86,6 +86,7 @@ export default function DomainsPage() {
   const [q, setQ] = useState('');
   // دومين جديد: يعرض المتجر أو صفحة هبوط (القائمة تبقى ظاهرة ومعطّلة للمتجر)
   const [toPage, setToPage] = useState(false);
+  const [fixedFrom, setFixedFrom] = useState(null); // زر 🔧 مفعّل: ما كتبه التاجر قبل الإصلاح (لإرجاعه)
   const [pageId, setPageId] = useState('');
 
   const load = useCallback(() => {
@@ -112,6 +113,7 @@ export default function DomainsPage() {
       }
       setDomains((l) => [data, ...(l || [])]);
       setValue('');
+      setFixedFrom(null);
       setSheet(false);
       setTab(target ? 'pages' : data.domain.endsWith('.mdstore.top') ? 'store' : 'custom');
       setToPage(false);
@@ -278,11 +280,14 @@ export default function DomainsPage() {
             </div>
             {/* الخانة ومعها زر يكمّل إلى .mdstore.top بذكاء (يظهر حين يمكن الإكمال) */}
             <div dir="ltr" className="flex items-center gap-2 pe-1.5 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl focus-within:border-indigo-400">
-              <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} placeholder="example.com" inputMode="url" autoCapitalize="none" autoCorrect="off"
+              <input autoFocus value={value} onChange={(e) => { setValue(e.target.value); setFixedFrom(null); }} placeholder="example.com" inputMode="url" autoCapitalize="none" autoCorrect="off"
                 className="flex-1 min-w-0 px-3 py-3 bg-transparent text-base outline-none" />
-              {suggestSubdomain(value) && (
-                <button type="button" onClick={() => setValue(suggestSubdomain(value))} title={suggestSubdomain(value)} aria-label={suggestSubdomain(value)}
-                  className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-600 text-white">
+              {/* 🔧 يعمل كمفتاح: ضغطة تُصلح إلى .mdstore.top، وضغطة ثانية تُرجع ما كُتب */}
+              {(fixedFrom !== null || suggestSubdomain(value)) && (
+                <button type="button" aria-pressed={fixedFrom !== null}
+                  onClick={() => { if (fixedFrom !== null) { setValue(fixedFrom); setFixedFrom(null); } else { setFixedFrom(value); setValue(suggestSubdomain(value)); } }}
+                  title={fixedFrom !== null ? fixedFrom : suggestSubdomain(value)} aria-label={fixedFrom !== null ? fixedFrom : suggestSubdomain(value)}
+                  className={`shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${fixedFrom !== null ? 'bg-indigo-600 text-white' : 'bg-indigo-100 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300'}`}>
                   <Wrench className="w-4 h-4" />
                 </button>
               )}
