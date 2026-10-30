@@ -210,8 +210,8 @@ export default function DomainsPage() {
           className="w-full ps-9 pe-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400" />
       </div>
 
-      {/* صندوق ثابت الارتفاع: التمرير داخله، فلا تقفز الصفحة عند تغيير التبويب */}
-      <div className={`${box} h-[260px] overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800`}>
+      {/* صندوق بارتفاع الشاشة المتبقي (فوق الشريط السفلي)، والتمرير داخله */}
+      <div className={`${box} h-[max(200px,calc(100dvh-415px))] md:h-[max(240px,calc(100dvh-380px))] overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800`}>
         {shown.length === 0
           ? <div className="h-full flex flex-col items-center justify-center gap-2 text-gray-400"><Globe className="w-8 h-8" /><p className="text-sm">{t('domains.empty')}</p></div>
           : shown.map((d) => (
