@@ -390,7 +390,7 @@
     "field_value": "Value",
     "field_ttl": "TTL",
     "my_link": "Your store link",
-    "custom": "Custom domains",
+    "custom": "Domains and landing-page links",
     "add_new": "Connect a new domain",
     "add_hint": "Type the domain without https:// — e.g. bebe-shop.com",
     "limit_short": "You reached your plan limit ({{limit}} domains)",

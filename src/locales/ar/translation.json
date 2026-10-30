@@ -390,7 +390,7 @@
     "field_value": "القيمة",
     "field_ttl": "TTL",
     "my_link": "رابط متجرك",
-    "custom": "الدومينات المخصصة",
+    "custom": "الدومينات وروابط صفحات الهبوط",
     "add_new": "ربط دومين جديد",
     "add_hint": "اكتب الدومين بدون https:// — مثل bebe-shop.com",
     "limit_short": "وصلت لحد خطتك ({{limit}} دومينات)",

@@ -390,7 +390,7 @@
     "field_value": "Valeur",
     "field_ttl": "TTL",
     "my_link": "Lien de votre boutique",
-    "custom": "Domaines personnalisés",
+    "custom": "Domaines et liens des landing pages",
     "add_new": "Connecter un domaine",
     "add_hint": "Écrivez le domaine sans https:// — ex. bebe-shop.com",
     "limit_short": "Limite de votre offre atteinte ({{limit}} domaines)",

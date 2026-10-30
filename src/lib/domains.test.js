@@ -14,6 +14,18 @@ describe('splitDomains', () => {
   });
 });
 
+describe('splitDomains — landing-page links', () => {
+  it('a landing-page subdomain (*.mdstore.top) is not the store link: it goes with the deletable domains', () => {
+    const list = [
+      { id: 'store', domain: 'bebe.mdstore.top', isActive: true, scope: 'store' },
+      { id: 'lp', domain: 'promo.mdstore.top', isActive: true, scope: 'landing_page' },
+    ];
+    const { system, custom } = splitDomains(list);
+    expect(system.map((d) => d.id)).toEqual(['store']);
+    expect(custom.map((d) => d.id)).toEqual(['lp']);
+  });
+});
+
 describe('DNS_RECORD', () => {
   it('has the four fields the registrar asks for', () => {
     expect(DNS_RECORD).toEqual([['type', 'CNAME'], ['host', '@'], ['value', 'mdstore.top'], ['ttl', 'Auto']]);
