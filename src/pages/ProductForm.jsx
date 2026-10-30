@@ -20,7 +20,7 @@ export default function ProductForm() {
   const { id } = useParams();
   const isNew = !id;
   const navigate = useNavigate();
-  const { storeId } = useAuth();
+  const { storeId, isOwner } = useAuth();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -159,7 +159,7 @@ export default function ProductForm() {
         <OffersEditor offers={offers} onChange={setOffers} />
       </Section>
 
-      {!isNew && (
+      {!isNew && isOwner && (
         <button type="button" onClick={() => setAds(true)} className="w-full flex items-center gap-3 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-4 text-start">
           <span className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0"><Megaphone className="w-5 h-5" /></span>
           <span className="flex-1"><span className="block font-bold text-sm">{t('ads.title')}</span><span className="block text-xs text-gray-400">{t('ads.subtitle')}</span></span>

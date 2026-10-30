@@ -95,7 +95,7 @@ export default function App() {
             <Route path="orders/:id" element={<RequirePerm perm="order.view"><OrderDetail /></RequirePerm>} />
             <Route path="more" element={<MorePage />} />
             <Route path="wallet" element={<WalletPage />} />
-            <Route path="meta" element={<RequirePerm perm="product.crud"><MetaPage /></RequirePerm>} />
+            <Route path="meta" element={<RequirePerm owner><MetaPage /></RequirePerm>} />
             <Route path="pixels" element={<PixelsPage />} />
             <Route path="stores" element={<StoresPage />} />
             <Route path="stores/new" element={<StoreForm />} />
@@ -115,7 +115,7 @@ export default function App() {
             <Route path="customers" element={<RequirePerm perm="order.view"><CustomersPage /></RequirePerm>} />
             <Route path="customers/:id" element={<RequirePerm perm="order.view"><CustomerDetail /></RequirePerm>} />
             <Route path="abandoned" element={<RequirePerm perm="order.view"><AbandonedPage /></RequirePerm>} />
-            <Route path="profit" element={<RequirePerm perm="product.crud"><ProfitPage /></RequirePerm>} />
+            <Route path="profit" element={<RequirePerm owner><ProfitPage /></RequirePerm>} />
             <Route path="categories" element={<RequirePerm perm="category.crud"><CategoriesPage /></RequirePerm>} />
             <Route path="domains" element={<RequirePerm perm="domain.crud"><DomainsPage /></RequirePerm>} />
             <Route path="products/new" element={<RequirePerm perm="product.crud"><ProductForm /></RequirePerm>} />

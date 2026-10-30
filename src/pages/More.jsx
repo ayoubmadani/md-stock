@@ -14,8 +14,8 @@ export const MORE = [
   { to: '/tasks', key: 'tasks', icon: ListTodo, all: true },
   { to: '/customers', key: 'customers', icon: Contact, perm: 'order.view' },
   { to: '/abandoned', key: 'abandoned', icon: ShoppingCart, perm: 'order.view' },
-  { to: '/profit', key: 'profit', icon: TrendingUp, perm: 'product.crud' },
-  { to: '/meta', key: 'meta', icon: Megaphone, perm: 'product.crud' },
+  { to: '/profit', key: 'profit', icon: TrendingUp, storeOwner: true },
+  { to: '/meta', key: 'meta', icon: Megaphone, storeOwner: true },
   { to: '/stores', key: 'stores', icon: Store, all: true },
   { to: '/landing', key: 'landing', icon: LayoutTemplate, owner: true },
   { to: '/messages', key: 'messages', icon: MessageSquare, owner: true },
@@ -81,13 +81,13 @@ function PushCard() {
 
 export default function MorePage() {
   const { t } = useTranslation();
-  const { can, stores, logout } = useAuth();
+  const { can, isOwner, stores, logout } = useAuth();
   const owner = stores.some((s) => s.role === 'owner');
   return (
     <div className="max-w-xl mx-auto space-y-3">
     {can('order.view') && <PushCard />}
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
-      {MORE.filter((m) => m.all || (m.owner ? owner : can(m.perm))).map((m) => (
+      {MORE.filter((m) => m.all || (m.storeOwner ? isOwner : m.owner ? owner : can(m.perm))).map((m) => (
         <Link key={m.to} to={m.to} className="flex items-center gap-3 px-4 py-3.5">
           <m.icon className="w-5 h-5 text-gray-400" />
           <span className="flex-1 font-semibold text-sm">{t(`nav.${m.key}`)}</span>

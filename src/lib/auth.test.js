@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { canManageStock } from './auth.jsx';
+import { canManageStock, isStoreOwner } from './auth.jsx';
 
 describe('canManageStock', () => {
   it('owner and members with the products permission can manage stock', () => {
@@ -20,5 +20,13 @@ describe('hasPerm', () => {
     expect(hasPerm({ role: 'member', permissions: ['order.view'] }, 'order.view')).toBe(true);
     expect(hasPerm({ role: 'member', permissions: ['order.view'] }, 'order.manage')).toBe(false);
     expect(hasPerm(null, 'order.view')).toBe(false);
+  });
+});
+
+describe('isStoreOwner', () => {
+  it('only the owner of the current store (profit and Meta ads)', () => {
+    expect(isStoreOwner({ role: 'owner' })).toBe(true);
+    expect(isStoreOwner({ role: 'member', permissions: ['*'] })).toBe(false);
+    expect(isStoreOwner(null)).toBe(false);
   });
 });

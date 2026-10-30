@@ -22,7 +22,7 @@ function Card({ label, value, tone = '', sub, to }) {
 
 function StockSummary() {
   const { t } = useTranslation();
-  const { storeId } = useAuth();
+  const { storeId, isOwner } = useAuth();
   const { data } = useInventory(storeId);
   const [recent, setRecent] = useState(null);
 
@@ -46,7 +46,7 @@ function StockSummary() {
         <div className="col-span-2"><Card label={t('inventory.totals.value_sell')} value={`${fmt(tt.valueSell)} DA`} /></div>
         <div className="col-span-2">
           <Card label={t('inventory.totals.value_cost')} value={tt.valueCost == null ? '—' : `${fmt(tt.valueCost)} DA`}
-            sub={tt.valueCost == null ? null : `${t('inventory.totals.profit')}: ${fmt(tt.valueSell - tt.valueCost)} DA`} />
+            sub={tt.valueCost == null || !isOwner ? null : `${t('inventory.totals.profit')}: ${fmt(tt.valueSell - tt.valueCost)} DA`} />
         </div>
       </div>
 

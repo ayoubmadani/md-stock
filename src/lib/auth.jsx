@@ -8,6 +8,9 @@ const AuthContext = createContext(null);
 export const canManageStock = (s) => s.role === 'owner' || (s.permissions || []).includes('product.crud') || (s.permissions || []).includes('*');
 
 /** صلاحية في المتجر كما في الفريق: المالك وصاحب «*» لهما كل شيء */
+/** صاحب المتجر الحالي فقط — الربحية وإعلانات ميتا */
+export const isStoreOwner = (s) => s?.role === 'owner';
+
 export const hasPerm = (s, perm) => !!s && (s.role === 'owner' || (s.permissions || []).includes('*') || (s.permissions || []).includes(perm));
 
 export function AuthProvider({ children }) {
@@ -54,7 +57,7 @@ export function AuthProvider({ children }) {
   const selectStore = (id) => { setStoreId(id); setStoreIdState(id); };
 
   return (
-    <AuthContext.Provider value={{ token, stores, offline, storeId, store: stores.find((s) => s.id === storeId) || null, can: (perm) => hasPerm(stores.find((s) => s.id === storeId), perm), loading, login, logout, selectStore, refresh }}>
+    <AuthContext.Provider value={{ token, stores, offline, storeId, store: stores.find((s) => s.id === storeId) || null, can: (perm) => hasPerm(stores.find((s) => s.id === storeId), perm), isOwner: isStoreOwner(stores.find((s) => s.id === storeId)), loading, login, logout, selectStore, refresh }}>
       {children}
     </AuthContext.Provider>
   );
