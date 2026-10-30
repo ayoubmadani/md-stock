@@ -94,20 +94,20 @@ export default function App() {
             <Route path="orders/:id/edit" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />
             <Route path="orders/:id" element={<RequirePerm perm="order.view"><OrderDetail /></RequirePerm>} />
             <Route path="more" element={<MorePage />} />
-            <Route path="wallet" element={<WalletPage />} />
+            <Route path="wallet" element={<RequirePerm owner><WalletPage /></RequirePerm>} />
             <Route path="meta" element={<RequirePerm owner><MetaPage /></RequirePerm>} />
-            <Route path="pixels" element={<PixelsPage />} />
+            <Route path="pixels" element={<RequirePerm owner><PixelsPage /></RequirePerm>} />
             <Route path="stores" element={<StoresPage />} />
             <Route path="stores/new" element={<StoreForm />} />
             <Route path="stores/:id" element={<StoreForm />} />
             <Route path="themes" element={<ThemesPage />} />
-            <Route path="subscription" element={<SubscriptionPage />} />
+            <Route path="subscription" element={<RequirePerm owner><SubscriptionPage /></RequirePerm>} />
             <Route path="team" element={<TeamPage />} />
             <Route path="delivery" element={<DeliveryPage />} />
             <Route path="confirmation" element={<ConfirmationPage />} />
             <Route path="messages" element={<MessagesPage />} />
             <Route path="landing" element={<LandingPagesPage />} />
-            <Route path="keys" element={<ApiKeysPage />} />
+            <Route path="keys" element={<RequirePerm owner><ApiKeysPage /></RequirePerm>} />
             <Route path="rates" element={<DeliveryRatesPage />} />
             <Route path="pos" element={<RequirePerm perm="order.manage"><PosPage /></RequirePerm>} />
             <Route path="pos/:orderId" element={<RequirePerm perm="order.manage"><PosPage /></RequirePerm>} />
