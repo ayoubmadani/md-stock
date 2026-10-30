@@ -411,7 +411,8 @@
     "search": "Rechercher un domaine ou une page…",
     "target": "Affiche",
     "target_store": "La boutique",
-    "target_page": "Une landing page"
+    "target_page": "Une landing page",
+    "split_test": "Test A/B"
   },
   "camera": {
     "fallback": "Ouverture de l'appareil photo du téléphone…",

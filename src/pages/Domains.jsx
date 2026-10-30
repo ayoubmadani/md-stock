@@ -47,7 +47,7 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
       <div className="flex items-center gap-1.5">
         <p className="flex-1 flex items-center gap-1.5 text-[11px] font-semibold min-w-0 ps-4">
           <span className={`shrink-0 ${d.isActive ? 'text-gray-500' : 'text-amber-500'}`}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
-          {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{page?.name || t('domains.landing_page')}</span></span>}
+          {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{d.builderPage?.name || page?.name || (d.splitTestId ? t('domains.split_test') : t('domains.landing_page'))}</span></span>}
         </p>
       {!sub && !d.isActive && (
           <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>

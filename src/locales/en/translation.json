@@ -411,7 +411,8 @@
     "search": "Search a domain or page…",
     "target": "Shows",
     "target_store": "The store",
-    "target_page": "A landing page"
+    "target_page": "A landing page",
+    "split_test": "A/B test"
   },
   "camera": {
     "fallback": "Opening the phone camera…",
