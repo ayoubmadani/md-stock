@@ -1,7 +1,7 @@
 // الدومين: معلومات الربط في الأعلى، ثم تبويبات (روابط المتجر / المخصصة / صفحات الهبوط) بأزرار تحقق، ربط، فسخ، حذف
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Copy, Search, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
+import { Check, Copy, Search, Wrench, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
@@ -276,15 +276,17 @@ export default function DomainsPage() {
               <p className="font-bold">{t('domains.add_new')}</p>
               <button type="button" onClick={() => setSheet(false)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
             </div>
-            <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} dir="ltr" placeholder="example.com" inputMode="url" autoCapitalize="none" autoCorrect="off"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
-            {/* إكمال ذكي إلى رابط فرعي .mdstore.top */}
-            {suggestSubdomain(value) && (
-              <button type="button" onClick={() => setValue(suggestSubdomain(value))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-bold">
-                <Plus className="w-3.5 h-3.5" /><bdi dir="ltr">{suggestSubdomain(value)}</bdi>
-              </button>
-            )}
+            {/* الخانة ومعها زر يكمّل إلى .mdstore.top بذكاء (يظهر حين يمكن الإكمال) */}
+            <div dir="ltr" className="flex items-center gap-2 pe-1.5 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl focus-within:border-indigo-400">
+              <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} placeholder="example.com" inputMode="url" autoCapitalize="none" autoCorrect="off"
+                className="flex-1 min-w-0 px-3 py-3 bg-transparent text-base outline-none" />
+              {suggestSubdomain(value) && (
+                <button type="button" onClick={() => setValue(suggestSubdomain(value))} title={suggestSubdomain(value)} aria-label={suggestSubdomain(value)}
+                  className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-600 text-white">
+                  <Wrench className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             <p className="text-[11px] text-gray-400">{t('domains.add_hint')}</p>
             {/* لمن الدومين: المتجر أو صفحة هبوط */}
             <div className="space-y-1.5">
