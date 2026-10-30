@@ -13,6 +13,8 @@ export function newAttribute(type, name) {
 }
 
 export const newValue = (value) => ({ id: uid('var'), name: value, value });
+/** إضافة يختارها الزبون مع المنتج (مثلاً: جبن إضافي +300) */
+export const newAddon = () => ({ id: uid('add'), name: '', price: '', isActive: true });
 export const newOffer = () => ({ id: uid('off'), name: '', subTitle: '', quantity: '', price: '', shippingFree: false });
 
 /** تحريك عنصر خطوة (−1 / +1) داخل القائمة */
@@ -25,7 +27,7 @@ export function moveItem(list, index, step) {
 }
 
 /** جسم POST/PATCH المنتج. النسخ يولّدها الخادم من الخصائص ويحافظ على سعر وكمية الموجود منها */
-export function productPayload(form, { attributes, offers, images }) {
+export function productPayload(form, { attributes, offers, images, addons }) {
   const num = (v) => (v === '' || v == null ? null : Number(v));
   const out = {
     name: form.name.trim(),
@@ -43,6 +45,8 @@ export function productPayload(form, { attributes, offers, images }) {
     images,
   };
   if (!attributes.length) out.stock = Number(form.stock) || 0;
+  // الإضافات: الأسطر بلا اسم تُتجاهل (نفس اللوحة)
+  if (addons) out.addons = addons.filter((a) => a.name?.trim()).map((a) => ({ id: String(a.id), name: a.name.trim(), price: Number(a.price) || 0, isActive: a.isActive !== false }));
   return out;
 }
 

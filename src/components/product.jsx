@@ -1,10 +1,10 @@
 // أجزاء نموذج المنتج للهاتف: الصور، الوصف، الخصائص، النسخ، العروض
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Bold, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { effectiveVariantPrice, moveItem, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
+import { effectiveVariantPrice, moveItem, newAddon, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -460,6 +460,30 @@ export function OffersEditor({ offers, onChange }) {
       ))}
       <button type="button" onClick={() => onChange([...offers, newOffer()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
         <Plus className="w-4 h-4" />{t('product.offer.add')}
+      </button>
+    </div>
+  );
+}
+
+// الإضافات: يختارها الزبون مع المنتج ويُضاف سعرها — إخفاء دون حذف
+export function AddonsEditor({ addons, onChange }) {
+  const { t } = useTranslation();
+  const set = (id, patch) => onChange(addons.map((a) => (a.id === id ? { ...a, ...patch } : a)));
+  return (
+    <div className="space-y-2">
+      <p className="text-[11px] text-gray-400">{t('product.addons.hint')}</p>
+      {addons.map((a) => (
+        <div key={a.id} className={`flex items-center gap-2 ${a.isActive === false ? 'opacity-50' : ''}`}>
+          <input value={a.name} onChange={(e) => set(a.id, { name: e.target.value })} placeholder={t('product.addons.name')} className={`${small} flex-1 min-w-0`} />
+          <input type="number" inputMode="decimal" min={0} dir="ltr" value={a.price} onChange={(e) => set(a.id, { price: e.target.value })} placeholder={t('product.addons.price')} className={`${small} w-24 shrink-0`} />
+          <button type="button" onClick={() => set(a.id, { isActive: a.isActive === false })} title={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} className="p-2 rounded-lg text-gray-400 shrink-0">
+            {a.isActive === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+          <button type="button" onClick={() => onChange(addons.filter((x) => x.id !== a.id))} className="p-2 rounded-lg text-rose-500 shrink-0"><Trash2 className="w-4 h-4" /></button>
+        </div>
+      ))}
+      <button type="button" onClick={() => onChange([...addons, newAddon()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+        <Plus className="w-4 h-4" />{t('product.addons.add')}
       </button>
     </div>
   );

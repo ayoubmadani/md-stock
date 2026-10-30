@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { productPayload, pruneVariantImages, validateProduct } from '../lib/product-form';
-import { AttributesEditor, BarcodeField, DescEditor, ImagesEditor, OffersEditor, Section, Toggle, VariantsEditor, input, label } from '../components/product';
+import { AddonsEditor, AttributesEditor, BarcodeField, DescEditor, ImagesEditor, OffersEditor, Section, Toggle, VariantsEditor, input, label } from '../components/product';
 
 const EMPTY = {
   name: '', desc: '', price: '', priceOriginal: '', costPrice: '', stock: '', lowStockThreshold: '5',
@@ -28,6 +28,7 @@ export default function ProductForm() {
   const [images, setImages] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [offers, setOffers] = useState([]);
+  const [addons, setAddons] = useState([]);
   const [variants, setVariants] = useState([]);
   const [ads, setAds] = useState(false);
   const [savedAttrs, setSavedAttrs] = useState('[]'); // لمعرفة هل تغيّرت الخصائص منذ آخر حفظ
@@ -46,6 +47,7 @@ export default function ProductForm() {
     setAttributes(attrs);
     setSavedAttrs(JSON.stringify(attrs));
     setOffers((p.offers || []).map((o) => ({ ...o, quantity: String(o.quantity ?? ''), price: String(o.price ?? '') })));
+    setAddons((p.addons || []).map((a) => ({ ...a, price: String(a.price ?? '') })));
     setVariants(p.variantDetails || []);
   });
 
@@ -64,7 +66,7 @@ export default function ProductForm() {
     if (errs.length) return toast.error(errs.map((k) => t(`product.err.${k}`)).join(' — '));
     setSaving(true);
     try {
-      const body = productPayload(form, { attributes, offers, images });
+      const body = productPayload(form, { attributes, offers, images, addons });
       let productId = id;
       if (isNew) {
         const { data } = await api.post(`/stores/${storeId}/products`, body);
@@ -157,6 +159,10 @@ export default function ProductForm() {
 
       <Section title={t('product.offer.title')}>
         <OffersEditor offers={offers} onChange={setOffers} />
+      </Section>
+
+      <Section title={t('product.addons.title')}>
+        <AddonsEditor addons={addons} onChange={setAddons} />
       </Section>
 
       {!isNew && isOwner && (

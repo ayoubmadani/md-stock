@@ -230,7 +230,16 @@
     "barcode_replace": "Replace the current barcode with a new one?",
     "print_label": "Print barcode label",
     "barcodes_all": "Generate all barcodes ({{count}})",
-    "barcodes_done": "{{count}} barcodes generated ✓"
+    "barcodes_done": "{{count}} barcodes generated ✓",
+    "addons": {
+      "title": "Add-ons (optional)",
+      "hint": "Extras the customer picks with the product; their price is added.",
+      "name": "Add-on name",
+      "price": "Price",
+      "add": "New add-on",
+      "hide": "Hide",
+      "show": "Show"
+    }
   },
   "no_permission": "You don't have permission for this section in this store — ask the store owner",
   "orders": {

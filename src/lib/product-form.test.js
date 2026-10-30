@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from './product-form.js';
+import { productPayload, validateProduct, moveItem, newAttribute, variantPriceField, effectiveVariantPrice, linkVariantImage, pruneVariantImages, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds, newAddon } from './product-form.js';
 
 const base = { name: 'قميص', price: '2500', priceOriginal: '', desc: '<p>x</p>', categoryId: '', shippingFree: false, isDigital: false, isActive: true, stock: '7', barcode: ' 123 ' };
 const attr = { id: 'att-1', type: 'size', name: 'المقاس', variants: [{ id: 'var-1', name: 'M', value: 'M' }] };
@@ -107,5 +107,26 @@ describe('أسماء الخصائص لا تتكرر', () => {
   it('flags every attribute whose name repeats (ignoring case and spaces)', () => {
     expect([...duplicateAttrIds([...attrs, { id: 'c', name: ' اللون ' }])].sort()).toEqual(['a', 'c']);
     expect(duplicateAttrIds(attrs).size).toBe(0);
+  });
+});
+
+describe('add-ons (الإضافات)', () => {
+  it('a new add-on is an empty, shown row with its own id', () => {
+    const a = newAddon();
+    expect(a).toMatchObject({ name: '', price: '', isActive: true });
+    expect(a.id).toBeTruthy();
+    expect(newAddon().id).not.toBe(a.id);
+  });
+
+  it('the payload drops nameless rows, trims names, numbers the price and keeps hidden ones', () => {
+    const addons = [{ id: 'a', name: ' جبن ', price: '300', isActive: true }, { id: 'b', name: '', price: '50' }, { id: 'c', name: 'صلصة', price: '', isActive: false }];
+    expect(productPayload(base, { attributes: [], offers: [], images: [], addons }).addons).toEqual([
+      { id: 'a', name: 'جبن', price: 300, isActive: true },
+      { id: 'c', name: 'صلصة', price: 0, isActive: false },
+    ]);
+  });
+
+  it('no add-ons list → the field is not sent (the server keeps what it has)', () => {
+    expect('addons' in productPayload(base, { attributes: [], offers: [], images: [] })).toBe(false);
   });
 });
