@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './lib/auth';
+import { hideSplash, splashVisible } from './lib/splash';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Handoff from './pages/Handoff';
@@ -42,11 +44,19 @@ import CustomerDetail from './pages/CustomerDetail';
 import RequirePerm from './components/RequirePerm';
 import TrialOffer from './components/TrialOffer';
 
+// تخفي شاشة البداية حين ينتهي التحقق من تسجيل الدخول (الصفحات المحمية وصفحة الدخول)
+function SplashDone() {
+  const { loading } = useAuth();
+  useEffect(() => { if (!loading) hideSplash(); }, [loading]);
+  return null;
+}
+
 function Gate() {
   const { t } = useTranslation();
   const { token, stores, loading, logout, offline, refresh } = useAuth();
   if (!token) return <Navigate to="/login" replace />;
-  if (loading) return <div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-7 h-7 animate-spin text-indigo-500" /></div>;
+  // شاشة البداية تغطي التحميل الأول؛ الدائرة لأي تحميل بعدها
+  if (loading) return splashVisible() ? null : <div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-7 h-7 animate-spin text-indigo-500" /></div>;
   if (offline) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center gap-4 p-6 text-center">
@@ -78,6 +88,7 @@ function Gate() {
 export default function App() {
   return (
     <AuthProvider>
+      <SplashDone />
       <BrowserRouter>
         <Toaster position="top-center" richColors />
         <Routes>
