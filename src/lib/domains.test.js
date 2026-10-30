@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupDomains, filterDomains, DNS_RECORD } from './domains';
+import { groupDomains, filterDomains, suggestSubdomain, DNS_RECORD } from './domains';
 
 describe('groupDomains', () => {
   const list = [
@@ -35,5 +35,21 @@ describe('filterDomains', () => {
     expect(filterDomains(list, ' COUSSIN ', pages).map((d) => d.id)).toEqual(['b']);
     expect(filterDomains(list, 'وسادة', pages).map((d) => d.id)).toEqual(['a']);
     expect(filterDomains(list, '', pages)).toBe(list);
+  });
+});
+
+describe('suggestSubdomain', () => {
+  it('completes a bare name or a partly typed ending with .mdstore.top', () => {
+    expect(suggestSubdomain('promo')).toBe('promo.mdstore.top');
+    expect(suggestSubdomain(' Promo Shop ')).toBe('promo-shop.mdstore.top');
+    expect(suggestSubdomain('https://promo')).toBe('promo.mdstore.top');
+    expect(suggestSubdomain('promo.')).toBe('promo.mdstore.top');
+    expect(suggestSubdomain('promo.mdst')).toBe('promo.mdstore.top');
+  });
+  it('no suggestion for a full domain, a finished subdomain or an empty field', () => {
+    expect(suggestSubdomain('bebe.com')).toBeNull();
+    expect(suggestSubdomain('promo.mdstore.top')).toBeNull();
+    expect(suggestSubdomain('')).toBeNull();
+    expect(suggestSubdomain('---')).toBeNull();
   });
 });

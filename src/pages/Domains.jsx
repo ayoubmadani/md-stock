@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { normalizeDomain } from '../lib/store-setup';
-import { DNS_RECORD, filterDomains, groupDomains } from '../lib/domains';
+import { DNS_RECORD, filterDomains, groupDomains, suggestSubdomain } from '../lib/domains';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
 
@@ -275,6 +275,13 @@ export default function DomainsPage() {
             </div>
             <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} dir="ltr" placeholder="example.com" inputMode="url" autoCapitalize="none" autoCorrect="off"
               className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
+            {/* إكمال ذكي إلى رابط فرعي .mdstore.top */}
+            {suggestSubdomain(value) && (
+              <button type="button" onClick={() => setValue(suggestSubdomain(value))}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-bold">
+                <Plus className="w-3.5 h-3.5" /><bdi dir="ltr">{suggestSubdomain(value)}</bdi>
+              </button>
+            )}
             <p className="text-[11px] text-gray-400">{t('domains.add_hint')}</p>
             {/* لمن الدومين: المتجر أو صفحة هبوط */}
             <div className="space-y-1.5">
