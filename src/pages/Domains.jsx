@@ -45,7 +45,7 @@ function DomainRow({ d, system, busy, onCheck, onRemove }) {
       )}
       {system
         ? <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-gray-400" aria-label={d.domain}><ExternalLink className="w-4 h-4" /></a>
-        : <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} className="p-2 rounded-lg text-gray-400 hover:text-rose-500 disabled:opacity-60"><Trash2 className="w-4 h-4" /></button>}
+        : <button type="button" disabled={busy} onClick={onRemove} className="shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-600 text-xs font-bold disabled:opacity-60"><Trash2 className="w-3.5 h-3.5" />{t('domains.delete')}</button>}
     </div>
   );
 }
