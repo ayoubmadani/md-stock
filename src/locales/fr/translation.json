@@ -76,7 +76,8 @@
     "filter": {
       "all": "Tout",
       "low": "Faible",
-      "out": "Épuisé"
+      "out": "Épuisé",
+      "off": "Désactivés"
     },
     "search": "Rechercher un produit...",
     "col": {
@@ -123,7 +124,25 @@
     "next": "Suivant",
     "auto_note": "Le stock diminue automatiquement à la confirmation d'une commande et revient en cas d'annulation ou de retour.",
     "total": "Total",
-    "need_attention": "{{count}} à surveiller"
+    "need_attention": "{{count}} à surveiller",
+    "bulk": {
+      "select": "Sélectionner",
+      "count": "{{count}} sélectionné(s)",
+      "all": "Tout sélectionner",
+      "none": "Tout désélectionner",
+      "nothing": "Les produits sélectionnés sont déjà dans cet état",
+      "to_active": "Activer",
+      "to_store_off": "Masquer en ligne",
+      "to_off": "Désactiver tout",
+      "done_active": "{{count}} produit(s) activé(s)",
+      "done_store_off": "{{count}} produit(s) masqué(s) en ligne (vendables en magasin)",
+      "done_off": "{{count}} produit(s) désactivé(s) totalement"
+    },
+    "state": {
+      "active": "Actif",
+      "store_off": "Masqué en boutique en ligne",
+      "off": "Désactivé totalement"
+    }
   },
   "scan": {
     "title": "Scanner un code-barres",
@@ -950,7 +969,8 @@
     "service_price": "Montant (payé par le client)",
     "service_cost_opt": "Coût (optionnel)",
     "service_profit": "Bénéfice",
-    "service_add": "Ajouter au panier"
+    "service_add": "Ajouter au panier",
+    "archived": "Ce produit est désactivé : {{name}}"
   },
   "quick": {
     "title": "Produit rapide",

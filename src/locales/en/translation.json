@@ -76,7 +76,8 @@
     "filter": {
       "all": "All",
       "low": "Low",
-      "out": "Out"
+      "out": "Out",
+      "off": "Inactive"
     },
     "search": "Search products...",
     "col": {
@@ -123,7 +124,25 @@
     "next": "Next",
     "auto_note": "Stock goes down automatically when an order is confirmed, and comes back on cancellation or return.",
     "total": "Total",
-    "need_attention": "{{count}} need attention"
+    "need_attention": "{{count}} need attention",
+    "bulk": {
+      "select": "Select",
+      "count": "{{count}} selected",
+      "all": "Select all",
+      "none": "Clear selection",
+      "nothing": "The selected products are already in that state",
+      "to_active": "Activate",
+      "to_store_off": "Hide online",
+      "to_off": "Turn off fully",
+      "done_active": "{{count}} product(s) activated",
+      "done_store_off": "{{count}} product(s) hidden online (still sold in the shop)",
+      "done_off": "{{count}} product(s) turned off fully"
+    },
+    "state": {
+      "active": "Active",
+      "store_off": "Hidden online",
+      "off": "Fully off"
+    }
   },
   "scan": {
     "title": "Scan barcode",
@@ -950,7 +969,8 @@
     "service_price": "Amount (paid by the customer)",
     "service_cost_opt": "Cost (optional)",
     "service_profit": "Profit",
-    "service_add": "Add to cart"
+    "service_add": "Add to cart",
+    "archived": "This product is turned off: {{name}}"
   },
   "quick": {
     "title": "Quick new product",

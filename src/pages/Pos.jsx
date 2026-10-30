@@ -8,6 +8,7 @@ import { Check, ChevronDown, Clock, ListPlus, Loader2, Receipt as ReceiptIcon, M
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { posProducts } from '../lib/bulk-select';
 import { money, paymentState } from '../lib/orders';
 import { addScanned, addService, cartTotal, findPickable, orderToCart, pickedHit, saleBody, setLine } from '../lib/pos';
 import Scanner from '../components/Scanner';
@@ -82,7 +83,7 @@ function PickSheet({ storeId, cart, onPick, onRemove, onClose }) {
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(null);
   useEffect(() => {
-    api.get(`/stores/${storeId}/inventory`).then(({ data }) => setList(data?.products || [])).catch((e) => { setList([]); toast.error(errorMessage(e, t('inventory.error'))); });
+    api.get(`/stores/${storeId}/inventory`).then(({ data }) => setList(posProducts(data?.products || []))).catch((e) => { setList([]); toast.error(errorMessage(e, t('inventory.error'))); });
   }, [storeId, t]);
   const inCart = (key) => cart.find((l) => l.key === key)?.quantity || 0;
   const qty = (n) => n > 0 && <span className="min-w-6 h-6 px-1.5 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0" dir="ltr">{n}</span>;
@@ -273,6 +274,7 @@ export default function PosPage() {
     setLooking(true);
     try {
       const { data } = await api.get(`/stores/${storeId}/inventory/barcode/${encodeURIComponent(code)}`);
+      if (data?.product?.isArchived) { beep(false); toast.error(t('pos.archived', { name: data.product.name })); return; }
       setCart((c) => addScanned(c, data));
       beep(true);
     } catch (e) {

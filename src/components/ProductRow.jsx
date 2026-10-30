@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { BarChart3, ChevronLeft, Minus, Package, Pencil, Plus, X } from 'lucide-react';
+import { BarChart3, Check, ChevronLeft, Minus, Package, Pencil, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
 import { stockLines } from '../lib/stock-lines';
+import { productState } from '../lib/bulk-select';
 import { StatusBadge, VariantParts, fmt, variantLabel } from './inventory';
 
 const SAVE_AFTER_MS = 700;
@@ -122,23 +123,32 @@ function StockSheet({ p, storeId, onAdjust, onChanged, onClose }) {
   );
 }
 
-// بطاقة مختصرة بنفس الشكل لكل المنتجات؛ الضغط يفتح النافذة
-export default function ProductRow({ p, storeId, onAdjust, onChanged }) {
+// بطاقة مختصرة بنفس الشكل لكل المنتجات؛ الضغط يفتح النافذة، أو يحدد المنتج في وضع التحديد
+export default function ProductRow({ p, storeId, onAdjust, onChanged, selecting, selected, onSelect }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const problems = p.variants.filter((v) => v.status !== 'ok').length;
+  const state = productState(p);
+  const off = state !== 'active';
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-3 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-3 text-start active:scale-[0.99] transition-transform">
-        <span className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
+      <button type="button" onClick={() => (selecting ? onSelect(p.id) : setOpen(true))}
+        className={`w-full flex items-center gap-3 rounded-2xl bg-white dark:bg-zinc-900 border p-3 text-start active:scale-[0.99] transition-transform ${selected ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-gray-100 dark:border-zinc-800/80'}`}>
+        {selecting && (
+          <span className={`w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center ${selected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300 dark:border-zinc-600'}`}>
+            {selected && <Check className="w-3.5 h-3.5" />}
+          </span>
+        )}
+        <span className={`w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center ${off ? 'opacity-40 grayscale' : ''}`}>
           {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Package className="w-5 h-5 text-gray-400" />}
         </span>
         <span className="flex-1 min-w-0">
           <span className="block font-semibold text-sm truncate"><bdi>{p.name}</bdi></span>
           <span className="flex items-center gap-1.5 mt-1">
-            <StatusBadge status={p.status} />
+            {off
+              ? <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${state === 'off' ? 'bg-red-50 text-red-600 dark:bg-red-500/10' : 'bg-gray-200 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300'}`}>{t(`inventory.state.${state}`)}</span>
+              : <StatusBadge status={p.status} />}
             {p.variants.length > 0 && (
               <span className="text-[11px] text-gray-400 truncate">
                 {t('inventory.variants', { count: p.variants.length })}{problems > 0 && ` · ${t('inventory.need_attention', { count: problems })}`}
@@ -150,7 +160,7 @@ export default function ProductRow({ p, storeId, onAdjust, onChanged }) {
           <span className="block text-[11px] text-gray-400">{t('inventory.total')}</span>
           <span className="block font-bold text-lg leading-tight" dir="ltr">{fmt(p.stock)}</span>
         </span>
-        <ChevronLeft className="w-4 h-4 text-gray-300 shrink-0 ltr:rotate-180" />
+        {!selecting && <ChevronLeft className="w-4 h-4 text-gray-300 shrink-0 ltr:rotate-180" />}
       </button>
       {open && <StockSheet p={p} storeId={storeId} onAdjust={onAdjust} onChanged={onChanged} onClose={() => setOpen(false)} />}
     </>
