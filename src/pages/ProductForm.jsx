@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { productPayload, pruneVariantImages, validateProduct } from '../lib/product-form';
-import { AddonsEditor, AttributesEditor, BarcodeField, DescEditor, ImagesEditor, OffersEditor, Section, Toggle, VariantsEditor, input, label } from '../components/product';
+import { AddonsEditor, AttributesEditor, BarcodeField, DescEditor, GenerateBarcodesButton, ImagesEditor, OffersEditor, Section, Toggle, input, label } from '../components/product';
 
 const EMPTY = {
   name: '', desc: '', price: '', priceOriginal: '', costPrice: '', stock: '', lowStockThreshold: '5',
@@ -29,9 +29,8 @@ export default function ProductForm() {
   const [attributes, setAttributes] = useState([]);
   const [offers, setOffers] = useState([]);
   const [addons, setAddons] = useState([]);
-  const [variants, setVariants] = useState([]);
+  const [variants, setVariants] = useState([]); // لزر «توليد باركود للكل» فقط — تعديل النسخ في صفحة عرض المنتج
   const [ads, setAds] = useState(false);
-  const [savedAttrs, setSavedAttrs] = useState('[]'); // لمعرفة هل تغيّرت الخصائص منذ آخر حفظ
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v?.target ? v.target.value : v }));
 
   const load = () => api.get(`/stores/${storeId}/products/${id}`).then(({ data }) => {
@@ -45,7 +44,6 @@ export default function ProductForm() {
     setImages((p.imagesProduct || []).map((i) => i.imageUrl).filter(Boolean));
     const attrs = (p.attributes || []).map((a) => ({ ...a, variants: a.variants || [], displayMode: a.displayMode || (a.type === 'color' ? 'color' : undefined) }));
     setAttributes(attrs);
-    setSavedAttrs(JSON.stringify(attrs));
     setOffers((p.offers || []).map((o) => ({ ...o, quantity: String(o.quantity ?? ''), price: String(o.price ?? '') })));
     setAddons((p.addons || []).map((a) => ({ ...a, price: String(a.price ?? '') })));
     setVariants(p.variantDetails || []);
@@ -82,7 +80,8 @@ export default function ProductForm() {
       }
       toast.success(t('inventory.saved'));
       // بعد الإنشاء/تغيير الخصائص: نبقى في الصفحة لتعديل سعر وكمية كل نسخة
-      if (isNew) navigate(productId ? `/products/${productId}` : '/stock', { replace: true });
+      // أسعار النسخ وكمياتها وباركودها في صفحة عرض المنتج
+      if (isNew) navigate(productId ? (attributes.length ? `/products/${productId}/show` : `/products/${productId}`) : '/stock', { replace: true });
       else await load();
     } catch (err) {
       toast.error(errorMessage(err, t('inventory.error')));
@@ -103,7 +102,6 @@ export default function ProductForm() {
   };
 
   if (loading) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
-  const attrsDirty = JSON.stringify(attributes) !== savedAttrs;
 
   return (
     <>
@@ -150,10 +148,9 @@ export default function ProductForm() {
         <AttributesEditor attributes={attributes} images={images} onChange={setAttributes} />
       </Section>
 
-      {!isNew && variants.length > 0 && (
-        <Section title={t('product.variants_title', { count: variants.length })}>
-          <VariantsEditor variants={variants} storeId={storeId} productId={id} productName={form.name} productPrice={form.price} dirty={attrsDirty} />
-        </Section>
+      {!isNew && (
+        <GenerateBarcodesButton storeId={storeId} productId={id} variants={variants}
+          onDone={(codes) => setVariants((l) => l.map((v) => (codes[v.id] ? { ...v, barcode: codes[v.id] } : v)))} />
       )}
       {isNew && attributes.length > 0 && <p className="text-xs text-gray-400 px-1">{t('product.variants_after_save')}</p>}
 

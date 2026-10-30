@@ -12,7 +12,8 @@ import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money } from '../lib/orders';
 import { barHeights, valueGroups } from '../lib/product-insights';
-import { Toggle } from '../components/product';
+import { BarcodeField, GenerateBarcodesButton, Toggle } from '../components/product';
+import { variantLabel } from '../components/inventory';
 
 const RANGES = [7, 30, 90, 0]; // 0 = كل الفترة
 const STATUS_COLORS = {
@@ -91,6 +92,19 @@ function NumberCell({ value, min = 0, integer = false, placeholder, onSave }) {
 
 function Stat({ label, value }) {
   return <div className="min-w-0"><p className="text-[10px] text-gray-400 truncate">{label}</p><p className="text-sm font-bold tabular-nums truncate"><bdi dir="ltr">{value}</bdi></p></div>;
+}
+
+// باركود النسخة: يُكتب أو يُمسح أو يُولَّد، ويُحفظ عند الخروج من الحقل؛ وطباعة الملصق
+function VariantBarcode({ v, product, onSave }) {
+  const [code, setCode] = useState(v.barcode || '');
+  const commit = (b) => {
+    const next = String(b ?? '').trim() || null;
+    if (next !== (v.barcode || null)) onSave(next);
+  };
+  return (
+    <BarcodeField value={code} onChange={setCode} onCommit={commit} className="px-3 py-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm outline-none focus:border-indigo-400 w-full"
+      label={{ name: product.name, variant: variantLabel(v.name.map((e) => ({ mode: e.displayMode || 'text', value: e.value, attr: e.attrName }))), price: Number(v.price) > 0 ? Number(v.price) : Number(product.price) }} />
+  );
 }
 
 export default function ProductShow() {
@@ -293,6 +307,10 @@ export default function ProductShow() {
                 );
               })}
             </div>
+            <div className="p-3 pb-0">
+              <GenerateBarcodesButton storeId={storeId} productId={id} variants={variants}
+                onDone={(codes) => patchList('variants', new Set(Object.keys(codes)), (o) => ({ barcode: codes[o.id] }))} />
+            </div>
             <div className="divide-y divide-gray-100 dark:divide-zinc-800">
               {variants.map((v, i) => (
                 <div key={v.id} className={`p-3 space-y-2.5 ${v.isActive ? '' : 'opacity-60'}`}>
@@ -313,6 +331,7 @@ export default function ProductShow() {
                     <label className="space-y-1"><span className="text-[10px] text-gray-400">{t('insights.variants.price')} ({DA})</span><NumberCell value={v.price > 0 ? v.price : ''} placeholder={String(product.price)} onSave={(n) => saveOption('variants', v.id, 'price', n)} /></label>
                     <label className="space-y-1"><span className="text-[10px] text-gray-400">{t('insights.variants.stock')}</span><NumberCell value={v.stock} integer onSave={(n) => saveOption('variants', v.id, 'stock', n)} /></label>
                   </div>
+                  <VariantBarcode key={v.barcode || ''} v={v} product={product} onSave={(code) => saveOption('variants', v.id, 'barcode', code)} />
                   <div className="grid grid-cols-3 gap-2">
                     <Stat label={t('insights.col.orders')} value={money(v.orders)} /><Stat label={t('insights.col.units')} value={money(v.units)} /><Stat label={t('insights.col.revenue')} value={price(v.revenue)} />
                   </div>

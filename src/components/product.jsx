@@ -4,13 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { effectiveVariantPrice, moveItem, newAddon, newAttribute, newOffer, newValue, variantPriceField, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
+import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
 import { printLabel } from '../lib/label';
 import { useAuth } from '../lib/auth';
 import ImageLibrary from './ImageLibrary';
-import { VariantParts, variantLabel } from './inventory';
 
 export const input = 'w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400';
 export const label = 'text-xs font-semibold text-gray-500 dark:text-zinc-400';
@@ -356,84 +355,30 @@ export function BarcodeField({ value, onChange, onCommit, className = input, lab
   );
 }
 
-function VariantRow({ v, storeId, productId, productName, productPrice, onSaved }) {
+// توليد باركود لكل نسخة بلا باركود (القائم لا يتغير)، ويُحفظ مباشرة — في صفحة عرض المنتج
+export function GenerateBarcodesButton({ storeId, productId, variants, onDone }) {
   const { t } = useTranslation();
-  const [f, setF] = useState({ price: variantPriceField(v.price), stock: String(v.stock ?? 0), barcode: v.barcode || '' });
-  const [active, setActive] = useState(v.isActive !== false);
-  const save = async (field, raw) => {
-    // سعر فارغ = يبقى سعر المنتج (-1) — لا حفظ
-    if (field === 'price' && String(raw).trim() === '') { setF((s) => ({ ...s, price: variantPriceField(v.price) })); return; }
-    const value = field === 'barcode' ? (raw.trim() || null) : Number(raw);
-    const old = field === 'barcode' ? (v.barcode || null) : Number(v[field]);
-    if (value === old || (field !== 'barcode' && !Number.isFinite(value))) return;
-    try {
-      await api.patch(`/stores/${storeId}/products/${productId}/variants/${v.id}`, { [field]: value });
-      v[field] = value;
-      onSaved?.();
-      toast.success(t('inventory.saved'));
-    } catch (e) {
-      toast.error(errorMessage(e, t('inventory.error')));
-      setF((s) => ({ ...s, [field]: field === 'barcode' ? (v.barcode || '') : field === 'price' ? variantPriceField(v.price) : String(v[field] ?? '') }));
-    }
-  };
-  const toggle = async () => {
-    try {
-      const { data } = await api.patch(`/stores/${storeId}/products/${productId}/variants/${v.id}/toggle-active`, {});
-      setActive((data?.data || data)?.isActive ?? !active);
-    } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); }
-  };
-  return (
-    <div className={`rounded-xl border border-gray-100 dark:border-zinc-800 p-3 space-y-2.5 ${active ? '' : 'opacity-60'}`}>
-      <div className="flex items-center justify-between gap-2">
-        <VariantParts parts={v.name} className="text-sm font-semibold" />
-        <Toggle checked={active} onChange={toggle}><span className="text-xs text-gray-400">{active ? t('product.active') : t('product.inactive')}</span></Toggle>
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('product.price')}</span>
-          <input type="number" inputMode="decimal" dir="ltr" value={f.price} placeholder={productPrice !== '' && productPrice != null ? String(productPrice) : ''} onChange={(e) => setF({ ...f, price: e.target.value })} onBlur={() => save('price', f.price)} className={`${small} w-full`} /></label>
-        <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('inventory.col.stock')}</span>
-          <input type="number" inputMode="numeric" dir="ltr" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} onBlur={() => save('stock', f.stock)} className={`${small} w-full`} /></label>
-      </div>
-      <BarcodeField value={f.barcode} onChange={(b) => setF({ ...f, barcode: b })} onCommit={(b) => save('barcode', b)} className={`${small} w-full`}
-        label={{ name: productName, variant: variantLabel(v.name), price: effectiveVariantPrice(f.price, productPrice) }} />
-    </div>
-  );
-}
-
-export function VariantsEditor({ variants, storeId, productId, productName, productPrice, dirty }) {
-  const { t } = useTranslation();
-  const [bulk, setBulk] = useState(false);
-  const [ver, setVer] = useState(0); // يعيد رسم الصفوف بعد التوليد الجماعي
+  const [busy, setBusy] = useState(false);
   const missing = variants.filter((v) => !String(v.barcode ?? '').trim()).length;
-  // باركود لكل نسخة بلا باركود (القائم لا يتغير) ويُحفظ مباشرة
-  const generateAll = async () => {
-    setBulk(true);
+  if (!missing) return null;
+  const run = async () => {
+    setBusy(true);
     try {
       const current = Object.fromEntries(variants.map((v) => [v.id, v.barcode || '']));
       const codes = await fillMissingBarcodes(variants.map((v) => v.id), current, () => freshBarcode(storeId));
-      for (const v of variants) {
-        if (!codes[v.id]) continue;
-        await api.patch(`/stores/${storeId}/products/${productId}/variants/${v.id}`, { barcode: codes[v.id] });
-        v.barcode = codes[v.id];
-      }
+      for (const [vid, code] of Object.entries(codes)) await api.patch(`/stores/${storeId}/products/${productId}/variants/${vid}`, { barcode: code });
+      onDone(codes);
       toast.success(t('product.barcodes_done', { count: Object.keys(codes).length }));
     } catch (e) {
       toast.error(errorMessage(e, t('inventory.error')));
     } finally {
-      setVer((n) => n + 1);
-      setBulk(false);
+      setBusy(false);
     }
   };
   return (
-    <div className="space-y-2">
-      {dirty && <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 rounded-lg p-2">{t('product.variants_dirty')}</p>}
-      {missing > 0 && (
-        <button type="button" onClick={generateAll} disabled={bulk} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/40 text-sm font-bold text-indigo-600 dark:text-indigo-400 disabled:opacity-60">
-          {bulk ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}{t('product.barcodes_all', { count: missing })}
-        </button>
-      )}
-      {variants.map((v) => <VariantRow key={`${v.id}-${ver}`} v={v} storeId={storeId} productId={productId} productName={productName} productPrice={productPrice} />)}
-    </div>
+    <button type="button" onClick={run} disabled={busy} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/40 text-sm font-bold text-indigo-600 dark:text-indigo-400 disabled:opacity-50">
+      {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}{t('product.barcodes_all', { count: missing })}
+    </button>
   );
 }
 
