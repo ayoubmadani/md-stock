@@ -109,8 +109,8 @@ export default function App() {
             <Route path="landing" element={<LandingPagesPage />} />
             <Route path="keys" element={<RequirePerm owner><ApiKeysPage /></RequirePerm>} />
             <Route path="rates" element={<RequirePerm perm="delivery.rates"><DeliveryRatesPage /></RequirePerm>} />
-            <Route path="pos" element={<RequirePerm perm={['order.manage', 'pos.sell']}><PosPage /></RequirePerm>} />
-            <Route path="pos/:orderId" element={<RequirePerm perm={['order.manage', 'pos.sell']}><PosPage /></RequirePerm>} />
+            <Route path="pos" element={<RequirePerm perm="pos.sell"><PosPage /></RequirePerm>} />
+            <Route path="pos/:orderId" element={<RequirePerm perm="pos.sell"><PosPage /></RequirePerm>} />
             <Route path="tasks" element={<TasksPage />} />
             <Route path="customers" element={<RequirePerm perm={['order.view', 'pos.sell']}><CustomersPage /></RequirePerm>} />
             <Route path="customers/:id" element={<RequirePerm perm={['order.view', 'pos.sell']}><CustomerDetail /></RequirePerm>} />

@@ -114,7 +114,8 @@ export default function OrderDetail() {
   const canSend = can('order.manage') && queue && !order.confirmationCompanyId && !order.isDigital && !pos;
   const canRecall = can('order.manage') && order.confirmationCompanyId && (queue || order.status === 'cancelled');
   const canShip = can('order.manage') && !pos && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital && !nextActions(order).some((a) => a.action === 'ship');
-  const canEdit = can('order.manage') && !order.confirmationCompanyId;
+  // تعديل بيع المحل يفتح صفحة البيع: يحتاج «البيع في المحل»
+  const canEdit = can(order.platform === 'pos' ? 'pos.sell' : 'order.manage') && !order.confirmationCompanyId;
 
   const recall = async () => {
     setRecalling(true);

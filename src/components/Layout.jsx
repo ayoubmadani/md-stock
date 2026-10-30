@@ -68,7 +68,7 @@ export default function Layout() {
           </Link>
           <div className="flex-1 hidden md:block" />
           {/* بيع في المحل — ظاهر في كل الصفحات */}
-          {(can('order.manage') || can('pos.sell')) && (
+          {can('pos.sell') && (
             <NavLink to="/pos" className={({ isActive }) => `flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold shrink-0 ${isActive ? 'bg-emerald-700 text-white' : 'bg-emerald-600 text-white'}`}>
               <ScanBarcode className="w-4 h-4" /><span>{t('nav.pos_short')}</span>
             </NavLink>
