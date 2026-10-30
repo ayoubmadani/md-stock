@@ -25,7 +25,7 @@ function CopyRow({ label, value }) {
   );
 }
 
-const btn = 'shrink-0 w-8 h-8 flex items-center justify-center rounded-lg disabled:opacity-60';
+const btn = 'shrink-0 w-7 h-7 flex items-center justify-center rounded-lg disabled:opacity-60';
 
 // سطر دومين (أو رابط فرعي .mdstore.top بنفس المعاملة): الحالة والاسم وصفحة الهبوط المربوطة، وأيقونات في نفس السطر:
 // تحقق (للدومين المنتظر فقط — الرابط الفرعي متصل دائماً)، ربط، فسخ، نسخ، فتح، حذف
@@ -37,7 +37,7 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
     try { await navigator.clipboard.writeText(`https://${d.domain}`); setCopied(true); setTimeout(() => setCopied(false), 1200); } catch { /* المتصفح منع النسخ */ }
   };
   return (
-    <div className="px-3 py-3 space-y-1.5">
+    <div className="px-3 py-2 space-y-1">
       {/* السطر الأول: الدومين كاملاً */}
       <p className="flex items-center gap-2 font-bold text-sm min-w-0">
         <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
@@ -51,18 +51,18 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
         </p>
       {!sub && !d.isActive && (
           <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
           </button>
         )}
         {d.scope !== 'landing_page' && (
-          <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-4 h-4" /></button>
+          <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-3.5 h-3.5" /></button>
         )}
         {d.scope === 'landing_page' && (
-          <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-4 h-4" /></button>
+          <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-3.5 h-3.5" /></button>
         )}
-        <button type="button" onClick={copy} title={t('domains.copy')} aria-label={t('domains.copy')} className={`${btn} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600`}>{copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}</button>
-        <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" title={d.domain} aria-label={d.domain} className={`${btn} bg-gray-100 dark:bg-zinc-800 text-gray-500`}><ExternalLink className="w-4 h-4" /></a>
-        <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} aria-label={t('domains.delete')} className={`${btn} bg-rose-50 dark:bg-rose-500/10 text-rose-600`}><Trash2 className="w-4 h-4" /></button>
+        <button type="button" onClick={copy} title={t('domains.copy')} aria-label={t('domains.copy')} className={`${btn} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600`}>{copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}</button>
+        <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" title={d.domain} aria-label={d.domain} className={`${btn} bg-gray-100 dark:bg-zinc-800 text-gray-500`}><ExternalLink className="w-3.5 h-3.5" /></a>
+        <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} aria-label={t('domains.delete')} className={`${btn} bg-rose-50 dark:bg-rose-500/10 text-rose-600`}><Trash2 className="w-3.5 h-3.5" /></button>
       </div>
     </div>
   );
@@ -210,7 +210,7 @@ export default function DomainsPage() {
         ))}
       </div>
       {/* صندوق ثابت الارتفاع: التمرير داخله، فلا تقفز الصفحة عند تغيير التبويب */}
-      <div className={`${box} h-[340px] overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800`}>
+      <div className={`${box} h-[260px] overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800`}>
         {shown.length === 0
           ? <div className="h-full flex flex-col items-center justify-center gap-2 text-gray-400"><Globe className="w-8 h-8" /><p className="text-sm">{t('domains.empty')}</p></div>
           : shown.map((d) => (
@@ -224,7 +224,7 @@ export default function DomainsPage() {
           {t('domains.limit_short', { limit })}{isOwner && <> — <Link to="/subscription" className="font-bold text-indigo-600 dark:text-indigo-400">{t('domains.upgrade')}</Link></>}
         </p>
       ) : (
-        <button type="button" onClick={() => setSheet(true)} className="w-full flex items-center justify-center gap-1.5 py-3.5 rounded-2xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+        <button type="button" onClick={() => setSheet(true)} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
           <Plus className="w-4 h-4" />{t('domains.add_new')}
         </button>
       )}
@@ -261,7 +261,7 @@ export default function DomainsPage() {
               className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
             <p className="text-[11px] text-gray-400">{t('domains.add_hint')}</p>
             <button disabled={adding || !value.trim()} className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold disabled:opacity-50">
-              {adding && <Loader2 className="w-4 h-4 animate-spin" />}{t('domains.add')}
+              {adding && <Loader2 className="w-3.5 h-3.5 animate-spin" />}{t('domains.add')}
             </button>
           </form>
         </div>
