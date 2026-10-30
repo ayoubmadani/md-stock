@@ -1,13 +1,13 @@
-// الدومين: معلومات الربط في الأعلى، رابط المتجر، الدومينات المخصصة (تحقق / حذف)، وربط دومين جديد ضمن حد الخطة
+// الدومين: معلومات الربط في الأعلى، ثم تبويبات (روابط المتجر / المخصصة / صفحات الهبوط) بأزرار تحقق، ربط، فسخ، حذف
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Copy, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, X } from 'lucide-react';
+import { Check, Copy, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { normalizeDomain } from '../lib/store-setup';
-import { DNS_RECORD, splitDomains } from '../lib/domains';
+import { DNS_RECORD, groupDomains } from '../lib/domains';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
 
@@ -25,30 +25,40 @@ function CopyRow({ label, value }) {
   );
 }
 
-// سطر دومين: الحالة، الاسم، وزر تحقق للمنتظر؛ دومين النظام يُفتح ولا يُحذف
-function DomainRow({ d, system, busy, onCheck, onRemove }) {
+const btn = 'shrink-0 w-9 h-9 flex items-center justify-center rounded-lg disabled:opacity-60';
+
+// سطر دومين: الحالة والاسم (وصفحة الهبوط المربوطة)، وأيقونات بسيطة في نفس السطر: تحقق، ربط، فسخ، فتح، حذف
+function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
   const { t } = useTranslation();
+  const sub = d.domain.endsWith('.mdstore.top');
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
+    <div className="flex items-center gap-2 px-3 py-3">
       <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
       <div className="flex-1 min-w-0">
         <p className="font-bold text-sm truncate"><bdi dir="ltr">{d.domain}</bdi></p>
-        <p className="flex items-center gap-1.5 mt-0.5 text-[11px] font-semibold">
-          <span className={d.isActive ? 'text-gray-500' : 'text-amber-500'}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
-          {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10"><LayoutTemplate className="w-3 h-3" />{t('domains.landing_page')}</span>}
+        <p className="flex items-center gap-1.5 mt-0.5 text-[11px] font-semibold min-w-0">
+          <span className={`shrink-0 ${d.isActive ? 'text-gray-500' : 'text-amber-500'}`}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
+          {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{page?.name || t('domains.landing_page')}</span></span>}
         </p>
       </div>
-      {!system && !d.isActive && (
-        <button type="button" disabled={busy} onClick={onCheck} className="shrink-0 flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-bold disabled:opacity-60">
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}{t('domains.check')}
+      {!sub && !d.isActive && (
+        <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>
+          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
         </button>
       )}
-      {system
-        ? <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-gray-400" aria-label={d.domain}><ExternalLink className="w-4 h-4" /></a>
-        : <button type="button" disabled={busy} onClick={onRemove} className="shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-600 text-xs font-bold disabled:opacity-60"><Trash2 className="w-3.5 h-3.5" />{t('domains.delete')}</button>}
+      {!sub && d.scope !== 'landing_page' && (
+        <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-4 h-4" /></button>
+      )}
+      {d.scope === 'landing_page' && (
+        <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-4 h-4" /></button>
+      )}
+      <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" title={d.domain} aria-label={d.domain} className={`${btn} bg-gray-100 dark:bg-zinc-800 text-gray-500`}><ExternalLink className="w-4 h-4" /></a>
+      <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} aria-label={t('domains.delete')} className={`${btn} bg-rose-50 dark:bg-rose-500/10 text-rose-600`}><Trash2 className="w-4 h-4" /></button>
     </div>
   );
 }
+
+const TABS = ['store', 'custom', 'pages'];
 
 export default function DomainsPage() {
   const { t } = useTranslation();
@@ -59,10 +69,14 @@ export default function DomainsPage() {
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(null);
   const [sheet, setSheet] = useState(false);
+  const [tab, setTab] = useState('store');
+  const [pages, setPages] = useState([]);
+  const [linking, setLinking] = useState(null); // الدومين الذي نختار له صفحة هبوط
 
   const load = useCallback(() => {
     api.get(`/domain/store/${storeId}`).then((r) => setDomains(r.data || [])).catch(() => setDomains([]));
     api.get(`/domain/limit/${storeId}`).then((r) => setLimit(r.data?.limit ?? null)).catch(() => setLimit(null));
+    api.get(`/builder-pages/store/${storeId}`).then((r) => setPages(Array.isArray(r.data) ? r.data : r.data?.data ?? [])).catch(() => setPages([]));
   }, [storeId]);
   useEffect(() => { load(); }, [load]);
 
@@ -112,9 +126,38 @@ export default function DomainsPage() {
     }
   };
 
+  // ربط دومين مخصص بصفحة هبوط، أو فسخه (يعود دومين متجر)
+  const link = async (d, pageId) => {
+    setBusy(d.id);
+    try {
+      const { data } = await api.patch(`/domain/${d.id}/assign-page`, { builderPageId: pageId, storeId });
+      setDomains((l) => l.map((x) => (x.id === d.id ? { ...x, ...data, scope: 'landing_page', builderPageId: pageId } : x)));
+      setLinking(null);
+      setTab('pages');
+      toast.success(t('domains.linked'));
+    } catch (err) {
+      toast.error(errorMessage(err, t('inventory.error')));
+    } finally {
+      setBusy(null);
+    }
+  };
+  const unlink = async (d) => {
+    if (!window.confirm(t('domains.confirm_unlink', { domain: d.domain }))) return;
+    setBusy(d.id);
+    try {
+      await api.patch(`/domain/${d.id}/unassign-page`, { storeId });
+      setDomains((l) => l.map((x) => (x.id === d.id ? { ...x, scope: 'store', builderPageId: null } : x)));
+      toast.success(t('domains.unlinked'));
+    } catch (err) {
+      toast.error(errorMessage(err, t('inventory.error')));
+    } finally {
+      setBusy(null);
+    }
+  };
+
   if (!domains) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
-  const { system, custom } = splitDomains(domains);
-  const row = (d, isSystem) => <DomainRow key={d.id} d={d} system={isSystem} busy={busy === d.id} onCheck={() => check(d)} onRemove={() => remove(d)} />;
+  const groups = groupDomains(domains);
+  const shown = groups[tab];
 
   return (
     <div className="max-w-xl mx-auto space-y-3">
@@ -138,17 +181,24 @@ export default function DomainsPage() {
         <p className="text-[11px] text-gray-400">{t('domains.dns_note')}</p>
       </div>
 
-      {system.length > 0 && (
-        <>
-          <p className="px-1 pt-2 text-xs font-bold text-gray-400">{t('domains.my_link')}</p>
-          <div className={`${box} divide-y divide-gray-100 dark:divide-zinc-800`}>{system.map((d) => row(d, true))}</div>
-        </>
-      )}
-
-      <p className="px-1 pt-2 text-xs font-bold text-gray-400">{t('domains.custom')}</p>
-      {custom.length === 0
+      {/* تبويبات القائمة */}
+      <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
+        {TABS.map((k) => (
+          <button key={k} type="button" onClick={() => setTab(k)} className={`py-2 rounded-lg text-xs font-bold ${tab === k ? 'bg-white dark:bg-zinc-800 shadow-sm' : 'text-gray-500'}`}>
+            {t(`domains.tab_${k}`)} <span className="opacity-60" dir="ltr">{groups[k].length}</span>
+          </button>
+        ))}
+      </div>
+      {shown.length === 0
         ? <div className="flex flex-col items-center gap-2 py-8 text-gray-400"><Globe className="w-8 h-8" /><p className="text-sm">{t('domains.empty')}</p></div>
-        : <div className={`${box} divide-y divide-gray-100 dark:divide-zinc-800`}>{custom.map((d) => row(d, false))}</div>}
+        : (
+          <div className={`${box} divide-y divide-gray-100 dark:divide-zinc-800`}>
+            {shown.map((d) => (
+              <DomainRow key={d.id} d={d} page={pages.find((p) => p.id === d.builderPageId)} busy={busy === d.id}
+                onCheck={() => check(d)} onLink={() => setLinking(d)} onUnlink={() => unlink(d)} onRemove={() => remove(d)} />
+            ))}
+          </div>
+        )}
 
       {full ? (
         <p className="rounded-xl bg-gray-100 dark:bg-zinc-900 px-4 py-3 text-center text-xs text-gray-500">
@@ -160,6 +210,27 @@ export default function DomainsPage() {
         </button>
       )}
 
+      {linking && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && setLinking(null)}>
+          <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[80dvh] flex flex-col pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-zinc-800">
+              <div className="min-w-0">
+                <p className="font-bold">{t('domains.link_title')}</p>
+                <p className="text-xs text-gray-400 truncate"><bdi dir="ltr">{linking.domain}</bdi></p>
+              </div>
+              <button type="button" onClick={() => setLinking(null)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
+              {pages.length === 0 ? <p className="text-center text-sm text-gray-400 py-8">{t('domains.no_pages')}</p> : pages.map((p) => (
+                <button key={p.id} type="button" disabled={busy === linking.id} onClick={() => link(linking, p.id)}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-zinc-800/60 text-start text-sm font-semibold disabled:opacity-50">
+                  <LayoutTemplate className="w-4 h-4 text-purple-500 shrink-0" /><span className="flex-1 truncate"><bdi>{p.name}</bdi></span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {sheet && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && setSheet(false)}>
           <form onSubmit={add} className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">

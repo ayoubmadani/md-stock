@@ -394,7 +394,17 @@
     "add_new": "Connecter un domaine",
     "add_hint": "Écrivez le domaine sans https:// — ex. bebe-shop.com",
     "limit_short": "Limite de votre offre atteinte ({{limit}} domaines)",
-    "upgrade": "Passer à une offre supérieure"
+    "upgrade": "Passer à une offre supérieure",
+    "tab_store": "Liens boutique",
+    "tab_custom": "Personnalisés",
+    "tab_pages": "Landing pages",
+    "link": "Lier",
+    "unlink": "Délier",
+    "link_title": "Lier le domaine à une landing page",
+    "no_pages": "Aucune landing page",
+    "linked": "Domaine lié à la page",
+    "unlinked": "Lien retiré — le domaine affiche la boutique",
+    "confirm_unlink": "Délier {{domain}} de la landing page ? Il affichera la boutique."
   },
   "camera": {
     "fallback": "Ouverture de l'appareil photo du téléphone…",

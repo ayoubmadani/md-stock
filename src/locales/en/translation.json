@@ -394,7 +394,17 @@
     "add_new": "Connect a new domain",
     "add_hint": "Type the domain without https:// — e.g. bebe-shop.com",
     "limit_short": "You reached your plan limit ({{limit}} domains)",
-    "upgrade": "Upgrade your plan"
+    "upgrade": "Upgrade your plan",
+    "tab_store": "Store links",
+    "tab_custom": "Custom",
+    "tab_pages": "Landing pages",
+    "link": "Link",
+    "unlink": "Unlink",
+    "link_title": "Link the domain to a landing page",
+    "no_pages": "No landing pages yet",
+    "linked": "Domain linked to the page",
+    "unlinked": "Unlinked — the domain shows the store now",
+    "confirm_unlink": "Unlink {{domain}} from its landing page? It will show the store."
   },
   "camera": {
     "fallback": "Opening the phone camera…",
