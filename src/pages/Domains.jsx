@@ -25,35 +25,45 @@ function CopyRow({ label, value }) {
   );
 }
 
-const btn = 'shrink-0 w-9 h-9 flex items-center justify-center rounded-lg disabled:opacity-60';
+const btn = 'shrink-0 w-8 h-8 flex items-center justify-center rounded-lg disabled:opacity-60';
 
-// سطر دومين: الحالة والاسم (وصفحة الهبوط المربوطة)، وأيقونات بسيطة في نفس السطر: تحقق، ربط، فسخ، فتح، حذف
+// سطر دومين (أو رابط فرعي .mdstore.top بنفس المعاملة): الحالة والاسم وصفحة الهبوط المربوطة، وأيقونات في نفس السطر:
+// تحقق (للدومين المنتظر فقط — الرابط الفرعي متصل دائماً)، ربط، فسخ، نسخ، فتح، حذف
 function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
   const { t } = useTranslation();
   const sub = d.domain.endsWith('.mdstore.top');
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(`https://${d.domain}`); setCopied(true); setTimeout(() => setCopied(false), 1200); } catch { /* المتصفح منع النسخ */ }
+  };
   return (
-    <div className="flex items-center gap-2 px-3 py-3">
-      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
-      <div className="flex-1 min-w-0">
-        <p className="font-bold text-sm truncate"><bdi dir="ltr">{d.domain}</bdi></p>
-        <p className="flex items-center gap-1.5 mt-0.5 text-[11px] font-semibold min-w-0">
+    <div className="px-3 py-3 space-y-1.5">
+      {/* السطر الأول: الدومين كاملاً */}
+      <p className="flex items-center gap-2 font-bold text-sm min-w-0">
+        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+        <span className="truncate"><bdi dir="ltr">{d.domain}</bdi></span>
+      </p>
+      {/* السطر الثاني: الحالة وصفحة الهبوط، والأيقونات */}
+      <div className="flex items-center gap-1.5">
+        <p className="flex-1 flex items-center gap-1.5 text-[11px] font-semibold min-w-0 ps-4">
           <span className={`shrink-0 ${d.isActive ? 'text-gray-500' : 'text-amber-500'}`}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
           {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{page?.name || t('domains.landing_page')}</span></span>}
         </p>
-      </div>
       {!sub && !d.isActive && (
-        <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>
-          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-        </button>
-      )}
-      {!sub && d.scope !== 'landing_page' && (
-        <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-4 h-4" /></button>
-      )}
-      {d.scope === 'landing_page' && (
-        <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-4 h-4" /></button>
-      )}
-      <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" title={d.domain} aria-label={d.domain} className={`${btn} bg-gray-100 dark:bg-zinc-800 text-gray-500`}><ExternalLink className="w-4 h-4" /></a>
-      <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} aria-label={t('domains.delete')} className={`${btn} bg-rose-50 dark:bg-rose-500/10 text-rose-600`}><Trash2 className="w-4 h-4" /></button>
+          <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          </button>
+        )}
+        {d.scope !== 'landing_page' && (
+          <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-4 h-4" /></button>
+        )}
+        {d.scope === 'landing_page' && (
+          <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-4 h-4" /></button>
+        )}
+        <button type="button" onClick={copy} title={t('domains.copy')} aria-label={t('domains.copy')} className={`${btn} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600`}>{copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}</button>
+        <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" title={d.domain} aria-label={d.domain} className={`${btn} bg-gray-100 dark:bg-zinc-800 text-gray-500`}><ExternalLink className="w-4 h-4" /></a>
+        <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} aria-label={t('domains.delete')} className={`${btn} bg-rose-50 dark:bg-rose-500/10 text-rose-600`}><Trash2 className="w-4 h-4" /></button>
+      </div>
     </div>
   );
 }
