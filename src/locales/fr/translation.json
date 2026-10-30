@@ -404,7 +404,9 @@
     "no_pages": "Aucune landing page",
     "linked": "Domaine lié à la page",
     "unlinked": "Lien retiré — le domaine affiche la boutique",
-    "confirm_unlink": "Délier {{domain}} de la landing page ? Il affichera la boutique."
+    "confirm_unlink": "Délier {{domain}} de la landing page ? Il affichera la boutique.",
+    "hide_info": "Masquer",
+    "show_info": "Afficher"
   },
   "camera": {
     "fallback": "Ouverture de l'appareil photo du téléphone…",

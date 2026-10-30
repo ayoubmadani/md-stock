@@ -1,7 +1,7 @@
 // الدومين: معلومات الربط في الأعلى، ثم تبويبات (روابط المتجر / المخصصة / صفحات الهبوط) بأزرار تحقق، ربط، فسخ، حذف
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Copy, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
+import { Check, ChevronDown, Copy, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
@@ -72,6 +72,9 @@ export default function DomainsPage() {
   const [tab, setTab] = useState('store');
   const [pages, setPages] = useState([]);
   const [linking, setLinking] = useState(null); // الدومين الذي نختار له صفحة هبوط
+  // معلومات الربط: تُخفى وتُظهر، والاختيار يُحفظ على هذا الجهاز
+  const [infoOpen, setInfoOpen] = useState(() => { try { return localStorage.getItem('domains_info') !== 'hidden'; } catch { return true; } });
+  const toggleInfo = () => setInfoOpen((o) => { try { localStorage.setItem('domains_info', o ? 'hidden' : 'shown'); } catch { /* وضع خاص */ } return !o; });
 
   const load = useCallback(() => {
     api.get(`/domain/store/${storeId}`).then((r) => setDomains(r.data || [])).catch(() => setDomains([]));
@@ -168,17 +171,24 @@ export default function DomainsPage() {
 
       {/* معلومات الربط: نفس السجل لكل الدومينات */}
       <div className={`${box} border-indigo-200 dark:border-indigo-500/30 bg-gradient-to-b from-indigo-50/60 dark:from-indigo-500/10 p-4 space-y-3`}>
-        <div className="flex items-start gap-3">
+        <button type="button" onClick={toggleInfo} aria-expanded={infoOpen} className="w-full flex items-start gap-3 text-start">
           <span className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0"><Link2 className="w-5 h-5" /></span>
-          <div>
-            <p className="font-bold">{t('domains.connect_title')}</p>
-            <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t('domains.connect_desc')}</p>
-          </div>
-        </div>
-        <div className="rounded-xl bg-white dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
-          {DNS_RECORD.map(([k, v]) => <CopyRow key={k} label={t(`domains.field_${k}`)} value={v} />)}
-        </div>
-        <p className="text-[11px] text-gray-400">{t('domains.dns_note')}</p>
+          <span className="flex-1 min-w-0">
+            <span className="block font-bold">{t('domains.connect_title')}</span>
+            {infoOpen && <span className="block text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t('domains.connect_desc')}</span>}
+          </span>
+          <span className="shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100/70 dark:bg-indigo-500/15">
+            {infoOpen ? t('domains.hide_info') : t('domains.show_info')}<ChevronDown className={`w-3.5 h-3.5 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
+        {infoOpen && (
+          <>
+            <div className="rounded-xl bg-white dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
+              {DNS_RECORD.map(([k, v]) => <CopyRow key={k} label={t(`domains.field_${k}`)} value={v} />)}
+            </div>
+            <p className="text-[11px] text-gray-400">{t('domains.dns_note')}</p>
+          </>
+        )}
       </div>
 
       {/* تبويبات القائمة */}

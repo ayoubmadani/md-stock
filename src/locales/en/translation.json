@@ -404,7 +404,9 @@
     "no_pages": "No landing pages yet",
     "linked": "Domain linked to the page",
     "unlinked": "Unlinked — the domain shows the store now",
-    "confirm_unlink": "Unlink {{domain}} from its landing page? It will show the store."
+    "confirm_unlink": "Unlink {{domain}} from its landing page? It will show the store.",
+    "hide_info": "Hide",
+    "show_info": "Show"
   },
   "camera": {
     "fallback": "Opening the phone camera…",
