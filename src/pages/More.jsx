@@ -10,9 +10,9 @@ import { Toggle } from '../components/product';
 import { navVisible, useAuth } from '../lib/auth';
 
 export const MORE = [
-  { to: '/pos', key: 'pos', icon: ScanBarcode, perm: 'order.manage' },
+  { to: '/pos', key: 'pos', icon: ScanBarcode, perm: ['order.manage', 'pos.sell'] },
   { to: '/tasks', key: 'tasks', icon: ListTodo, all: true },
-  { to: '/customers', key: 'customers', icon: Contact, perm: 'order.view' },
+  { to: '/customers', key: 'customers', icon: Contact, perm: ['order.view', 'pos.sell'] },
   { to: '/abandoned', key: 'abandoned', icon: ShoppingCart, perm: 'order.view' },
   { to: '/profit', key: 'profit', icon: TrendingUp, storeOwner: true },
   { to: '/meta', key: 'meta', icon: Megaphone, storeOwner: true },

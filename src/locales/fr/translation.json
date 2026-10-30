@@ -703,7 +703,8 @@
       "seo.manage": "SEO",
       "delivery.rates": "Tarifs de livraison",
       "delivery.account": "Compte de livraison choisi (modification seule)",
-      "messages.read": "Lire les messages"
+      "messages.read": "Lire les messages",
+      "pos.sell": "Vente en magasin (avec les clients)"
     },
     "tab_invitations": "Invitations",
     "inv_empty": "Aucune invitation",

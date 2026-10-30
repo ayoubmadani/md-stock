@@ -703,7 +703,8 @@
       "seo.manage": "SEO (محركات البحث)",
       "delivery.rates": "أسعار التوصيل",
       "delivery.account": "حساب التوصيل المختار (تعديل فقط)",
-      "messages.read": "قراءة الرسائل"
+      "messages.read": "قراءة الرسائل",
+      "pos.sell": "البيع في المحل (مع عرض الزبائن)"
     },
     "tab_invitations": "الدعوات",
     "inv_empty": "لا دعوات جديدة",

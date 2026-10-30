@@ -703,7 +703,8 @@
       "seo.manage": "SEO",
       "delivery.rates": "Delivery rates",
       "delivery.account": "Selected delivery account (edit only)",
-      "messages.read": "Read messages"
+      "messages.read": "Read messages",
+      "pos.sell": "In-shop selling (with customers)"
     },
     "tab_invitations": "Invitations",
     "inv_empty": "No new invitations",

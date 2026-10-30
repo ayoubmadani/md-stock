@@ -1,5 +1,5 @@
 // صلاحيات مجموعات الفريق (نفس اللوحة) — إدارة الطلبات تستلزم عرضها
-export const PERMISSIONS = ['store.update', 'product.crud', 'category.crud', 'order.view', 'order.manage', 'domain.crud', 'seo.manage', 'delivery.rates', 'delivery.account', 'messages.read'];
+export const PERMISSIONS = ['store.update', 'product.crud', 'category.crud', 'order.view', 'order.manage', 'domain.crud', 'seo.manage', 'delivery.rates', 'delivery.account', 'messages.read', 'pos.sell'];
 
 export function togglePerm(list, p) {
   const s = new Set(list);
