@@ -7,7 +7,7 @@ import { Contact, ListTodo, Bell, BellRing, Code2, Store, Palette, Crown, Users,
 import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/push';
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
-import { useAuth } from '../lib/auth';
+import { navVisible, useAuth } from '../lib/auth';
 
 export const MORE = [
   { to: '/pos', key: 'pos', icon: ScanBarcode, perm: 'order.manage' },
@@ -18,10 +18,10 @@ export const MORE = [
   { to: '/meta', key: 'meta', icon: Megaphone, storeOwner: true },
   { to: '/stores', key: 'stores', icon: Store, all: true },
   { to: '/landing', key: 'landing', icon: LayoutTemplate, owner: true },
-  { to: '/messages', key: 'messages', icon: MessageSquare, owner: true },
+  { to: '/messages', key: 'messages', icon: MessageSquare, perm: 'messages.read' },
   { to: '/team', key: 'team', icon: Users, all: true },
-  { to: '/delivery', key: 'delivery', icon: Truck, owner: true },
-  { to: '/rates', key: 'rates', icon: Banknote, owner: true },
+  { to: '/delivery', key: 'delivery', icon: Truck, perm: 'delivery.account' },
+  { to: '/rates', key: 'rates', icon: Banknote, perm: 'delivery.rates' },
   { to: '/confirmation', key: 'confirmation', icon: PhoneCall, owner: true },
   { to: '/themes', key: 'themes', icon: Palette, owner: true },
   { to: '/pixels', key: 'pixels', icon: Code2, storeOwner: true },
@@ -87,7 +87,7 @@ export default function MorePage() {
     <div className="max-w-xl mx-auto space-y-3">
     {can('order.view') && <PushCard />}
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
-      {MORE.filter((m) => m.all || (m.storeOwner ? isOwner : m.owner ? owner : can(m.perm))).map((m) => (
+      {MORE.filter((m) => navVisible(m, { can, isOwner, ownsAnyStore: owner })).map((m) => (
         <Link key={m.to} to={m.to} className="flex items-center gap-3 px-4 py-3.5">
           <m.icon className="w-5 h-5 text-gray-400" />
           <span className="flex-1 font-semibold text-sm">{t(`nav.${m.key}`)}</span>

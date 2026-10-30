@@ -1,9 +1,11 @@
 // رسائل الزوار (نموذج «اتصل بنا» في المتاجر): جديدة / مقروءة / أرشيف — بحث، اتصال وواتساب، أرشفة وحذف
+// عضو الفريق (صلاحية «قراءة الرسائل»): رسائل هذا المتجر للقراءة فقط
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Archive, ArchiveRestore, Inbox, Loader2, Mail, MessageCircle, Phone, Search, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import { timeAgo } from '../components/orders';
 import { input } from '../components/product';
 
@@ -13,6 +15,7 @@ const waNumber = (p) => String(p || '').replace(/\D/g, '').replace(/^0/, '213');
 
 export default function MessagesPage() {
   const { t, i18n } = useTranslation();
+  const { storeId, isOwner } = useAuth();
   const [tab, setTab] = useState('inbox');
   const [q, setQ] = useState('');
   const [list, setList] = useState(null);
@@ -22,13 +25,13 @@ export default function MessagesPage() {
     const params = { archive: tab === 'archive', filter: q.trim() || undefined, nb: '1' };
     if (tab === 'inbox') params.viewed = 'false';
     if (tab === 'viewed') params.viewed = 'true';
-    api.get('/user/message-user', { params }).then(({ data }) => setList(Array.isArray(data) ? data : data?.data ?? [])).catch(() => setList([]));
-  }, [tab, q]);
+    api.get(isOwner ? '/user/message-user' : `/stores/${storeId}/messages`, { params }).then(({ data }) => setList(Array.isArray(data) ? data : data?.data ?? [])).catch(() => setList([]));
+  }, [tab, q, isOwner, storeId]);
   useEffect(() => { setList(null); const id = setTimeout(load, q ? 400 : 0); return () => clearTimeout(id); }, [load, q]);
 
   const view = (m) => {
     setOpen(open === m.id ? null : m.id);
-    if (!m.isViewed) {
+    if (!m.isViewed && isOwner) {
       api.patch(`/user/message-user/${m.id}/view`).catch(() => {});
       setList((l) => l.map((x) => (x.id === m.id ? { ...x, isViewed: true } : x)));
     }
@@ -77,8 +80,10 @@ export default function MessagesPage() {
                     {m.phone && <a href={`https://wa.me/${waNumber(m.phone)}`} target="_blank" rel="noreferrer" className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600"><MessageCircle className="w-4 h-4" /></a>}
                     {m.email && <a href={`mailto:${m.email}`} className="p-2 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300"><Mail className="w-4 h-4" /></a>}
                     <span className="flex-1" />
+                    {isOwner && <>
                     <button type="button" onClick={() => archive(m)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800">{tab === 'archive' ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}</button>
                     <button type="button" onClick={() => remove(m)} className="p-2 rounded-lg text-gray-400 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>
+                    </>}
                   </div>
                 )}
               </div>

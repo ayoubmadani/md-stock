@@ -1,11 +1,12 @@
-// شركات التوصيل: حسابات المتجر (افتراضي، حذف) + ربط حساب جديد (اختيار الشركة، المفاتيح، اختبار ثم حفظ)
+// شركات التوصيل: حسابات المتجر (افتراضي، تعديل، حذف) + ربط حساب جديد (اختيار الشركة، المفاتيح، اختبار ثم حفظ)
+// عضو الفريق (صلاحية «حساب التوصيل»): يرى الحساب المختار للمتجر ويعدّله فقط
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, ChevronLeft, Loader2, Plus, Search, Star, Trash2, Truck, X, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, Loader2, Pencil, Plus, Search, Star, Trash2, Truck, X, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { canSave, credentialKeys } from '../lib/shipping-accounts';
+import { canSave, credentialKeys, editPayload, visibleAccounts } from '../lib/shipping-accounts';
 import { input, label } from '../components/product';
 
 function Logo({ p, size = 'w-11 h-11' }) {
@@ -90,10 +91,47 @@ function AddSheet({ storeId, providers, onClose, onSaved }) {
   );
 }
 
+// تعديل حساب: الاسم، والمفاتيح الجديدة (فارغة = تبقى الحالية)
+function EditSheet({ storeId, account, provider, onClose, onSaved }) {
+  const { t } = useTranslation();
+  const [name, setName] = useState(account.accountName || '');
+  const [creds, setCreds] = useState({});
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    setBusy(true);
+    try { await api.patch(`/stores/${storeId}/shipping/accounts/${account.id}`, editPayload(account.providerName, name, creds)); toast.success(t('delivery.saved')); onSaved(); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); setBusy(false); }
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[92dvh] flex flex-col">
+        <div className="flex items-center gap-2 p-4 border-b border-gray-100 dark:border-zinc-800">
+          <Logo p={provider} size="w-8 h-8" />
+          <p className="flex-1 font-bold">{t('delivery.edit')}</p>
+          <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="space-y-1.5"><label className={label}>{t('delivery.account_name')}</label><input value={name} onChange={(e) => setName(e.target.value)} className={input} /></div>
+          {credentialKeys(account.providerName).map((k) => (
+            <div key={k} className="space-y-1.5">
+              <label className={label}>{k === 'id' ? 'API ID' : k === 'key' ? 'API Key' : 'API Token'}</label>
+              <input dir="ltr" type="password" autoComplete="off" placeholder="••••••" value={creds[k] || ''} onChange={(e) => setCreds((c) => ({ ...c, [k]: e.target.value }))} className={input} />
+            </div>
+          ))}
+          <p className="text-[11px] text-gray-400">{t('delivery.keys_keep')}</p>
+          <button type="button" disabled={!name.trim() || busy} onClick={save} className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold disabled:opacity-50">
+            {busy && <Loader2 className="w-4 h-4 animate-spin" />}{t('inventory.save')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DeliveryPage() {
   const { t } = useTranslation();
-  const { storeId } = useAuth();
+  const { storeId, isOwner } = useAuth();
   const [accounts, setAccounts] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [providers, setProviders] = useState([]);
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(null);
@@ -117,14 +155,14 @@ export default function DeliveryPage() {
     <div className="max-w-xl mx-auto space-y-3">
       <div className="flex items-center justify-between">
         <h1 className="font-bold">{t('nav.delivery')}</h1>
-        <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold"><Plus className="w-4 h-4" />{t('delivery.add')}</button>
+        {isOwner && <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold"><Plus className="w-4 h-4" />{t('delivery.add')}</button>}
       </div>
       {accounts === null ? <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
-        : accounts.length === 0 ? (
+        : visibleAccounts(accounts, isOwner).length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-16 text-gray-400 text-center"><Truck className="w-10 h-10" /><p className="text-sm max-w-xs">{t('delivery.empty')}</p></div>
         ) : (
           <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
-            {accounts.map((a) => (
+            {visibleAccounts(accounts, isOwner).map((a) => (
               <div key={a.id} className="flex items-center gap-3 p-3">
                 <Logo p={provider(a.providerName)} />
                 <div className="flex-1 min-w-0">
@@ -134,15 +172,17 @@ export default function DeliveryPage() {
                     {a.isVerified ? <span className="text-emerald-600 font-bold">· {t('delivery.verified')}</span> : <span className="text-amber-600 font-bold">· {t('delivery.unverified')}</span>}
                   </p>
                 </div>
+                <button type="button" onClick={() => setEditing(a)} title={t('delivery.edit')} className="p-2 rounded-lg text-gray-400 hover:text-indigo-600"><Pencil className="w-4 h-4" /></button>
                 {a.isDefault
                   ? <span className="flex items-center gap-1 text-[11px] font-bold text-amber-600"><Star className="w-3.5 h-3.5 fill-current" />{t('delivery.default')}</span>
-                  : <button type="button" disabled={busy === a.id} onClick={() => makeDefault(a)} title={t('delivery.make_default')} className="p-2 rounded-lg text-gray-400 hover:text-amber-500">{busy === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Star className="w-4 h-4" />}</button>}
-                <button type="button" onClick={() => remove(a)} className="p-2 rounded-lg text-gray-300 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>
+                  : isOwner && <button type="button" disabled={busy === a.id} onClick={() => makeDefault(a)} title={t('delivery.make_default')} className="p-2 rounded-lg text-gray-400 hover:text-amber-500">{busy === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Star className="w-4 h-4" />}</button>}
+                {isOwner && <button type="button" onClick={() => remove(a)} className="p-2 rounded-lg text-gray-300 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
           </div>
         )}
-      <p className="text-[11px] text-gray-400 px-1 leading-relaxed">{t('delivery.hint')}</p>
+      <p className="text-[11px] text-gray-400 px-1 leading-relaxed">{t(isOwner ? 'delivery.hint' : 'delivery.member_hint')}</p>
+      {editing && <EditSheet storeId={storeId} account={editing} provider={provider(editing.providerName)} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
       {adding && <AddSheet storeId={storeId} providers={providers} onClose={() => setAdding(false)} onSaved={() => { setAdding(false); load(); }} />}
     </div>
   );

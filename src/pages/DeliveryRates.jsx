@@ -5,7 +5,7 @@ import { Building2, Check, Download, Home, Loader2, MapPin, Pencil, Plus, Search
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { applyBulk, applyRates, communeChanges, communeSnapshot, communesOff, rowPayload } from '../lib/shipping-rates';
+import { applyBulk, applyRates, communeChanges, communeSnapshot, communesOff, ratesApi, rowPayload } from '../lib/shipping-rates';
 import { Toggle, input, label } from '../components/product';
 
 const box = 'rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80';
@@ -23,16 +23,16 @@ function Sheet({ title, onClose, children }) {
 }
 
 // بلديات الولاية: تعطيل بلدية كلياً أو المنزل/المكتب فقط — لا يظهر للزبون ما عُطّل
-function CommunesSheet({ wilaya, cfg, onClose, onSaved }) {
+function CommunesSheet({ wilaya, route, onClose, onSaved }) {
   const { t } = useTranslation();
   const [list, setList] = useState(null);
   const [initial, setInitial] = useState({});
   const [q, setQ] = useState('');
   const [saving, setSaving] = useState(false);
   useEffect(() => {
-    api.get(`/shipping/communes/${wilaya.id}`, cfg).then(({ data }) => { const rows = Array.isArray(data) ? data : []; setList(rows); setInitial(communeSnapshot(rows)); })
+    api.get(...route).then(({ data }) => { const rows = Array.isArray(data) ? data : []; setList(rows); setInitial(communeSnapshot(rows)); })
       .catch((e) => { toast.error(errorMessage(e, t('inventory.error'))); setList([]); });
-  }, [wilaya.id, cfg, t]);
+  }, [route[0], t]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (id, patch) => setList((l) => l.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   const setAll = (on) => setList((l) => l.map((c) => ({ ...c, homeEnabled: on, officeEnabled: on })));
   const changes = list ? communeChanges(list, initial) : [];
@@ -41,7 +41,7 @@ function CommunesSheet({ wilaya, cfg, onClose, onSaved }) {
     if (!changes.length) return onClose();
     setSaving(true);
     try {
-      const { data } = await api.post(`/shipping/communes/${wilaya.id}`, { communes: changes }, cfg);
+      const { data } = await api.post(route[0], { communes: changes }, route[1]);
       toast.success(t('rates.communes_saved'));
       onSaved(wilaya.id, data?.restricted ?? 0);
     } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); setSaving(false); }
@@ -84,7 +84,8 @@ function CommunesSheet({ wilaya, cfg, onClose, onSaved }) {
 
 export default function DeliveryRatesPage() {
   const { t } = useTranslation();
-  const { storeId } = useAuth();
+  // عضو الفريق (صلاحية «أسعار التوصيل»): أسعار هذا المتجر فقط — بلا حسابات أسعار ولا استيراد
+  const { storeId, isOwner } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [profileId, setProfileId] = useState(null);
   const [rows, setRows] = useState(null);
@@ -96,7 +97,8 @@ export default function DeliveryRatesPage() {
   const [communesOf, setCommunesOf] = useState(null); // الولاية المفتوحة بلدياتها
   const [bulk, setBulk] = useState({ home: '', office: '', ret: '' });
   const [accounts, setAccounts] = useState(null);
-  const cfg = useMemo(() => ({ params: profileId ? { profileId } : undefined }), [profileId]);
+  const R = useMemo(() => ratesApi(isOwner, storeId, profileId), [isOwner, storeId, profileId]);
+  const cfg = R.list[1];
 
   const loadProfiles = useCallback((select) => api.get('/shipping/profiles').then(({ data }) => {
     setProfiles(data ?? []);
@@ -106,9 +108,9 @@ export default function DeliveryRatesPage() {
       return (data.find((p) => p.stores?.some((s) => s.id === storeId)) || data[0])?.id ?? null;
     });
   }).catch(() => setProfiles([])), [storeId]);
-  useEffect(() => { loadProfiles(); }, [loadProfiles]);
-  const loadRows = useCallback(() => { setRows(null); setDirty(new Set()); api.get('/shipping/get-shipping', cfg).then((r) => setRows(r.data ?? [])).catch(() => setRows([])); }, [cfg]);
-  useEffect(() => { if (profileId) loadRows(); }, [profileId, loadRows]);
+  useEffect(() => { if (isOwner) loadProfiles(); }, [isOwner, loadProfiles]);
+  const loadRows = useCallback(() => { setRows(null); setDirty(new Set()); api.get(...R.list).then((r) => setRows(r.data ?? [])).catch(() => setRows([])); }, [R]);
+  useEffect(() => { if (profileId || !isOwner) loadRows(); }, [profileId, isOwner, loadRows]);
 
   const profile = profiles.find((p) => p.id === profileId);
   const usedHere = !!profile?.stores?.some((s) => s.id === storeId);
@@ -118,7 +120,7 @@ export default function DeliveryRatesPage() {
   const saveDirty = async () => {
     setBusy('save');
     try {
-      await api.post('/shipping/update-shipping', rows.filter((w) => dirty.has(w.id)).map(rowPayload), cfg);
+      await api.post(R.update[0], rows.filter((w) => dirty.has(w.id)).map(rowPayload), R.update[1]);
       toast.success(t('rates.saved', { count: dirty.size })); setDirty(new Set());
     } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
   };
@@ -130,7 +132,7 @@ export default function DeliveryRatesPage() {
       if (w[other] === false) return toast.error(t('rates.need_one'));
     }
     setBusy(`t-${w.id}`);
-    try { await api.post('/shipping/update-shipping', [{ wilayaId: w.id, [field]: next }], cfg); setRows((l) => l.map((x) => (x.id === w.id ? { ...x, [field]: next } : x))); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
+    try { await api.post(R.update[0], [{ wilayaId: w.id, [field]: next }], R.update[1]); setRows((l) => l.map((x) => (x.id === w.id ? { ...x, [field]: next } : x))); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
   };
   const init = async () => {
     setBusy('init');
@@ -209,7 +211,7 @@ export default function DeliveryRatesPage() {
       {rows === null ? <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
         : rows.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-14 text-gray-400 text-center"><Truck className="w-10 h-10" /><p className="text-sm max-w-xs">{t('rates.empty')}</p>
-            <button type="button" disabled={busy === 'init'} onClick={init} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold disabled:opacity-50">{busy === 'init' && <Loader2 className="w-4 h-4 animate-spin" />}{t('rates.init')}</button>
+            {isOwner && <button type="button" disabled={busy === 'init'} onClick={init} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold disabled:opacity-50">{busy === 'init' && <Loader2 className="w-4 h-4 animate-spin" />}{t('rates.init')}</button>}
           </div>
         ) : (
           <>
@@ -219,7 +221,7 @@ export default function DeliveryRatesPage() {
                 <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('rates.search')} className={`${input} ps-9`} />
               </div>
               <button type="button" onClick={() => setSheet('bulk')} title={t('rates.bulk')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300"><Wand2 className="w-5 h-5" /></button>
-              <button type="button" onClick={openImport} title={t('rates.import')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300"><Download className="w-5 h-5" /></button>
+              {isOwner && <button type="button" onClick={openImport} title={t('rates.import')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300"><Download className="w-5 h-5" /></button>}
             </div>
 
             <div className={`${box} divide-y divide-gray-100 dark:divide-zinc-800`}>
@@ -286,7 +288,7 @@ export default function DeliveryRatesPage() {
         </Sheet>
       )}
       {communesOf && (
-        <CommunesSheet wilaya={communesOf} cfg={cfg} onClose={() => setCommunesOf(null)}
+        <CommunesSheet wilaya={communesOf} route={R.communes(communesOf.id)} onClose={() => setCommunesOf(null)}
           onSaved={(id, restricted) => { setRows((l) => l.map((w) => (w.id === id ? { ...w, restrictedCommunes: restricted } : w))); setCommunesOf(null); }} />
       )}
       {sheet === 'import' && (

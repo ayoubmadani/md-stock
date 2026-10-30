@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { canManageStock, isStoreOwner } from './auth.jsx';
+import { canManageStock, isStoreOwner, navVisible } from './auth.jsx';
 
 describe('canManageStock', () => {
   it('owner and members with the products permission can manage stock', () => {
@@ -28,5 +28,22 @@ describe('isStoreOwner', () => {
     expect(isStoreOwner({ role: 'owner' })).toBe(true);
     expect(isStoreOwner({ role: 'member', permissions: ['*'] })).toBe(false);
     expect(isStoreOwner(null)).toBe(false);
+  });
+});
+
+describe('navVisible', () => {
+  const member = { can: (p) => p === 'order.view', isOwner: false, ownsAnyStore: true };
+  const owner = { can: () => true, isOwner: true, ownsAnyStore: true };
+  it('owner-only items (profit, Meta, wallet…) are hidden from team members, also in the sidebar', () => {
+    expect(navVisible({ storeOwner: true }, member)).toBe(false);
+    expect(navVisible({ storeOwner: true }, owner)).toBe(true);
+  });
+  it('permission items follow the group, «all» items show to everyone', () => {
+    expect(navVisible({ perm: 'order.view' }, member)).toBe(true);
+    expect(navVisible({ perm: ['product.crud', 'order.view'] }, member)).toBe(true);
+    expect(navVisible({ perm: 'delivery.rates' }, member)).toBe(false);
+    expect(navVisible({ all: true }, member)).toBe(true);
+    expect(navVisible({}, member)).toBe(true);
+    expect(navVisible({ owner: true }, { ...member, ownsAnyStore: false })).toBe(false);
   });
 });

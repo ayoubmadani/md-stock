@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store, ScanBarcode } from 'lucide-react';
 import { MORE } from '../pages/More';
 import { useState } from 'react';
-import { useAuth } from '../lib/auth';
+import { navVisible, useAuth } from '../lib/auth';
 import TrialOffer from './TrialOffer';
 
 // الشريط السفلي: 5 أزرار ثابتة؛ ما لا صلاحية له يظهر باهتاً ويفتح رسالة «لا صلاحية»
@@ -18,7 +18,7 @@ const LANGS = ['ar', 'fr', 'en'];
 
 export default function Layout() {
   const { t, i18n } = useTranslation();
-  const { stores, store, logout, can } = useAuth();
+  const { stores, store, logout, can, isOwner } = useAuth();
   const owner = stores.some((s) => s.role === 'owner');
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
 
@@ -45,7 +45,7 @@ export default function Layout() {
         </div>
         {/* القائمة تتمرر وحدها — زر الخروج يبقى ظاهراً في الأسفل */}
         <nav className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-1 -mx-1 px-1">
-          {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => (n.owner ? owner : !n.perm || [].concat(n.perm).some((x) => can(x)))).map((n) => (
+          {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter((n) => navVisible(n, { can, isOwner, ownsAnyStore: owner })).map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5 shrink-0" />{t(`nav.${n.key}`)}</NavLink>
           ))}
         </nav>

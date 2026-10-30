@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyBulk, applyRates, extractHomeOfficePrices, rowPayload, communeChanges, communeSnapshot, communesOff } from './shipping-rates';
+import { applyBulk, applyRates, extractHomeOfficePrices, rowPayload, communeChanges, communeSnapshot, communesOff, ratesApi } from './shipping-rates';
 
 const W = [
   { id: 16, code: 16, name: 'Alger', livraisonHome: 400, livraisonOfice: 300, livraisonReturn: 200, isActive: true },
@@ -40,5 +40,20 @@ describe('communes', () => {
   });
   it('counts a commune as off when both home and office are off', () => {
     expect(communesOff([{ homeEnabled: false, officeEnabled: false }, { homeEnabled: false, officeEnabled: true }])).toBe(1);
+  });
+});
+
+describe('ratesApi', () => {
+  it('the owner edits a rates profile through his own routes', () => {
+    const r = ratesApi(true, 's1', 'p1');
+    expect(r.list).toEqual(['/shipping/get-shipping', { params: { profileId: 'p1' } }]);
+    expect(r.update).toEqual(['/shipping/update-shipping', { params: { profileId: 'p1' } }]);
+    expect(r.communes(16)).toEqual(['/shipping/communes/16', { params: { profileId: 'p1' } }]);
+  });
+  it('a team member edits the rates of this store only', () => {
+    const r = ratesApi(false, 's1', 'p1');
+    expect(r.list).toEqual(['/stores/s1/delivery-rates', {}]);
+    expect(r.update).toEqual(['/stores/s1/delivery-rates', {}]);
+    expect(r.communes(16)).toEqual(['/stores/s1/delivery-rates/communes/16', {}]);
   });
 });

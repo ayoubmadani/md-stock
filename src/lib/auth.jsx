@@ -11,6 +11,14 @@ export const canManageStock = (s) => s.role === 'owner' || (s.permissions || [])
 /** صاحب المتجر الحالي فقط — الربحية وإعلانات ميتا */
 export const isStoreOwner = (s) => s?.role === 'owner';
 
+/** عنصر قائمة (المزيد والشريط الجانبي): storeOwner = صاحب المتجر الحالي، owner = من يملك أي متجر، perm = صلاحية أو قائمة */
+export const navVisible = (item, { can, isOwner, ownsAnyStore }) => {
+  if (item.all) return true;
+  if (item.storeOwner) return !!isOwner;
+  if (item.owner) return !!ownsAnyStore;
+  return !item.perm || [].concat(item.perm).some((p) => can(p));
+};
+
 export const hasPerm = (s, perm) => !!s && (s.role === 'owner' || (s.permissions || []).includes('*') || (s.permissions || []).includes(perm));
 
 export function AuthProvider({ children }) {

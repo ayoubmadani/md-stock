@@ -700,7 +700,10 @@
       "order.view": "View orders",
       "order.manage": "Manage orders",
       "domain.crud": "Domains",
-      "seo.manage": "SEO"
+      "seo.manage": "SEO",
+      "delivery.rates": "Delivery rates",
+      "delivery.account": "Selected delivery account (edit only)",
+      "messages.read": "Read messages"
     },
     "tab_invitations": "Invitations",
     "inv_empty": "No new invitations",
@@ -725,7 +728,11 @@
     "make_default": "Make default",
     "confirm_delete": "Delete account “{{name}}”?",
     "empty": "No delivery company connected. Connect your account to ship and track orders automatically.",
-    "hint": "Confirmed orders are shipped with the default account. Keys are in the delivery company's dashboard (API)."
+    "hint": "Confirmed orders are shipped with the default account. Keys are in the delivery company's dashboard (API).",
+    "edit": "Edit account",
+    "saved": "Account saved",
+    "keys_keep": "Leave the keys empty to keep the current ones.",
+    "member_hint": "This is the store's selected delivery account. You can only edit it; adding and removing accounts is for the owner."
   },
   "confirm": {
     "tab_saved": "My companies",

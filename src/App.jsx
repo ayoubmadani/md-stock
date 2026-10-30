@@ -103,12 +103,12 @@ export default function App() {
             <Route path="themes" element={<ThemesPage />} />
             <Route path="subscription" element={<RequirePerm owner><SubscriptionPage /></RequirePerm>} />
             <Route path="team" element={<TeamPage />} />
-            <Route path="delivery" element={<DeliveryPage />} />
+            <Route path="delivery" element={<RequirePerm perm="delivery.account"><DeliveryPage /></RequirePerm>} />
             <Route path="confirmation" element={<ConfirmationPage />} />
-            <Route path="messages" element={<MessagesPage />} />
+            <Route path="messages" element={<RequirePerm perm="messages.read"><MessagesPage /></RequirePerm>} />
             <Route path="landing" element={<LandingPagesPage />} />
             <Route path="keys" element={<RequirePerm owner><ApiKeysPage /></RequirePerm>} />
-            <Route path="rates" element={<DeliveryRatesPage />} />
+            <Route path="rates" element={<RequirePerm perm="delivery.rates"><DeliveryRatesPage /></RequirePerm>} />
             <Route path="pos" element={<RequirePerm perm="order.manage"><PosPage /></RequirePerm>} />
             <Route path="pos/:orderId" element={<RequirePerm perm="order.manage"><PosPage /></RequirePerm>} />
             <Route path="tasks" element={<TasksPage />} />

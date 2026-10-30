@@ -700,7 +700,10 @@
       "order.view": "Voir les commandes",
       "order.manage": "Gérer les commandes",
       "domain.crud": "Domaines",
-      "seo.manage": "SEO"
+      "seo.manage": "SEO",
+      "delivery.rates": "Tarifs de livraison",
+      "delivery.account": "Compte de livraison choisi (modification seule)",
+      "messages.read": "Lire les messages"
     },
     "tab_invitations": "Invitations",
     "inv_empty": "Aucune invitation",
@@ -725,7 +728,11 @@
     "make_default": "Définir par défaut",
     "confirm_delete": "Supprimer le compte « {{name}} » ?",
     "empty": "Aucune société de livraison connectée. Connectez votre compte pour envoyer et suivre les commandes.",
-    "hint": "Le compte par défaut reçoit les commandes confirmées. Les clés se trouvent dans le tableau de bord du transporteur (API)."
+    "hint": "Le compte par défaut reçoit les commandes confirmées. Les clés se trouvent dans le tableau de bord du transporteur (API).",
+    "edit": "Modifier le compte",
+    "saved": "Compte enregistré",
+    "keys_keep": "Laissez les clés vides pour garder les actuelles.",
+    "member_hint": "Compte de livraison choisi pour la boutique. Vous pouvez seulement le modifier ; l'ajout et la suppression sont réservés au propriétaire."
   },
   "confirm": {
     "tab_saved": "Mes sociétés",

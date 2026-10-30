@@ -56,3 +56,14 @@ export const communeChanges = (list, initial) => (list ?? [])
   .filter((c) => initial[c.id] !== communeKey(c))
   .map((c) => ({ communeId: c.id, homeEnabled: !!c.homeEnabled, officeEnabled: !!c.officeEnabled }));
 export const communesOff = (list) => (list ?? []).filter((c) => !c.homeEnabled && !c.officeEnabled).length;
+
+/** مسارات الأسعار: المالك يعدّل حساب أسعار يختاره؛ عضو الفريق يعدّل أسعار هذا المتجر فقط */
+export function ratesApi(isOwner, storeId, profileId) {
+  const cfg = isOwner ? { params: profileId ? { profileId } : undefined } : {};
+  const base = isOwner ? null : `/stores/${storeId}/delivery-rates`;
+  return {
+    list: [base ?? '/shipping/get-shipping', cfg],
+    update: [base ?? '/shipping/update-shipping', cfg],
+    communes: (wilayaId) => [base ? `${base}/communes/${wilayaId}` : `/shipping/communes/${wilayaId}`, cfg],
+  };
+}
