@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts } from './orders.js';
+import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts, orderAmounts } from './orders.js';
 
 describe('allowedStatuses', () => {
   it('a regular order can take any status', () => {
@@ -95,5 +95,18 @@ describe('pay later: what is paid and what is left', () => {
   });
   it('an unpaid sale has no «next step» button — payments are recorded in the payment card', () => {
     expect(nextActions({ platform: 'pos', status: 'unpaid', items: [] })).toEqual([]);
+  });
+});
+
+describe('orderAmounts', () => {
+  it('selling price from the lines, total = products + delivery (same as the order page)', () => {
+    const o = { totalPrice: 5600, priceShip: 800, items: [{ finalPrice: 4400, quantity: 1 }, { finalPrice: 600, quantity: 2 }] };
+    expect(orderAmounts(o)).toEqual({ products: 5600, ship: 800, total: 6400 });
+  });
+  it('the same after an edit, when the saved total already holds the delivery', () => {
+    expect(orderAmounts({ totalPrice: 6400, priceShip: 800, items: [{ finalPrice: 5600, quantity: 1 }] })).toEqual({ products: 5600, ship: 800, total: 6400 });
+  });
+  it('digital orders have no delivery', () => {
+    expect(orderAmounts({ isDigital: true, priceShip: 500, items: [{ finalPrice: 1000, quantity: 1 }] })).toEqual({ products: 1000, ship: 0, total: 1000 });
   });
 });

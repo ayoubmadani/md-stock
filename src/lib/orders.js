@@ -94,3 +94,10 @@ export function paymentState(order) {
   const paid = Math.round((order?.payments || []).reduce((s, p) => s + Number(p.amount || 0), 0) * 100) / 100;
   return { paid, remaining: Math.max(0, Math.round((Number(order?.totalPrice || 0) - paid) * 100) / 100) };
 }
+
+/** سعر البيع (المنتجات من الأسطر) والتوصيل والإجمالي — نفس حساب صفحة الطلب */
+export function orderAmounts(order) {
+  const products = (order.items || []).reduce((s, i) => s + Number(i.finalPrice || 0) * Number(i.quantity || 1), 0);
+  const ship = order.isDigital ? 0 : Number(order.priceShip || 0);
+  return { products, ship, total: products + ship };
+}

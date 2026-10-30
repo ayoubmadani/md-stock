@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, ChevronDown, Globe, Loader2, MapPin, Phone, Plus, Search, ShieldAlert, Store as StoreIcon, X } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { POS_STATUSES, STATUSES, STATUS_DOT, money, paymentState, sumCounts } from '../lib/orders';
+import { POS_STATUSES, STATUSES, STATUS_DOT, money, orderAmounts, paymentState, sumCounts } from '../lib/orders';
 import { OrderStatusBadge, StatusSheet, timeAgo } from '../components/orders';
 
 const PAGE_SIZE = 50; // نفس حد الخادم
@@ -15,6 +15,7 @@ function OrderCard({ order, canManage, onStatus }) {
   const items = order.items || [];
   const first = items[0];
   const image = first?.product?.imagesProduct?.[0]?.imageUrl;
+  const amounts = orderAmounts(order); // سعر البيع، والإجمالي مع التوصيل
   const navigate = useNavigate();
   return (
     <div role="link" tabIndex={0} onClick={() => navigate(`/orders/${order.id}`)} onKeyDown={(e) => e.key === 'Enter' && navigate(`/orders/${order.id}`)}
@@ -34,7 +35,8 @@ function OrderCard({ order, canManage, onStatus }) {
           </p>
         </div>
         <div className="text-end shrink-0">
-          <p className="font-black text-sm text-emerald-600 dark:text-emerald-400" dir="ltr">{money(order.totalPrice)} DA</p>
+          <p className="font-black text-sm text-emerald-600 dark:text-emerald-400" dir="ltr">{money(items.length ? amounts.products : order.totalPrice)} DA</p>
+          {items.length > 0 && amounts.ship > 0 && <p className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{t('orders.total')}: <span dir="ltr">{money(amounts.total)} DA</span></p>}
           {order.status === 'unpaid' && <p className="text-[11px] font-bold text-orange-600 dark:text-orange-400">{t('pos.remaining')}: <span dir="ltr">{money(paymentState(order).remaining)}</span></p>}
           <p className="text-[11px] text-gray-400 mt-0.5">{order.createdAt && timeAgo(order.createdAt, i18n.language)}</p>
         </div>
