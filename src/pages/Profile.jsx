@@ -33,7 +33,7 @@ function PasswordCard({ provider, onChanged }) {
       onChanged();
     } catch (ex) {
       const msg = errorMessage(ex, t('inventory.error'));
-      setError(/current password is incorrect/i.test(msg) ? t('profile.err_wrong_current') : msg);
+      setError(/current password is incorrect/i.test(msg) ? t('profile.err_wrong_current') : /too weak/i.test(msg) ? t('profile.err_weak') : msg);
     } finally {
       setSaving(false);
     }
@@ -48,6 +48,7 @@ function PasswordCard({ provider, onChanged }) {
       {!withCurrent && <p className="text-xs text-gray-500 dark:text-zinc-400">{t('profile.google_hint')}</p>}
       {withCurrent && <input type="password" dir="ltr" autoComplete="current-password" value={form.current} onChange={set('current')} placeholder={t('profile.current')} className={input} />}
       <input type="password" dir="ltr" autoComplete="new-password" value={form.next} onChange={set('next')} placeholder={t('profile.new', { n: MIN_PASSWORD })} className={input} />
+      <p className="text-xs text-gray-500 dark:text-zinc-400">{t('profile.rule', { n: MIN_PASSWORD })}</p>
       <input type="password" dir="ltr" autoComplete="new-password" value={form.confirm} onChange={set('confirm')} placeholder={t('profile.confirm')} className={input} />
       {error && <p className="text-sm text-rose-500">{error}</p>}
       <button disabled={saving} className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl disabled:opacity-60">

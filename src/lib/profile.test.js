@@ -10,7 +10,7 @@ describe('hasPassword', () => {
 });
 
 describe('passwordFormError', () => {
-  const ok = { current: 'old-pass', next: 'new-pass-1', confirm: 'new-pass-1' };
+  const ok = { current: 'old-pass', next: 'Store2024dz', confirm: 'Store2024dz' };
   it('valid form → null', () => {
     expect(passwordFormError(ok, true)).toBeNull();
   });
@@ -30,5 +30,15 @@ describe('passwordBody', () => {
   it('sends the current password only when the account has one', () => {
     expect(passwordBody({ current: 'a', next: 'bbbbbbbb' }, true)).toEqual({ password: 'a', newPassword: 'bbbbbbbb' });
     expect(passwordBody({ current: '', next: 'bbbbbbbb' }, false)).toEqual({ newPassword: 'bbbbbbbb' });
+  });
+});
+
+describe('weak passwords (same rule as the API: src/user/password-policy.ts)', () => {
+  const form = (pw) => ({ current: 'old', next: pw, confirm: pw });
+  it.each(['12345678', '87654321', '11111111', 'abcdefgh', 'password1', 'qwerty123', 'azertyuiop', 'motdepasse', '20242025'])('%s → weak', (pw) => {
+    expect(passwordFormError(form(pw), true)).toBe('weak');
+  });
+  it('letters + digits, not common → accepted', () => {
+    expect(passwordFormError(form('Store2024dz'), true)).toBeNull();
   });
 });

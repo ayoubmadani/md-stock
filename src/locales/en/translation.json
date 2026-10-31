@@ -1236,6 +1236,8 @@
     "err_current_required": "Enter your current password",
     "err_too_short": "The new password needs at least {{n}} characters",
     "err_mismatch": "The confirmation does not match the new password",
-    "err_wrong_current": "Current password is incorrect"
+    "err_wrong_current": "Current password is incorrect",
+    "err_weak": "Password too weak: mix letters and numbers, avoid sequences like 12345678 and common words",
+    "rule": "At least {{n}} characters, with letters and numbers — not 12345678 or password"
   }
 }

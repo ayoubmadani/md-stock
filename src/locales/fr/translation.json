@@ -1236,6 +1236,8 @@
     "err_current_required": "Saisissez le mot de passe actuel",
     "err_too_short": "Le nouveau mot de passe doit contenir au moins {{n}} caractères",
     "err_mismatch": "La confirmation ne correspond pas",
-    "err_wrong_current": "Mot de passe actuel incorrect"
+    "err_wrong_current": "Mot de passe actuel incorrect",
+    "err_weak": "Mot de passe trop faible : mélangez lettres et chiffres, évitez les suites comme 12345678 et les mots courants",
+    "rule": "Au moins {{n}} caractères, avec lettres et chiffres — pas 12345678 ni password"
   }
 }
