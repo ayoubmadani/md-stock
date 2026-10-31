@@ -47,9 +47,11 @@ export default function Scanner({ onDetected, paused = false, continuous = false
       <div className={`relative w-full overflow-hidden bg-black transition-all duration-300 ${compact ? 'h-24 rounded-2xl' : 'aspect-[4/3] rounded-3xl'} ${
         flash ? (flash.ok ? 'ring-4 ring-emerald-500 shadow-[0_0_30px_rgba(16,185,129,.45)]' : 'ring-4 ring-rose-500') : ''}`}>
         {!paused && <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />}
-        {/* إطار التوجيه */}
-        <div className={`pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-2xl border-2 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)] ${compact ? 'inset-x-16 h-12' : 'inset-x-8 h-28'} ${
-          flash ? (flash.ok ? 'border-emerald-400' : 'border-rose-400') : 'border-white/80'}`} />
+        {/* إطار التوجيه — لا يظهر في الشريط المصغّر */}
+        {!compact && (
+          <div className={`pointer-events-none absolute inset-x-8 top-1/2 -translate-y-1/2 h-28 rounded-2xl border-2 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)] ${
+            flash ? (flash.ok ? 'border-emerald-400' : 'border-rose-400') : 'border-white/80'}`} />
+        )}
         {onToggleSize && (
           <button type="button" onClick={onToggleSize} aria-label={t(compact ? 'scan.expand' : 'scan.shrink')}
             className="absolute top-2 end-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/55 text-white text-[11px] font-bold">
