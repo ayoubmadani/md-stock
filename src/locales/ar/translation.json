@@ -29,7 +29,9 @@
     "pos_short": "بيع",
     "customers": "الزبائن",
     "tasks": "المهام",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "scan_order": "طلب",
+    "scan_info": "معلومات"
   },
   "login": {
     "title": "تسجيل الدخول",

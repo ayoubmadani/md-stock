@@ -29,7 +29,9 @@
     "pos_short": "Vente",
     "customers": "Clients",
     "tasks": "Tâches",
-    "profile": "Profil"
+    "profile": "Profil",
+    "scan_order": "Commande",
+    "scan_info": "Infos"
   },
   "login": {
     "title": "Connexion",
