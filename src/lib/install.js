@@ -1,8 +1,8 @@
 // تثبيت التطبيق (PWA) من زر تحت نموذج الدخول:
-// Android/Chrome/Edge: الحدث beforeinstallprompt يُلتقط عند التحميل (main.jsx) ويُستعمل عند الضغط
-// iPhone/iPad: لا واجهة تثبيت — نعرض خطوات «مشاركة ← إضافة إلى الشاشة الرئيسية»
+// Chrome على Android: الحدث beforeinstallprompt يُلتقط عند التحميل (main.jsx) ويُستعمل عند الضغط (وإلا خطوات القائمة ⋮)
+// Safari على iPhone: لا واجهة تثبيت — خطوات «مشاركة ← إضافة إلى الشاشة الرئيسية»
 import { useEffect, useState } from 'react';
-import { isIos, isStandalone } from './push';
+import { isStandalone } from './push';
 
 let deferred = null;
 const listeners = new Set();
@@ -14,10 +14,16 @@ export function captureInstallPrompt() {
   window.addEventListener('appinstalled', () => { deferred = null; notify(); });
 }
 
-export function installMode({ standalone, ios, canPrompt }) {
+// المتصفحات المدعومة للتثبيت: Chrome على Android و Safari على iPhone فقط — غيرها (Samsung، Firefox، Chrome iPhone،
+// متصفح فيسبوك/إنستغرام داخل التطبيق…) ← رسالة «افتح في Chrome / Safari»؛ الحاسوب ← لا شيء
+const IN_APP = /FBAN|FBAV|FB_IAB|Instagram|Line\/|; wv\)|TikTok|Snapchat/i;
+const isAndroidChrome = (ua) => /Android/i.test(ua) && /Chrome\/\d+/.test(ua) && !/SamsungBrowser|EdgA|OPR|YaBrowser|UCBrowser|MiuiBrowser|HuaweiBrowser|Firefox/i.test(ua) && !IN_APP.test(ua);
+const isIosSafari = (ua) => /iPhone|iPad|iPod/i.test(ua) && /Version\/[\d.]+.*Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA\//.test(ua) && !IN_APP.test(ua);
+
+export function installMode({ ua, standalone, canPrompt }) {
   if (standalone) return 'installed';
-  if (canPrompt) return 'prompt';
-  if (ios) return 'ios';
+  if (/Android/i.test(ua)) return isAndroidChrome(ua) ? (canPrompt ? 'prompt' : 'android') : 'open-chrome';
+  if (/iPhone|iPad|iPod/i.test(ua)) return isIosSafari(ua) ? 'ios' : 'open-safari';
   return 'none';
 }
 
@@ -33,7 +39,7 @@ export async function promptInstall() {
 }
 
 export function useInstallMode() {
-  const read = () => installMode({ standalone: isStandalone(), ios: isIos(), canPrompt: !!deferred });
+  const read = () => installMode({ ua: navigator.userAgent, standalone: isStandalone(), canPrompt: !!deferred });
   const [mode, setMode] = useState(read);
   useEffect(() => {
     const fn = () => setMode(read());

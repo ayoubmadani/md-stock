@@ -1259,6 +1259,15 @@
     "ios_title": "Installer l'application sur iPhone",
     "ios_step1": "Touchez le bouton Partager dans la barre de Safari",
     "ios_step2": "Choisissez « Sur l'écran d'accueil »",
-    "ios_step3": "Touchez « Ajouter » — l'application apparaît sur votre écran"
+    "ios_step3": "Touchez « Ajouter » — l'application apparaît sur votre écran",
+    "android_title": "Installer l'application depuis Chrome",
+    "android_step1": "Touchez le menu ⋮ en haut de Chrome",
+    "android_step2": "Choisissez « Installer l'application » ou « Ajouter à l'écran d'accueil »",
+    "android_step3": "Touchez « Installer » — l'application apparaît sur votre écran",
+    "open_chrome": "Pour installer l'application, ouvrez cette page dans Google Chrome",
+    "open_safari": "Pour installer l'application, ouvrez cette page dans Safari",
+    "open_in_chrome": "Ouvrir dans Chrome",
+    "copy_link": "Copier le lien",
+    "copied": "Copié"
   }
 }

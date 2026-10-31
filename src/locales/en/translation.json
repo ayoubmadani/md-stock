@@ -1259,6 +1259,15 @@
     "ios_title": "Install the app on iPhone",
     "ios_step1": "Tap the Share button in the Safari bar",
     "ios_step2": "Choose «Add to Home Screen»",
-    "ios_step3": "Tap «Add» — the app appears on your home screen"
+    "ios_step3": "Tap «Add» — the app appears on your home screen",
+    "android_title": "Install the app from Chrome",
+    "android_step1": "Tap the ⋮ menu at the top of Chrome",
+    "android_step2": "Choose «Install app» or «Add to Home screen»",
+    "android_step3": "Tap «Install» — the app appears on your home screen",
+    "open_chrome": "To install the app, open this page in Google Chrome",
+    "open_safari": "To install the app, open this page in Safari",
+    "open_in_chrome": "Open in Chrome",
+    "copy_link": "Copy link",
+    "copied": "Copied"
   }
 }
