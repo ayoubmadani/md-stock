@@ -25,3 +25,7 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
   #pos-receipt, #pos-receipt * { visibility: visible; }
   #pos-receipt { position: absolute; inset: 0 auto auto 0; width: 100%; box-shadow: none; }
 }
+
+/* لوحة المفاتيح مفتوحة (آيفون): المودل يأخذ الجزء الظاهر فوقها فقط — lib/keyboard.js */
+html.kb .fixed.inset-0 { top: var(--vvt, 0px); bottom: auto; height: var(--vvh, 100%); }
+html.kb .fixed.inset-0 > * { max-height: calc(var(--vvh, 100dvh) - 8px) !important; }

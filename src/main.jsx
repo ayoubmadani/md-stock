@@ -5,6 +5,7 @@ import './index.css';
 import App from './App.jsx';
 import { registerSw } from './lib/push';
 import { playCoin, unlockAudio } from './lib/coin';
+import { watchKeyboard } from './lib/keyboard';
 
 // الوضع الليلي افتراضياً — يبقى اختيار المستخدم
 try {
@@ -22,6 +23,9 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 );
+
+// لوحة المفاتيح: المودل المفتوح يتقلّص فوقها
+watchKeyboard();
 
 // إشعارات الطلبات تصل حتى والتطبيق مغلق
 registerSw();
