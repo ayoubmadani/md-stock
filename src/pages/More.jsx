@@ -8,6 +8,7 @@ import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
 import { navVisible, useAuth } from '../lib/auth';
+import { AccountsCard } from '../components/Accounts';
 
 export const MORE = [
   { to: '/pos', key: 'pos', icon: ScanBarcode, perm: 'pos.sell' },
@@ -85,6 +86,7 @@ export default function MorePage() {
   const owner = stores.some((s) => s.role === 'owner');
   return (
     <div className="max-w-xl mx-auto space-y-3">
+    <AccountsCard />
     {can('order.view') && <PushCard />}
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
       {MORE.filter((m) => navVisible(m, { can, isOwner, ownsAnyStore: owner })).map((m) => (

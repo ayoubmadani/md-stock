@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { SavedAccounts } from '../components/Accounts';
 
 export default function Login() {
   const { t } = useTranslation();
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
+  const { login, token } = useAuth();
+  // ?add=1: إضافة حساب والحساب الحالي ما زال مفتوحاً · ?email=: حساب انتهت جلسته
+  const params = new URLSearchParams(window.location.search);
+  const adding = !!token && params.get('add') === '1';
+  const [email, setEmail] = useState(params.get('email') || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   // رجوع من Google بخطأ (مثلاً حساب غير موجود)
@@ -40,11 +45,17 @@ export default function Login() {
   return (
     <div className="min-h-dvh flex items-center justify-center p-5">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5">
+        {adding && (
+          <Link to="/more" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-zinc-400">
+            <ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('accounts.back')}
+          </Link>
+        )}
         <div className="text-center space-y-2">
           <img src="/icon-192.png" alt="" className="w-14 h-14 rounded-2xl mx-auto" />
-          <h1 className="text-2xl font-bold">{t('login.title')}</h1>
+          <h1 className="text-2xl font-bold">{adding ? t('accounts.add') : t('login.title')}</h1>
           <p className="text-sm text-gray-500 dark:text-zinc-400">{t('login.subtitle')}</p>
         </div>
+        {!adding && <SavedAccounts onPickExpired={setEmail} />}
         <input type="email" dir="ltr" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('login.email')} className={input} />
         <input type="password" dir="ltr" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('login.password')} className={input} />
         {error && <p className="text-sm text-rose-500 text-center">{error}</p>}

@@ -1208,5 +1208,16 @@
     "save": "Save & upload",
     "title_cover": "Desktop cover",
     "title_cover_mobile": "Phone cover"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "add": "Add account",
+    "current": "Current account",
+    "relogin": "Session expired — sign in again",
+    "remove": "Remove from this phone",
+    "remove_confirm": "Remove {{email}} from this phone? You can add it again by signing in.",
+    "limit": "Up to {{n}} accounts on this phone",
+    "back": "Back",
+    "saved": "Your accounts on this phone"
   }
 }

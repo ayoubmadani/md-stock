@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { markExpired, readAccounts, tokenUserId, writeAccounts } from './accounts';
 
 // جلسة تطبيق المخزون (منفصلة عن لوحة التاجر — نفس الحساب ونفس الـ API)
 const TOKEN_KEY = 'stock_token';
@@ -25,6 +26,8 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401 && getToken()) {
+      // الحساب يبقى في القائمة بعلامة «سجّل الدخول من جديد»؛ الحسابات الأخرى لا تتأثر
+      writeAccounts(markExpired(readAccounts(), tokenUserId(getToken())));
       setToken(null);
       window.location.assign('/login');
     }

@@ -1208,5 +1208,16 @@
     "save": "Enregistrer et envoyer",
     "title_cover": "Couverture ordinateur",
     "title_cover_mobile": "Couverture téléphone"
+  },
+  "accounts": {
+    "title": "Comptes",
+    "add": "Ajouter un compte",
+    "current": "Compte actuel",
+    "relogin": "Session expirée — reconnectez-vous",
+    "remove": "Retirer de ce téléphone",
+    "remove_confirm": "Retirer {{email}} de ce téléphone ? Vous pourrez le rajouter en vous connectant.",
+    "limit": "{{n}} comptes maximum sur ce téléphone",
+    "back": "Retour",
+    "saved": "Vos comptes sur ce téléphone"
   }
 }

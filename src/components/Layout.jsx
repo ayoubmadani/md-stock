@@ -4,6 +4,7 @@ import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, Layou
 import { MORE } from '../pages/More';
 import { useState } from 'react';
 import { navVisible, useAuth } from '../lib/auth';
+import { Avatar } from './Accounts';
 import TrialOffer from './TrialOffer';
 
 // الشريط السفلي: 5 أزرار ثابتة؛ ما لا صلاحية له يظهر باهتاً ويفتح رسالة «لا صلاحية»
@@ -18,7 +19,8 @@ const LANGS = ['ar', 'fr', 'en'];
 
 export default function Layout() {
   const { t, i18n } = useTranslation();
-  const { stores, store, logout, can, isOwner } = useAuth();
+  const { stores, store, logout, can, isOwner, accounts, currentAccountId } = useAuth();
+  const me = accounts.length > 1 ? accounts.find((a) => a.id === currentAccountId) : null;
   const owner = stores.some((s) => s.role === 'owner');
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
 
@@ -78,6 +80,8 @@ export default function Layout() {
             <Languages className="w-4 h-4" />{i18n.language}
           </button>
           <button onClick={toggleTheme} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900">{dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}</button>
+          {/* عدة حسابات على الهاتف: صورة الحساب الحالي — حتى لا تعمل في الحساب الخطأ */}
+          {me && <Link to="/more" title={me.email} className="shrink-0"><Avatar account={me} size="w-8 h-8" /></Link>}
         </header>
 
         <main className="p-4 md:p-6 max-w-6xl mx-auto">
