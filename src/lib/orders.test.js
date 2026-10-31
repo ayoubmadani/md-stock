@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts, orderAmounts } from './orders.js';
+import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts, orderAmounts, needsCustomer } from './orders.js';
 
 describe('allowedStatuses', () => {
   it('a regular order can take any status', () => {
@@ -108,5 +108,17 @@ describe('orderAmounts', () => {
   });
   it('digital orders have no delivery', () => {
     expect(orderAmounts({ isDigital: true, priceShip: 500, items: [{ finalPrice: 1000, quantity: 1 }] })).toEqual({ products: 1000, ship: 0, total: 1000 });
+  });
+});
+
+describe('needsCustomer (shop order → «pay later» needs a customer)', () => {
+  const shop = { platform: 'pos', customerName: 'زبون المحل', customerPhone: '' };
+  it('shop order without a customer phone → pick a customer first', () => {
+    expect(needsCustomer(shop, 'unpaid')).toBe(true);
+  });
+  it('already has a customer, another status, or a website order → no', () => {
+    expect(needsCustomer({ ...shop, customerPhone: '0555123456' }, 'unpaid')).toBe(false);
+    expect(needsCustomer(shop, 'cancelled')).toBe(false);
+    expect(needsCustomer({ ...shop, platform: 'store' }, 'unpaid')).toBe(false);
   });
 });

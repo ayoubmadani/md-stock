@@ -321,7 +321,10 @@
     "next_step": "Étape suivante",
     "filter_status": "Statut des commandes",
     "channel_online": "Commandes en ligne",
-    "channel_shop": "Ventes en boutique"
+    "channel_shop": "Ventes en boutique",
+    "add_customer": "Ajouter un client",
+    "change_customer": "Changer de client",
+    "customer_set": "Client : {{name}}"
   },
   "library": {
     "title_products": "Images des produits",

@@ -321,7 +321,10 @@
     "next_step": "Next step",
     "filter_status": "Order status",
     "channel_online": "Online orders",
-    "channel_shop": "In-shop sales"
+    "channel_shop": "In-shop sales",
+    "add_customer": "Add customer",
+    "change_customer": "Change customer",
+    "customer_set": "Customer: {{name}}"
   },
   "library": {
     "title_products": "Product images",

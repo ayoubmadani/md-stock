@@ -2,13 +2,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Barcode, Check, Clock, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Receipt, Trash2, Truck, Undo2 } from 'lucide-react';
+import { ArrowRight, Barcode, Check, Clock, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Receipt, Trash2, Truck, Undo2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money, nextActions, paymentState, whatsappLink } from '../lib/orders';
 import { NextStepCard, OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, timeAgo } from '../components/orders';
 import { VariantParts } from '../components/inventory';
+import { CustomerPickerSheet } from '../components/customers';
 
 const QUEUE = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
 const actionBtn = 'flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold';
@@ -80,6 +81,7 @@ export default function OrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { can, storeId } = useAuth();
+  const [pickingClient, setPickingClient] = useState(false);
   const [order, setOrder] = useState(null);
   const [action, setAction] = useState(null); // 'confirm' | 'ship'
   const [recalling, setRecalling] = useState(false);
@@ -116,6 +118,18 @@ export default function OrderDetail() {
   const canShip = can('order.manage') && !pos && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital && !nextActions(order).some((a) => a.action === 'ship');
   // تعديل بيع المحل يفتح صفحة البيع: يحتاج «البيع في المحل»
   const canEdit = can(order.platform === 'pos' ? 'pos.sell' : 'order.manage') && !order.confirmationCompanyId;
+
+  // طلب محل: ربط زبون من قائمة زبائن المتجر
+  const setClient = async (c) => {
+    setPickingClient(false);
+    try {
+      await api.patch(`/orders/${storeId}/pos/${order.id}/customer`, { clientId: c.id });
+      setOrder((o) => ({ ...o, customerId: c.id, customerName: c.name, customerPhone: c.phone }));
+      toast.success(t('orders.customer_set', { name: c.name }));
+    } catch (e) {
+      toast.error(errorMessage(e, t('orders.save_failed')));
+    }
+  };
 
   const recall = async () => {
     setRecalling(true);
@@ -183,9 +197,16 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {/* الزبون */}
+      {/* الزبون — طلب محل: إضافة زبون من القائمة أو تغييره */}
       <div className={`${box} space-y-3`}>
-        <p className="font-bold text-lg"><bdi>{order.customerName || '—'}</bdi></p>
+        <div className="flex items-start justify-between gap-2">
+          <p className="font-bold text-lg min-w-0 truncate"><bdi>{order.customerName || '—'}</bdi></p>
+          {pos && can('pos.sell') && (
+            <button type="button" onClick={() => setPickingClient(true)} className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 text-xs font-bold">
+              <UserPlus className="w-4 h-4" />{order.customerPhone ? t('orders.change_customer') : t('orders.add_customer')}
+            </button>
+          )}
+        </div>
         <p className="text-sm font-semibold -mt-2"><span dir="ltr">{order.customerPhone}</span></p>
         <div className="grid grid-cols-3 gap-2">
           <a href={`tel:${order.customerPhone}`} className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">
@@ -242,7 +263,8 @@ export default function OrderDetail() {
 
       {action === 'confirm' && <SendConfirmationSheet order={order} storeId={storeId} onClose={() => setAction(null)} onDone={() => { setAction(null); load(); }} />}
       {action === 'ship' && <ShipSheet order={order} storeId={storeId} onClose={() => setAction(null)} onDone={() => { setAction(null); load(); }} />}
-      {sheet && <StatusSheet order={order} onClose={() => setSheet(false)} onChanged={(s) => { setSheet(false); setOrder((o) => ({ ...o, status: s })); }} />}
+      {sheet && <StatusSheet order={order} onClose={() => setSheet(false)} onChanged={(s, patch) => { setSheet(false); setOrder((o) => ({ ...o, ...patch, status: s })); }} />}
+      {pickingClient && <CustomerPickerSheet storeId={storeId} onClose={() => setPickingClient(false)} onPick={setClient} />}
     </div>
   );
 }

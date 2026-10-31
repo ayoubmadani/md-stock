@@ -321,7 +321,10 @@
     "next_step": "الخطوة التالية",
     "filter_status": "حالة الطلبات",
     "channel_online": "طلبات أونلاين",
-    "channel_shop": "طلبات المحل"
+    "channel_shop": "طلبات المحل",
+    "add_customer": "إضافة زبون",
+    "change_customer": "تغيير الزبون",
+    "customer_set": "الزبون: {{name}}"
   },
   "library": {
     "title_products": "صور المنتجات",

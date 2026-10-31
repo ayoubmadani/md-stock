@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Check, Loader2, Lock, Truck, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { STATUS_CLS, STATUS_DOT, allowedStatuses, nextActions, statusPayload } from '../lib/orders';
+import { STATUS_CLS, STATUS_DOT, allowedStatuses, needsCustomer, nextActions, statusPayload } from '../lib/orders';
+import { useAuth } from '../lib/auth';
+import { CustomerPickerSheet } from './customers';
 
 // order: الطلب نفسه — «مسلّم» يُسمّى «تم البيع» للبيع في المحل و«تم التسليم» للرقمي
 export const statusLabel = (t, status, order) =>
@@ -34,23 +36,35 @@ export function timeAgo(date, lang) {
 }
 
 /** نافذة من الأسفل لاختيار حالة جديدة؛ تحفظ ثم تُرجع الحالة الجديدة */
+// onChanged(status, patch): patch = بيانات الزبون إن اختير زبون (طلب محل ← «دفع لاحقاً»)
 export function StatusSheet({ order, onClose, onChanged }) {
   const { t } = useTranslation();
+  const { storeId } = useAuth();
   const [busy, setBusy] = useState(null);
+  const [needClient, setNeedClient] = useState(null); // الحالة التي تنتظر اختيار زبون
   const options = allowedStatuses(order);
 
-  const pick = async (status) => {
+  const pick = async (status, client = null) => {
     if (status === order.status) return onClose();
+    // طلب محل بلا زبون ← «دفع لاحقاً» يحتاج زبوناً: الاختيار أولاً
+    if (!client && needsCustomer(order, status)) return setNeedClient(status);
     setBusy(status);
     try {
-      await api.patch(`/orders/${order.id}`, statusPayload(order, status));
-      toast.success(`${order.customerName || ''} ← ${statusLabel(t, status, order)}`);
-      onChanged(status);
+      const body = statusPayload(order, status);
+      if (client) body[0] = { ...body[0], clientId: client.id };
+      await api.patch(`/orders/${order.id}`, body);
+      const patch = client ? { customerId: client.id, customerName: client.name, customerPhone: client.phone } : null;
+      toast.success(`${patch?.customerName || order.customerName || ''} ← ${statusLabel(t, status, order)}`);
+      onChanged(status, patch);
     } catch (e) {
       toast.error(errorMessage(e, t('orders.save_failed')));
       setBusy(null);
     }
   };
+
+  if (needClient) {
+    return <CustomerPickerSheet storeId={storeId} onClose={() => setNeedClient(null)} onPick={(c) => { const st = needClient; setNeedClient(null); pick(st, c); }} />;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>

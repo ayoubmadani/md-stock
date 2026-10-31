@@ -101,3 +101,6 @@ export function orderAmounts(order) {
   const ship = order.isDigital ? 0 : Number(order.priceShip || 0);
   return { products, ship, total: products + ship };
 }
+
+/** طلب محل ← «دفع لاحقاً» يحتاج زبوناً (اسم وهاتف): بلا هاتف ← اختيار زبون أولاً (الخادم يرفض أيضاً) */
+export const needsCustomer = (order, status) => order?.platform === 'pos' && status === 'unpaid' && !String(order.customerPhone || '').trim();
