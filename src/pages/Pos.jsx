@@ -1,7 +1,7 @@
 // بيع في المحل: مسح المنتجات (كاميرا أو قارئ باركود)، تعديل الكمية والسعر، زبون اختياري،
 // ثم «تأكيد البيع» ← طلب «مسلّم» (يُخصم المخزون) وإيصال بباركود الطلب
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import JsBarcode from 'jsbarcode';
 import { Check, ChevronDown, Clock, ListPlus, Loader2, Receipt as ReceiptIcon, Minus, Package, PackagePlus, Pencil, Plus, Printer, Search, ShoppingBag, Trash2, User, X } from 'lucide-react';
@@ -251,6 +251,7 @@ export default function PosPage() {
   const { t } = useTranslation();
   const { orderId } = useParams();
   const nav = useNavigate();
+  const location = useLocation();
   const { storeId, store } = useAuth();
   const [editing, setEditing] = useState(null); // الطلب المعدَّل
   const [cart, setCart] = useState([]);
@@ -298,6 +299,16 @@ export default function PosPage() {
       setCart(orderToCart(data)); setCustomer(c); setEditing(data);
     }).catch((e) => { toast.error(errorMessage(e, t('orders.load_failed'))); nav('/orders'); });
   }, [orderId, nav, t]);
+
+  // من الماسح («بيع» في بطاقة المنتج): السلة تبدأ بالمنتج الممسوح — بعد التصفير أعلاه
+  const fromScan = !orderId ? location.state?.add : null;
+  useEffect(() => {
+    if (!fromScan?.product) return;
+    setCart((c) => addScanned(c, fromScan));
+    const code = fromScan.variant?.barcode || fromScan.product.barcode;
+    if (code) recent.current.set(String(code), Date.now()); // نفس القطعة أمام الكاميرا لا تُضاف مرة ثانية
+    nav('/pos', { replace: true, state: null });
+  }, [fromScan, nav]);
 
   const total = cartTotal(cart);
   const confirm = async (credit = null) => {

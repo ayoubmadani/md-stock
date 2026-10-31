@@ -2,7 +2,7 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Package, Plus, ClipboardCheck, ScanLine, PackagePlus, Pencil, Phone, MapPin, ExternalLink } from 'lucide-react';
+import { Loader2, Package, Plus, ClipboardCheck, ScanLine, PackagePlus, Pencil, Phone, MapPin, ExternalLink, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { NextStepCard, OrderStatusBadge, ShipSheet } from '../components/orders';
 import { money } from '../lib/orders';
@@ -107,6 +107,13 @@ export default function ScanPage() {
                 <button onClick={() => setAdjust({ mode: 'add' })} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 text-white font-bold"><Plus className="w-4 h-4" />{t('inventory.restock')}</button>
                 <button onClick={() => setAdjust({ mode: 'set' })} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gray-100 dark:bg-zinc-800 font-bold"><ClipboardCheck className="w-4 h-4" />{t('inventory.count')}</button>
               </div>
+              {/* بيع في المحل: السلة تبدأ بهذا المنتج، ثم المسح المتتالي هناك */}
+              {can('pos.sell') && (
+                <button onClick={() => navigate('/pos', { state: { add: hit } })} disabled={hit.product.isArchived}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">
+                  <ShoppingBag className="w-5 h-5" />{t('scan.sell')}
+                </button>
+              )}
             </div>
           )}
 

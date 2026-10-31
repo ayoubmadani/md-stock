@@ -155,7 +155,8 @@
     "denied": "Allow camera access in your browser settings",
     "no_camera": "Camera unavailable — type the barcode",
     "https": "The camera needs https — type the barcode",
-    "open_order": "Open the order"
+    "open_order": "Open the order",
+    "sell": "Sell"
   },
   "product": {
     "new": "New product",

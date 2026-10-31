@@ -155,7 +155,8 @@
     "denied": "Autorisez la caméra dans les réglages du navigateur",
     "no_camera": "Caméra indisponible — saisissez le code",
     "https": "La caméra nécessite https — saisissez le code",
-    "open_order": "Ouvrir la commande"
+    "open_order": "Ouvrir la commande",
+    "sell": "Vendre"
   },
   "product": {
     "new": "Nouveau produit",
