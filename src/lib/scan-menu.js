@@ -1,8 +1,7 @@
-// زر المسح في الأسفل ← صفحة /scan بخيارين: «طلب» (بيع في المحل، أيقونة سلة) و«معلومات» (منتج أو طلب، أيقونة استفهام)
-// خيار واحد مسموح ← يُفتح مباشرة
-export function scanChoices(can) {
-  return [
-    can('pos.sell') && { key: 'order', to: '/pos' },
-    (can('product.crud') || can('order.view')) && { key: 'info', to: '/scan/info' },
-  ].filter(Boolean);
+// زر المسح في الأسفل: البيع في المحل («طلب») مباشرة — معلومات المنتج من زر في سطر السلة.
+// عضو بلا بيع في المحل: معلومات المنتج أو الطلب (/scan/info). بلا صلاحية: لا زر.
+export function scanTarget(can) {
+  if (can('pos.sell')) return '/pos';
+  if (can('product.crud') || can('order.view')) return '/scan/info';
+  return null;
 }

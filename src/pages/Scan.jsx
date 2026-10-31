@@ -2,10 +2,8 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Package, Plus, ClipboardCheck, ScanLine, PackagePlus, Pencil, Phone, MapPin, ExternalLink, ShoppingBag } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { NextStepCard, OrderStatusBadge, ShipSheet } from '../components/orders';
-import { money } from '../lib/orders';
+import { Loader2, Package, Plus, ClipboardCheck, ScanLine, PackagePlus, Pencil, ShoppingBag } from 'lucide-react';
+import ScannedOrder from '../components/ScannedOrder';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -24,7 +22,6 @@ export default function ScanPage() {
   const [loading, setLoading] = useState(false);
   const [adjust, setAdjust] = useState(null);
   const [order, setOrder] = useState(null); // طلب ممسوح: يظهر هنا مع أزرار الخطوة التالية
-  const [ship, setShip] = useState(false);
   const [quick, setQuick] = useState(false);
 
   // منتج أولاً، ثم طلب (باركود الطلب أو رقم تتبع شركة التوصيل) — حسب صلاحيات العضو
@@ -63,7 +60,6 @@ export default function ScanPage() {
   }, [storeId, t, can, navigate]);
 
   const again = () => { setCode(null); setHit(null); setOrder(null); };
-  const reloadOrder = () => api.get(`/orders/get-one/${order.id}`).then((r) => setOrder(r.data)).catch(() => {});
   const stock = hit && hit !== 'none' ? (hit.variant ? hit.variant.stock : hit.product.stock) : 0;
 
   return (
@@ -117,36 +113,7 @@ export default function ScanPage() {
             </div>
           )}
 
-          {!loading && order && (
-            <>
-              <div className="rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold tracking-wider text-gray-500" dir="ltr">{order.barcode}</span>
-                  <OrderStatusBadge order={order} />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-bold truncate"><bdi>{order.customerName || '—'}</bdi></p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                    <a href={`tel:${order.customerPhone}`} dir="ltr" className="flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400"><Phone className="w-3.5 h-3.5" />{order.customerPhone}</a>
-                    {order.customerWilaya && <span className="flex items-center gap-1 truncate"><MapPin className="w-3.5 h-3.5" />{order.customerWilaya.ar_name}</span>}
-                  </div>
-                </div>
-                <div className="space-y-1 text-sm">
-                  {(order.items || []).map((it) => (
-                    <p key={it.id} className="truncate text-gray-600 dark:text-zinc-300"><span dir="ltr">{it.quantity}×</span> <bdi>{it.product?.name || it.title}</bdi></p>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-zinc-800">
-                  <span className="text-sm text-gray-500">{t('orders.total')}</span>
-                  <b className="text-emerald-600 dark:text-emerald-400" dir="ltr">{money(order.totalPrice)} DA</b>
-                </div>
-              </div>
-              {can('order.manage') && <NextStepCard order={order} highlight onShip={() => setShip(true)} onChanged={(st) => setOrder((o) => ({ ...o, status: st }))} />}
-              <Link to={`/orders/${order.id}`} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-semibold">
-                <ExternalLink className="w-4 h-4" />{t('scan.open_order')}
-              </Link>
-            </>
-          )}
+          {!loading && order && <ScannedOrder order={order} storeId={storeId} onChange={setOrder} />}
 
           <button onClick={again} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 font-semibold">
             <ScanLine className="w-4 h-4" />{t('scan.again')}
@@ -154,7 +121,6 @@ export default function ScanPage() {
         </div>
       )}
 
-      {ship && order && <ShipSheet order={order} storeId={storeId} onClose={() => setShip(false)} onDone={() => { setShip(false); reloadOrder(); }} />}
       {adjust && hit && hit !== 'none' && (
         <AdjustModal
           storeId={storeId}

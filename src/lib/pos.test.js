@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addScanned, addService, cartTotal, findPickable, orderToCart, pickedHit, saleBody, setLine } from './pos';
+import { addScanned, addService, cartTotal, findPickable, lineInfo, orderToCart, pickedHit, saleBody, setLine } from './pos';
 
 const simple = { product: { id: 'p1', name: 'Mug', price: 900, image: null }, variant: null };
 const variant = { product: { id: 'p2', name: 'Set', price: 2500 }, variant: { id: 'v1', price: 2900, parts: [{ value: 'M' }] } };
@@ -112,5 +112,24 @@ describe('service lines (no product): water bill, top-up…', () => {
     const c = orderToCart({ items: [{ id: 'i9', productId: null, title: 'فاتورة ماء', cost: '3000.00', quantity: 1, finalPrice: '3200.00' }] });
     expect(c[0]).toMatchObject({ key: 'svc:i9', service: true, name: 'فاتورة ماء', price: 3200, cost: 3000 });
     expect(saleBody(c, {}).items).toEqual([{ title: 'فاتورة ماء', cost: 3000, quantity: 1, finalPrice: 3200 }]);
+  });
+});
+
+describe('lineInfo (info modal from a cart line)', () => {
+  const products = [
+    { id: 'p1', name: 'Parfum', price: 4500, stock: 12, status: 'ok', barcode: '111', variants: [] },
+    { id: 'p2', name: 'T-shirt', price: 1500, stock: 7, status: 'low', barcode: null, variants: [
+      { id: 'v1', label: 'S', stock: 0, price: 1500, status: 'out', barcode: '201' },
+      { id: 'v2', label: 'M', stock: 7, price: 1600, status: 'ok', barcode: '202' },
+    ] },
+  ];
+  it('simple product: its own stock, status and barcode', () => {
+    expect(lineInfo(products, { productId: 'p1' })).toMatchObject({ product: { id: 'p1' }, variant: null, stock: 12, status: 'ok', price: 4500, barcode: '111' });
+  });
+  it('option line: the option\'s stock, price and barcode', () => {
+    expect(lineInfo(products, { productId: 'p2', variantId: 'v1' })).toMatchObject({ variant: { id: 'v1' }, stock: 0, status: 'out', price: 1500, barcode: '201' });
+  });
+  it('product gone (deleted / archived elsewhere) → null', () => {
+    expect(lineInfo(products, { productId: 'zz' })).toBeNull();
   });
 });

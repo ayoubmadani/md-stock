@@ -29,9 +29,7 @@
     "pos_short": "Sell",
     "customers": "Customers",
     "tasks": "Tasks",
-    "profile": "Profile",
-    "scan_order": "Order",
-    "scan_info": "Info"
+    "profile": "Profile"
   },
   "login": {
     "title": "Sign in",
@@ -1021,7 +1019,13 @@
     "service_cost_opt": "Cost (optional)",
     "service_profit": "Profit",
     "service_add": "Add to cart",
-    "archived": "This product is turned off: {{name}}"
+    "archived": "This product is turned off: {{name}}",
+    "info": "Product info",
+    "info_price": "Price",
+    "info_barcode": "Barcode",
+    "info_options": "Other options",
+    "info_missing": "Product not found in stock (maybe deleted)",
+    "order_found": "Scanned order"
   },
   "quick": {
     "title": "Quick new product",

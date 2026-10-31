@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { navVisible, useAuth } from '../lib/auth';
 import { Avatar } from './Accounts';
 import TrialOffer from './TrialOffer';
-import { scanChoices } from '../lib/scan-menu';
+import { scanTarget } from '../lib/scan-menu';
 
 // الشريط السفلي: 5 أزرار ثابتة؛ ما لا صلاحية له يظهر باهتاً ويفتح رسالة «لا صلاحية»
 const NAV = [
@@ -33,8 +33,9 @@ export default function Layout() {
   };
   const nextLang = () => i18n.changeLanguage(LANGS[(LANGS.indexOf(i18n.language) + 1) % LANGS.length]);
 
-  // المسح يظهر لمن له «طلب» أو «معلومات» (البائع فقط أيضاً)
-  const visible = (n) => (n.primary ? scanChoices(can).length > 0 : navVisible(n, { can, isOwner, ownsAnyStore: owner }));
+  // زر المسح: البيع في المحل مباشرة، أو معلومات المنتج/الطلب لمن لا يبيع في المحل
+  const scanTo = scanTarget(can);
+  const visible = (n) => (n.primary ? !!scanTo : navVisible(n, { can, isOwner, ownsAnyStore: owner }));
   const { pathname } = useLocation();
   const scanActive = ['/scan', '/pos'].some((x) => pathname.startsWith(x));
   const bottomNav = NAV.filter(visible);
@@ -97,7 +98,7 @@ export default function Layout() {
       {/* ما ليس للعضو صلاحيته لا يظهر (المسح: المنتجات أو الطلبات) */}
       <nav style={{ gridTemplateColumns: `repeat(${bottomNav.length}, minmax(0, 1fr))` }} className="md:hidden fixed bottom-0 inset-x-0 z-40 grid bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-gray-100 dark:border-zinc-900 pb-[env(safe-area-inset-bottom)]">
         {bottomNav.map((n) => n.primary ? (
-          <NavLink key={n.to} to={n.to} aria-label={t('nav.scan')} className="flex flex-col items-center justify-center -mt-5">
+          <NavLink key={n.to} to={scanTo} aria-label={t('nav.scan')} className="flex flex-col items-center justify-center -mt-5">
             <span className={`w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 ${scanActive ? 'bg-indigo-700' : 'bg-indigo-600'}`}><n.icon className="w-6 h-6" /></span>
           </NavLink>
         ) : (

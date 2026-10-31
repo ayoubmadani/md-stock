@@ -1,20 +1,18 @@
 import { describe, it, expect } from 'vitest';
-import { scanChoices } from './scan-menu';
+import { scanTarget } from './scan-menu';
 
 const canOf = (...perms) => (p) => perms.includes(p);
 
-describe('scanChoices (bottom scan button)', () => {
-  it('owner / full member: both — order (sale) and info', () => {
-    expect(scanChoices(canOf('pos.sell', 'product.crud', 'order.view')).map((c) => c.key)).toEqual(['order', 'info']);
+describe('scanTarget (bottom scan button)', () => {
+  it('can sell in the shop → straight to the sale («طلب»)', () => {
+    expect(scanTarget(canOf('pos.sell', 'product.crud', 'order.view'))).toBe('/pos');
+    expect(scanTarget(canOf('pos.sell'))).toBe('/pos');
   });
-  it('seller only: just the sale → opens directly', () => {
-    expect(scanChoices(canOf('pos.sell')).map((c) => c.to)).toEqual(['/pos']);
+  it('no shop selling, but products or orders → product / order info', () => {
+    expect(scanTarget(canOf('order.view'))).toBe('/scan/info');
+    expect(scanTarget(canOf('product.crud'))).toBe('/scan/info');
   });
-  it('orders or products only: just info', () => {
-    expect(scanChoices(canOf('order.view')).map((c) => c.to)).toEqual(['/scan/info']);
-    expect(scanChoices(canOf('product.crud')).map((c) => c.to)).toEqual(['/scan/info']);
-  });
-  it('no permission: nothing', () => {
-    expect(scanChoices(canOf())).toEqual([]);
+  it('no permission → no scan button', () => {
+    expect(scanTarget(canOf())).toBeNull();
   });
 });

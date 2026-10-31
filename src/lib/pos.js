@@ -73,3 +73,12 @@ const serviceLine = (key, { title, price, cost }, quantity = 1) => ({
 
 /** سطر خدمة جديد في أعلى السلة — كل خدمة سطر مستقل (n يجعل المفتاح فريداً) */
 export const addService = (cart, svc, n = Date.now()) => [serviceLine(`svc:${n}`, svc), ...cart];
+
+/** معلومات سطر في السلة (زر «معلومات»): المنتج والنسخة من /inventory — مخزون وحالة وسعر وباركود السطر نفسه */
+export function lineInfo(products, line) {
+  const product = (products || []).find((p) => String(p.id) === String(line.productId));
+  if (!product) return null;
+  const variant = line.variantId ? product.variants?.find((v) => String(v.id) === String(line.variantId)) ?? null : null;
+  const src = variant || product;
+  return { product, variant, stock: src.stock, status: src.status, price: src.price, barcode: src.barcode ?? null };
+}

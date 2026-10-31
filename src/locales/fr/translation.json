@@ -29,9 +29,7 @@
     "pos_short": "Vente",
     "customers": "Clients",
     "tasks": "Tâches",
-    "profile": "Profil",
-    "scan_order": "Commande",
-    "scan_info": "Infos"
+    "profile": "Profil"
   },
   "login": {
     "title": "Connexion",
@@ -1021,7 +1019,13 @@
     "service_cost_opt": "Coût (optionnel)",
     "service_profit": "Bénéfice",
     "service_add": "Ajouter au panier",
-    "archived": "Ce produit est désactivé : {{name}}"
+    "archived": "Ce produit est désactivé : {{name}}",
+    "info": "Infos produit",
+    "info_price": "Prix",
+    "info_barcode": "Code-barres",
+    "info_options": "Autres options",
+    "info_missing": "Produit introuvable dans le stock (peut-être supprimé)",
+    "order_found": "Commande scannée"
   },
   "quick": {
     "title": "Produit rapide",

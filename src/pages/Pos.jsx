@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import JsBarcode from 'jsbarcode';
-import { Check, ChevronDown, Clock, ListPlus, Loader2, Receipt as ReceiptIcon, Minus, Package, PackagePlus, Pencil, Plus, Printer, Search, ShoppingBag, Trash2, User, X } from 'lucide-react';
+import { Check, ChevronDown, CircleHelp, Clock, ListPlus, Loader2, Receipt as ReceiptIcon, Minus, Package, PackagePlus, Pencil, Plus, Printer, Search, ShoppingBag, Trash2, User, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -12,6 +12,8 @@ import { posProducts } from '../lib/bulk-select';
 import { money, paymentState } from '../lib/orders';
 import { addScanned, addService, cartTotal, findPickable, orderToCart, pickedHit, saleBody, setLine } from '../lib/pos';
 import Scanner from '../components/Scanner';
+import ProductInfoSheet from '../components/ProductInfoSheet';
+import ScannedOrder from '../components/ScannedOrder';
 import QuickProductSheet from '../components/QuickProductSheet';
 import { CustomerAvatar, CustomerPickerSheet } from '../components/customers';
 import { input } from '../components/product';
@@ -264,6 +266,8 @@ export default function PosPage() {
   const [picking, setPicking] = useState(false);
   const [payLater, setPayLater] = useState(false);
   const [serving, setServing] = useState(false);
+  const [infoLine, setInfoLine] = useState(null); // سطر السلة الذي تُعرض معلوماته
+  const [scannedOrder, setScannedOrder] = useState(null); // باركود طلب ممسوح: يُعرض في مودل (عرض/تعديل)
   const { can } = useAuth();
   const recent = useRef(new Map()); // آخر مسح لكل كود — لا نضيف نفس القطعة مرتين وهي أمام الكاميرا
 
@@ -281,6 +285,12 @@ export default function PosPage() {
     } catch (e) {
       beep(false);
       if (e.response?.status === 404) {
+        // باركود طلب (لا منتج): الطلب في مودل — عرض وتعديل والخطوة التالية
+        if (can('order.view')) {
+          const found = await api.get(`/orders/scan/${storeId}/${encodeURIComponent(code)}`).then((r) => r.data).catch(() => null);
+          const order = found?.id ? await api.get(`/orders/get-one/${found.id}`).then((r) => r.data).catch(() => null) : null;
+          if (order) { setScannedOrder(order); navigator.vibrate?.(60); return; }
+        }
         // باركود جديد: إضافته كمنتج سريع بنفس الباركود
         toast.error(t('pos.unknown', { code }), can('product.crud') ? { action: { label: t('pos.add_as_product'), onClick: () => setQuick({ barcode: code }) }, duration: 8000 } : undefined);
       } else toast.error(errorMessage(e, t('inventory.error')));
@@ -340,7 +350,7 @@ export default function PosPage() {
       )}
       <div className="relative">
         {/* يتوقف الماسح أثناء «منتج سريع» (يحرّر الكاميرا الخلفية لتصوير المنتج) وأثناء اختيار منتج */}
-        <Scanner onDetected={onCode} continuous paused={!!quick || picking} />
+        <Scanner onDetected={onCode} continuous paused={!!quick || picking || !!infoLine || !!scannedOrder} />
         {looking && <span className="absolute top-3 end-3 p-2 rounded-full bg-black/60"><Loader2 className="w-4 h-4 animate-spin text-white" /></span>}
       </div>
 
@@ -360,7 +370,14 @@ export default function PosPage() {
             <div key={l.key} className="p-3 flex items-center gap-3">
               <span className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">{l.image ? <img src={l.image} alt="" className="w-full h-full object-cover" /> : l.service ? <ReceiptIcon className="w-5 h-5 text-indigo-400" /> : <Package className="w-5 h-5 text-gray-400" />}</span>
               <div className="flex-1 min-w-0 space-y-1">
-                <p className="text-sm font-semibold truncate"><bdi>{l.name}</bdi></p>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <p className="text-sm font-semibold truncate"><bdi>{l.name}</bdi></p>
+                  {/* معلومات المنتج: المخزون والخيارات (وتوريد/جرد لصاحب صلاحية المنتجات) */}
+                  {!l.service && l.productId && (
+                    <button type="button" onClick={() => setInfoLine(l)} title={t('pos.info')} aria-label={t('pos.info')}
+                      className="shrink-0 w-6 h-6 grid place-items-center rounded-full text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"><CircleHelp className="w-4 h-4" /></button>
+                  )}
+                </div>
                 {l.parts.length > 0 && <VariantParts parts={l.parts} className="text-xs text-gray-500" />}
                 <div className="flex items-center gap-1">
                   <input type="number" inputMode="numeric" dir="ltr" min="0" value={l.price} onChange={(e) => setCart((c) => setLine(c, l.key, { price: e.target.value === '' ? '' : Number(e.target.value) }))} className="w-24 px-2 py-1 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-sm font-bold" />
@@ -395,6 +412,18 @@ export default function PosPage() {
       {payLater && <PayLaterSheet total={total} customer={customer} onPickCustomer={() => setPickingCustomer(true)} onClearCustomer={() => setCustomer(NO_CUSTOMER)} saving={saving} onClose={() => setPayLater(false)} onConfirm={(paidNow) => confirm({ payLater: true, paidNow })} />}
       {pickingCustomer && <CustomerPickerSheet storeId={storeId} onClose={() => setPickingCustomer(false)} onPick={(c) => { setCustomer({ id: c.id, name: c.name, phone: c.phone, photoUrl: c.photoUrl }); setPickingCustomer(false); }} />}
 
+      {scannedOrder && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50" onClick={() => setScannedOrder(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[92dvh] overflow-y-auto p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between">
+              <p className="font-bold">{t('pos.order_found')}</p>
+              <button type="button" onClick={() => setScannedOrder(null)} aria-label={t('rates.close')} className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"><X className="w-5 h-5" /></button>
+            </div>
+            <ScannedOrder order={scannedOrder} storeId={storeId} onChange={setScannedOrder} />
+          </div>
+        </div>
+      )}
+      {infoLine && <ProductInfoSheet storeId={storeId} line={infoLine} onClose={() => setInfoLine(null)} />}
       {serving && <ServiceSheet onClose={() => setServing(false)} onAdd={(svc) => { setCart((c) => addService(c, svc)); setServing(false); beep(true); }} />}
       {picking && <PickSheet storeId={storeId} cart={cart} onClose={() => setPicking(false)} onPick={(hit) => { setCart((c) => addScanned(c, hit)); beep(true); }}
         onRemove={(key) => setCart((c) => setLine(c, key, { quantity: (c.find((l) => l.key === key)?.quantity || 0) - 1 }))} />}

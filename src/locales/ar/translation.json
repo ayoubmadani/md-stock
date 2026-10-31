@@ -29,9 +29,7 @@
     "pos_short": "بيع",
     "customers": "الزبائن",
     "tasks": "المهام",
-    "profile": "الملف الشخصي",
-    "scan_order": "طلب",
-    "scan_info": "معلومات"
+    "profile": "الملف الشخصي"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -1021,7 +1019,13 @@
     "service_cost_opt": "التكلفة (اختياري)",
     "service_profit": "الربح",
     "service_add": "إضافة للسلة",
-    "archived": "هذا المنتج متوقف مطلقاً: {{name}}"
+    "archived": "هذا المنتج متوقف مطلقاً: {{name}}",
+    "info": "معلومات المنتج",
+    "info_price": "السعر",
+    "info_barcode": "الباركود",
+    "info_options": "الخيارات الأخرى",
+    "info_missing": "المنتج غير موجود في المخزون (ربما حُذف)",
+    "order_found": "طلب ممسوح"
   },
   "quick": {
     "title": "منتج جديد سريع",

@@ -19,7 +19,6 @@ import OrdersPage from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import OrderForm from './pages/OrderForm';
 import MorePage from './pages/More';
-import ScanChoice from './pages/ScanChoice';
 import ProfilePage from './pages/Profile';
 import CategoriesPage from './pages/Categories';
 import DomainsPage from './pages/Domains';
@@ -44,6 +43,7 @@ import CustomersPage from './pages/Customers';
 import TasksPage from './pages/Tasks';
 import CustomerDetail from './pages/CustomerDetail';
 import RequirePerm from './components/RequirePerm';
+import { scanTarget } from './lib/scan-menu';
 import TrialOffer from './components/TrialOffer';
 
 // تخفي شاشة البداية حين ينتهي التحقق من تسجيل الدخول (الصفحات المحمية وصفحة الدخول)
@@ -51,6 +51,12 @@ function SplashDone() {
   const { loading } = useAuth();
   useEffect(() => { if (!loading) hideSplash(); }, [loading]);
   return null;
+}
+
+// /scan (روابط قديمة والقائمة الجانبية): البيع في المحل أو معلومات المنتج حسب الصلاحيات
+function ScanEntry() {
+  const { can } = useAuth();
+  return <Navigate to={scanTarget(can) || '/'} replace />;
 }
 
 function Gate() {
@@ -101,7 +107,7 @@ export default function App() {
             <Route path="stock" element={<RequirePerm perm="product.crud"><StockPage /></RequirePerm>} />
             <Route path="alerts" element={<RequirePerm perm="product.crud"><AlertsPage /></RequirePerm>} />
             <Route path="history" element={<RequirePerm perm="product.crud"><HistoryPage /></RequirePerm>} />
-            <Route path="scan" element={<RequirePerm perm={['product.crud', 'order.view', 'pos.sell']}><ScanChoice /></RequirePerm>} />
+            <Route path="scan" element={<ScanEntry />} />
             <Route path="scan/info" element={<RequirePerm perm={['product.crud', 'order.view']}><ScanPage /></RequirePerm>} />
             <Route path="orders" element={<RequirePerm perm="order.view"><OrdersPage /></RequirePerm>} />
             <Route path="orders/new" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />
