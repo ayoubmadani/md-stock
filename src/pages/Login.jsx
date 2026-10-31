@@ -5,6 +5,7 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { SavedAccounts } from '../components/Accounts';
+import InstallButton from '../components/InstallButton';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -79,6 +80,9 @@ export default function Login() {
           </svg>
           {t('login.google')}
         </a>
+
+        {/* تثبيت التطبيق على الهاتف (لا يظهر إن كان مثبتاً أو المتصفح لا يدعمه) */}
+        {!adding && <InstallButton />}
       </form>
     </div>
   );

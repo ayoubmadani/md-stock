@@ -1253,5 +1253,12 @@
     "err_wrong_current": "Mot de passe actuel incorrect",
     "err_weak": "Mot de passe trop faible : mélangez lettres et chiffres, évitez les suites comme 12345678 et les mots courants",
     "rule": "Au moins {{n}} caractères, avec lettres et chiffres — pas 12345678 ni password"
+  },
+  "install": {
+    "button": "Installer l'application",
+    "ios_title": "Installer l'application sur iPhone",
+    "ios_step1": "Touchez le bouton Partager dans la barre de Safari",
+    "ios_step2": "Choisissez « Sur l'écran d'accueil »",
+    "ios_step3": "Touchez « Ajouter » — l'application apparaît sur votre écran"
   }
 }

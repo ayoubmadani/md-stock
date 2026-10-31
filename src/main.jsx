@@ -6,6 +6,7 @@ import App from './App.jsx';
 import { registerSw } from './lib/push';
 import { playCoin, unlockAudio } from './lib/coin';
 import { watchKeyboard } from './lib/keyboard';
+import { captureInstallPrompt } from './lib/install';
 
 // الوضع الليلي افتراضياً — يبقى اختيار المستخدم
 try {
@@ -26,6 +27,9 @@ createRoot(document.getElementById('root')).render(
 
 // لوحة المفاتيح: المودل المفتوح يتقلّص فوقها
 watchKeyboard();
+
+// «تثبيت التطبيق»: المتصفح يعرض الحدث مرة واحدة عند التحميل — نحفظه لزر صفحة الدخول
+captureInstallPrompt();
 
 // إشعارات الطلبات تصل حتى والتطبيق مغلق
 registerSw();
