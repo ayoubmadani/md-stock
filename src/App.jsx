@@ -19,6 +19,7 @@ import OrdersPage from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import OrderForm from './pages/OrderForm';
 import MorePage from './pages/More';
+import ProfilePage from './pages/Profile';
 import CategoriesPage from './pages/Categories';
 import DomainsPage from './pages/Domains';
 import WalletPage from './pages/Wallet';
@@ -105,6 +106,7 @@ export default function App() {
             <Route path="orders/:id/edit" element={<RequirePerm perm="order.manage"><OrderForm /></RequirePerm>} />
             <Route path="orders/:id" element={<RequirePerm perm="order.view"><OrderDetail /></RequirePerm>} />
             <Route path="more" element={<MorePage />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="wallet" element={<RequirePerm owner><WalletPage /></RequirePerm>} />
             <Route path="meta" element={<RequirePerm owner><MetaPage /></RequirePerm>} />
             <Route path="pixels" element={<RequirePerm owner><PixelsPage /></RequirePerm>} />

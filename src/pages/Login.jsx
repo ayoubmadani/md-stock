@@ -46,7 +46,7 @@ export default function Login() {
     <div className="min-h-dvh flex items-center justify-center p-5">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5">
         {adding && (
-          <Link to="/more" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-zinc-400">
+          <Link to="/profile" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-zinc-400">
             <ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('accounts.back')}
           </Link>
         )}

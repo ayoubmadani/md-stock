@@ -8,7 +8,7 @@ import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
 import { navVisible, useAuth } from '../lib/auth';
-import { AccountsCard } from '../components/Accounts';
+import { Avatar } from '../components/Accounts';
 
 export const MORE = [
   { to: '/pos', key: 'pos', icon: ScanBarcode, perm: 'pos.sell' },
@@ -82,11 +82,21 @@ function PushCard() {
 
 export default function MorePage() {
   const { t } = useTranslation();
-  const { can, isOwner, stores, logout } = useAuth();
+  const { can, isOwner, stores, logout, accounts, currentAccountId } = useAuth();
+  const me = accounts.find((a) => a.id === currentAccountId);
   const owner = stores.some((s) => s.role === 'owner');
   return (
     <div className="max-w-xl mx-auto space-y-3">
-    <AccountsCard />
+    {/* الملف الشخصي: الحسابات على هذا الهاتف + كلمة السر */}
+    <Link to="/profile" className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80">
+      <Avatar account={me} size="w-11 h-11" />
+      <span className="flex-1 min-w-0">
+        <span className="block font-bold text-sm truncate">{me?.name || t('nav.profile')}</span>
+        <span className="block text-xs text-gray-400 truncate">{me?.email ? <bdi dir="ltr">{me.email}</bdi> : t('profile.subtitle')}</span>
+      </span>
+      {accounts.length > 1 && <span className="text-xs font-bold text-indigo-500 shrink-0">{t('profile.n_accounts', { n: accounts.length })}</span>}
+      <ChevronLeft className="w-4 h-4 text-gray-300 ltr:rotate-180" />
+    </Link>
     {can('order.view') && <PushCard />}
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800">
       {MORE.filter((m) => navVisible(m, { can, isOwner, ownsAnyStore: owner })).map((m) => (

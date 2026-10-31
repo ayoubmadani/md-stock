@@ -28,7 +28,8 @@
     "pos": "In-shop sale",
     "pos_short": "Sell",
     "customers": "Customers",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "profile": "Profile"
   },
   "login": {
     "title": "Sign in",
@@ -1219,5 +1220,22 @@
     "limit": "Up to {{n}} accounts on this phone",
     "back": "Back",
     "saved": "Your accounts on this phone"
+  },
+  "profile": {
+    "subtitle": "Accounts and password",
+    "n_accounts": "{{n}} accounts",
+    "change_password": "Change password",
+    "set_password": "Add a password",
+    "google_hint": "Your account uses Google. Add a password to also sign in with email and password.",
+    "current": "Current password",
+    "new": "New password (at least {{n}} characters)",
+    "confirm": "Confirm new password",
+    "save_password": "Save password",
+    "password_changed": "Password changed",
+    "password_set": "Password added",
+    "err_current_required": "Enter your current password",
+    "err_too_short": "The new password needs at least {{n}} characters",
+    "err_mismatch": "The confirmation does not match the new password",
+    "err_wrong_current": "Current password is incorrect"
   }
 }

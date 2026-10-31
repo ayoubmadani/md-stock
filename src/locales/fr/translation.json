@@ -28,7 +28,8 @@
     "pos": "Vente en boutique",
     "pos_short": "Vente",
     "customers": "Clients",
-    "tasks": "Tâches"
+    "tasks": "Tâches",
+    "profile": "Profil"
   },
   "login": {
     "title": "Connexion",
@@ -1219,5 +1220,22 @@
     "limit": "{{n}} comptes maximum sur ce téléphone",
     "back": "Retour",
     "saved": "Vos comptes sur ce téléphone"
+  },
+  "profile": {
+    "subtitle": "Comptes et mot de passe",
+    "n_accounts": "{{n}} comptes",
+    "change_password": "Changer le mot de passe",
+    "set_password": "Ajouter un mot de passe",
+    "google_hint": "Votre compte est lié à Google. Ajoutez un mot de passe pour vous connecter aussi par e-mail.",
+    "current": "Mot de passe actuel",
+    "new": "Nouveau mot de passe ({{n}} caractères min.)",
+    "confirm": "Confirmer le nouveau mot de passe",
+    "save_password": "Enregistrer le mot de passe",
+    "password_changed": "Mot de passe modifié",
+    "password_set": "Mot de passe ajouté",
+    "err_current_required": "Saisissez le mot de passe actuel",
+    "err_too_short": "Le nouveau mot de passe doit contenir au moins {{n}} caractères",
+    "err_mismatch": "La confirmation ne correspond pas",
+    "err_wrong_current": "Mot de passe actuel incorrect"
   }
 }
