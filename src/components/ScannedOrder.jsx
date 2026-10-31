@@ -7,11 +7,13 @@ import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money } from '../lib/orders';
 import { NextStepCard, OrderStatusBadge, ShipSheet } from './orders';
+import OrderForm from '../pages/OrderForm';
 
 export default function ScannedOrder({ order, storeId, onChange }) {
   const { t } = useTranslation();
   const { can } = useAuth();
   const [ship, setShip] = useState(false);
+  const [editing, setEditing] = useState(false); // تعديل طلب الموقع في مودل فوق الصفحة الحالية (لا نغادر البيع في المحل)
   const reload = () => api.get(`/orders/get-one/${order.id}`).then((r) => onChange(r.data)).catch(() => {});
   // نفس قاعدة صفحة الطلب: طلب المحل يُعدَّل من البيع في المحل، وطلب شركة التأكيد لا يُعدَّل
   const canEdit = can(order.platform === 'pos' ? 'pos.sell' : 'order.manage') && !order.confirmationCompanyId;
@@ -44,8 +46,15 @@ export default function ScannedOrder({ order, storeId, onChange }) {
       {can('order.manage') && <NextStepCard order={order} highlight onShip={() => setShip(true)} onChanged={(st) => onChange({ ...order, status: st })} />}
       <div className="flex gap-2">
         <Link to={`/orders/${order.id}`} className={btn}><ExternalLink className="w-4 h-4" />{t('scan.open_order')}</Link>
-        {canEdit && <Link to={order.platform === 'pos' ? `/pos/${order.id}` : `/orders/${order.id}/edit`} className={btn}><Pencil className="w-4 h-4" />{t('orders.actions.edit')}</Link>}
+        {canEdit && (order.platform === 'pos'
+          ? <Link to={`/pos/${order.id}`} className={btn}><Pencil className="w-4 h-4" />{t('orders.actions.edit')}</Link>
+          : <button type="button" onClick={() => setEditing(true)} className={btn}><Pencil className="w-4 h-4" />{t('orders.actions.edit')}</button>)}
       </div>
+      {editing && (
+        <div className="fixed inset-0 z-[60] overflow-y-auto bg-gray-50 dark:bg-zinc-950 px-4 pt-[max(1rem,env(safe-area-inset-top))]">
+          <OrderForm orderId={order.id} onClose={() => setEditing(false)} onDone={() => { setEditing(false); reload(); }} />
+        </div>
+      )}
       {ship && <ShipSheet order={order} storeId={storeId} onClose={() => setShip(false)} onDone={() => { setShip(false); reload(); }} />}
     </>
   );

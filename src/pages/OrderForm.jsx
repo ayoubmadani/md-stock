@@ -127,9 +127,12 @@ function ItemCard({ item, options, disabled, onChange, onRemove }) {
   );
 }
 
-export default function OrderForm() {
+// صفحة (/orders/new، /orders/:id/edit) أو داخل مودل (orderId + onDone + onClose): مثلاً طلب ممسوح أثناء البيع في المحل
+export default function OrderForm({ orderId, onDone, onClose } = {}) {
   const { t } = useTranslation();
-  const { id } = useParams();
+  const params = useParams();
+  const embedded = !!orderId;
+  const id = orderId ?? params.id;
   const isNew = !id;
   const navigate = useNavigate();
   const { storeId, store } = useAuth();
@@ -186,7 +189,7 @@ export default function OrderForm() {
       });
       loadCommunes(data.customerWilayaId ?? data.customerWilaya?.id);
       loadOptions((data.items || []).map((it) => it.productId || it.product?.id));
-    }).catch(() => { toast.error(t('orders.load_failed')); navigate('/orders'); });
+    }).catch(() => { toast.error(t('orders.load_failed')); if (embedded) onClose(); else navigate('/orders'); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isNew]);
 
@@ -250,7 +253,7 @@ export default function OrderForm() {
       } else {
         await api.patch(`/orders/${form.id}`, orderPayload(form, { free }));
         toast.success(t('inventory.saved'));
-        navigate(`/orders/${form.id}`, { replace: true });
+        if (embedded) onDone(); else navigate(`/orders/${form.id}`, { replace: true });
       }
     } catch (err) {
       toast.error(errorMessage(err, t('orders.save_failed')));
@@ -263,9 +266,9 @@ export default function OrderForm() {
   const ship = form.isDigital || free ? 0 : Number(form.priceShip || 0);
 
   return (
-    <form onSubmit={save} className="max-w-xl mx-auto space-y-3 pb-28 md:pb-6">
+    <form onSubmit={save} className={`max-w-xl mx-auto space-y-3 ${embedded ? 'pb-4' : 'pb-28 md:pb-6'}`}>
       <div className="flex items-center justify-between">
-        <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</button>
+        <button type="button" onClick={() => (embedded ? onClose() : navigate(-1))} className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</button>
         <h1 className="font-bold">{isNew ? t('orders.form.new') : t('orders.form.edit')}</h1>
         <span className="w-8" />
       </div>
@@ -343,7 +346,7 @@ export default function OrderForm() {
       </div>
 
       {!locked && (
-        <div className="fixed md:static bottom-16 inset-x-0 p-4 md:p-0 bg-gray-50/95 dark:bg-zinc-950/95 md:bg-transparent z-30">
+        <div className={embedded ? 'sticky bottom-0 -mx-4 p-4 bg-gray-50/95 dark:bg-zinc-950/95 z-30' : 'fixed md:static bottom-16 inset-x-0 p-4 md:p-0 bg-gray-50/95 dark:bg-zinc-950/95 md:bg-transparent z-30'}>
           <button disabled={saving} className="w-full max-w-xl mx-auto flex items-center justify-center gap-2 py-3.5 bg-indigo-600 text-white font-bold rounded-xl disabled:opacity-60">
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}{isNew ? t('orders.form.create') : t('inventory.save')}
           </button>
