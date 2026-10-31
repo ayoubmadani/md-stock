@@ -60,7 +60,10 @@ export default function Layout() {
       <div className="flex-1 min-w-0 pb-20 md:pb-0">
         {/* الشريط العلوي */}
         <header className="sticky top-0 z-30 flex items-center gap-2 px-4 py-3 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur border-b border-gray-100 dark:border-zinc-900">
-          <img src="/icon-192.png" alt="" className="w-7 h-7 rounded-lg md:hidden" />
+          {/* الهاتف: صورة الحساب الحالي مكان الشعار ← الملف الشخصي (لا خانة إضافية في الشريط) */}
+          {me
+            ? <Link to="/profile" title={me.email} className="shrink-0 md:hidden"><Avatar account={me} size="w-8 h-8" /></Link>
+            : <img src="/icon-192.png" alt="" className="w-7 h-7 rounded-lg md:hidden" />}
           {/* المتجر الحالي — اختيار متجر آخر من صفحة «متاجري» */}
           <Link to="/stores" className="flex-1 min-w-0 md:flex-none md:max-w-xs flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-900">
             <span className="w-7 h-7 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shrink-0 flex items-center justify-center">
@@ -80,8 +83,8 @@ export default function Layout() {
             <Languages className="w-4 h-4" />{i18n.language}
           </button>
           <button onClick={toggleTheme} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900">{dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}</button>
-          {/* صورة الحساب الحالي ← الملف الشخصي (حتى لا تعمل في الحساب الخطأ) */}
-          {me && <Link to="/profile" title={me.email} className="shrink-0"><Avatar account={me} size="w-8 h-8" /></Link>}
+          {/* الحاسوب: صورة الحساب الحالي ← الملف الشخصي (حتى لا تعمل في الحساب الخطأ) */}
+          {me && <Link to="/profile" title={me.email} className="shrink-0 hidden md:block"><Avatar account={me} size="w-8 h-8" /></Link>}
         </header>
 
         <main className="p-4 md:p-6 max-w-6xl mx-auto">
