@@ -156,7 +156,9 @@
     "no_camera": "Caméra indisponible — saisissez le code",
     "https": "La caméra nécessite https — saisissez le code",
     "open_order": "Ouvrir la commande",
-    "sell": "Vendre"
+    "sell": "Vendre",
+    "expand": "Agrandir",
+    "shrink": "Réduire"
   },
   "product": {
     "new": "Nouveau produit",
@@ -1025,7 +1027,9 @@
     "info_barcode": "Code-barres",
     "info_options": "Autres options",
     "info_missing": "Produit introuvable dans le stock (peut-être supprimé)",
-    "order_found": "Commande scannée"
+    "order_found": "Commande scannée",
+    "more": "Ajouter",
+    "tap_for_info": "Touchez un produit pour voir son stock et ses infos"
   },
   "quick": {
     "title": "Produit rapide",

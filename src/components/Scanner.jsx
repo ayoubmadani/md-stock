@@ -2,9 +2,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
-import { Keyboard } from 'lucide-react';
+import { Check, Maximize2, Minimize2, Search, X } from 'lucide-react';
 
-export default function Scanner({ onDetected, paused = false, continuous = false }) {
+// compact: شريط رفيع (السلة ممتلئة) مع زر تكبير/تصغير onToggleSize · flash: { ok, text, price } وميض بعد المسح · extra: زر بجانب الخانة
+export default function Scanner({ onDetected, paused = false, continuous = false, compact = false, onToggleSize, flash = null, extra = null }) {
   const { t } = useTranslation();
   const videoRef = useRef(null);
   const doneRef = useRef(false);
@@ -43,23 +44,39 @@ export default function Scanner({ onDetected, paused = false, continuous = false
 
   return (
     <div className="space-y-3">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black">
+      <div className={`relative w-full overflow-hidden bg-black transition-all duration-300 ${compact ? 'h-24 rounded-2xl' : 'aspect-[4/3] rounded-3xl'} ${
+        flash ? (flash.ok ? 'ring-4 ring-emerald-500 shadow-[0_0_30px_rgba(16,185,129,.45)]' : 'ring-4 ring-rose-500') : ''}`}>
         {!paused && <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />}
         {/* إطار التوجيه */}
-        <div className="pointer-events-none absolute inset-x-8 top-1/2 -translate-y-1/2 h-28 rounded-2xl border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
+        <div className={`pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-2xl border-2 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)] ${compact ? 'inset-x-16 h-12' : 'inset-x-8 h-28'} ${
+          flash ? (flash.ok ? 'border-emerald-400' : 'border-rose-400') : 'border-white/80'}`} />
+        {onToggleSize && (
+          <button type="button" onClick={onToggleSize} aria-label={t(compact ? 'scan.expand' : 'scan.shrink')}
+            className="absolute top-2 end-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/55 text-white text-[11px] font-bold">
+            {compact ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}{t(compact ? 'scan.expand' : 'scan.shrink')}
+          </button>
+        )}
+        {/* ما مُسح للتو: اسم وسعر (أخضر) أو «غير معروف» (أحمر) */}
+        {flash && (
+          <div className={`absolute bottom-2 inset-x-2 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-white ${flash.ok ? 'bg-emerald-600' : 'bg-rose-600'}`}>
+            {flash.ok ? <Check className="w-4 h-4 shrink-0" /> : <X className="w-4 h-4 shrink-0" />}
+            <span className="flex-1 min-w-0 truncate"><bdi>{flash.text}</bdi></span>
+            {flash.price != null && <span className="shrink-0" dir="ltr">{Number(flash.price).toLocaleString('en-US')} DA</span>}
+          </div>
+        )}
         {error && <p className="absolute inset-x-4 bottom-4 text-center text-sm text-white bg-black/60 rounded-xl p-2">{error}</p>}
       </div>
-      <form
-        onSubmit={(e) => { e.preventDefault(); if (manual.trim()) onDetected(manual.trim()); }}
-        className="flex gap-2"
-      >
-        <div className="relative flex-1">
-          <Keyboard className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className="flex gap-2">
+        <form
+          onSubmit={(e) => { e.preventDefault(); const v = manual.trim(); if (!v) return; onDetected(v); if (continuous) setManual(''); }}
+          className="relative flex-1"
+        >
           <input value={manual} onChange={(e) => setManual(e.target.value)} inputMode="numeric" dir="ltr" placeholder={t('scan.manual')}
-            className="w-full ps-9 pe-3 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
-        </div>
-        <button className="px-4 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm">{t('scan.go')}</button>
-      </form>
+            className="w-full pl-3 pr-11 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
+          <button aria-label={t('scan.go')} className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-lg text-gray-500 hover:text-indigo-600"><Search className="w-5 h-5" /></button>
+        </form>
+        {extra}
+      </div>
     </div>
   );
 }

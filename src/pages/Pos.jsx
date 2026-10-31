@@ -4,13 +4,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import JsBarcode from 'jsbarcode';
-import { Check, ChevronDown, CircleHelp, Clock, ListPlus, Loader2, Receipt as ReceiptIcon, Minus, Package, PackagePlus, Pencil, Plus, Printer, Search, ShoppingBag, Trash2, User, X } from 'lucide-react';
+import { Check, ChevronDown, Clock, ListPlus, Loader2, Receipt as ReceiptIcon, Minus, Package, PackagePlus, Pencil, Plus, Printer, Search, ShoppingBag, Trash2, User, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { posProducts } from '../lib/bulk-select';
 import { money, paymentState } from '../lib/orders';
-import { addScanned, addService, cartTotal, findPickable, orderToCart, pickedHit, saleBody, setLine } from '../lib/pos';
+import { addScanned, addService, cartTotal, findPickable, hitLabel, orderToCart, pickedHit, saleBody, setLine } from '../lib/pos';
 import Scanner from '../components/Scanner';
 import ProductInfoSheet from '../components/ProductInfoSheet';
 import ScannedOrder from '../components/ScannedOrder';
@@ -268,6 +268,13 @@ export default function PosPage() {
   const [serving, setServing] = useState(false);
   const [infoLine, setInfoLine] = useState(null); // سطر السلة الذي تُعرض معلوماته
   const [scannedOrder, setScannedOrder] = useState(null); // باركود طلب ممسوح: يُعرض في مودل (عرض/تعديل)
+  const [flash, setFlash] = useState(null); // وميض الكاميرا بعد المسح: { ok, text, price }
+  const [bigCam, setBigCam] = useState(false); // تكبير الكاميرا يدوياً والسلة ممتلئة
+  const [menu, setMenu] = useState(false); // قائمة «+»: اختيار منتج / منتج سريع / خدمة
+  const flashTimer = useRef(null);
+  const showFlash = useCallback((f) => { clearTimeout(flashTimer.current); setFlash(f); flashTimer.current = setTimeout(() => setFlash(null), 1600); }, []);
+  useEffect(() => () => clearTimeout(flashTimer.current), []);
+  useEffect(() => { if (!cart.length) setBigCam(false); }, [cart.length]);
   const { can } = useAuth();
   const recent = useRef(new Map()); // آخر مسح لكل كود — لا نضيف نفس القطعة مرتين وهي أمام الكاميرا
 
@@ -279,9 +286,10 @@ export default function PosPage() {
     setLooking(true);
     try {
       const { data } = await api.get(`/stores/${storeId}/inventory/barcode/${encodeURIComponent(code)}`);
-      if (data?.product?.isArchived) { beep(false); toast.error(t('pos.archived', { name: data.product.name })); return; }
+      if (data?.product?.isArchived) { beep(false); showFlash({ ok: false, text: t('pos.archived', { name: data.product.name }) }); return; }
       setCart((c) => addScanned(c, data));
       beep(true);
+      showFlash({ ok: true, text: hitLabel(data), price: data.variant?.price ?? data.product.price });
     } catch (e) {
       beep(false);
       if (e.response?.status === 404) {
@@ -292,12 +300,13 @@ export default function PosPage() {
           if (order) { setScannedOrder(order); navigator.vibrate?.(60); return; }
         }
         // باركود جديد: إضافته كمنتج سريع بنفس الباركود
+        showFlash({ ok: false, text: t('pos.unknown', { code }) });
         toast.error(t('pos.unknown', { code }), can('product.crud') ? { action: { label: t('pos.add_as_product'), onClick: () => setQuick({ barcode: code }) }, duration: 8000 } : undefined);
       } else toast.error(errorMessage(e, t('inventory.error')));
     } finally {
       setLooking(false);
     }
-  }, [storeId, t, can]);
+  }, [storeId, t, can, showFlash]);
 
   useEffect(() => {
     setEditing(null);
@@ -350,17 +359,27 @@ export default function PosPage() {
       )}
       <div className="relative">
         {/* يتوقف الماسح أثناء «منتج سريع» (يحرّر الكاميرا الخلفية لتصوير المنتج) وأثناء اختيار منتج */}
-        <Scanner onDetected={onCode} continuous paused={!!quick || picking || !!infoLine || !!scannedOrder} />
+        <Scanner onDetected={onCode} continuous paused={!!quick || picking || !!infoLine || !!scannedOrder}
+          compact={cart.length > 0 && !bigCam} onToggleSize={cart.length > 0 ? () => setBigCam((b) => !b) : undefined} flash={flash}
+          extra={(
+            <div className="relative">
+              <button type="button" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-label={t('pos.more')}
+                className="w-12 h-12 rounded-xl bg-indigo-600 text-white grid place-items-center">{menu ? <X className="w-5 h-5" /> : <Plus className="w-6 h-6" />}</button>
+              {menu && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setMenu(false)} />
+                  <div className="absolute top-full mt-2 end-0 z-40 w-56 rounded-2xl bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 shadow-xl overflow-hidden text-sm font-semibold divide-y divide-gray-100 dark:divide-zinc-700">
+                    <button type="button" onClick={() => { setMenu(false); setPicking(true); }} className="w-full flex items-center gap-2 px-4 py-3 text-start"><ListPlus className="w-4 h-4 text-indigo-500" />{t('pos.pick')}</button>
+                    {can('product.crud') && <button type="button" onClick={() => { setMenu(false); setQuick({ barcode: '' }); }} className="w-full flex items-center gap-2 px-4 py-3 text-start"><PackagePlus className="w-4 h-4 text-indigo-500" />{t('quick.title')}</button>}
+                    <button type="button" onClick={() => { setMenu(false); setServing(true); }} className="w-full flex items-center gap-2 px-4 py-3 text-start"><ReceiptIcon className="w-4 h-4 text-indigo-500" />{t('pos.service_title')}</button>
+                  </div>
+                </>
+              )}
+            </div>
+          )} />
         {looking && <span className="absolute top-3 end-3 p-2 rounded-full bg-black/60"><Loader2 className="w-4 h-4 animate-spin text-white" /></span>}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => setPicking(true)} className={`${can('product.crud') ? '' : 'col-span-2 '}flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold`}><ListPlus className="w-4 h-4" />{t('pos.pick')}</button>
-        {can('product.crud') && (
-          <button type="button" onClick={() => setQuick({ barcode: '' })} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400"><PackagePlus className="w-4 h-4" />{t('quick.title')}</button>
-        )}
-      </div>
-      <button type="button" onClick={() => setServing(true)} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-bold text-gray-600 dark:text-zinc-300"><ReceiptIcon className="w-4 h-4" />{t('pos.service_title')}</button>
 
       {cart.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-8 text-gray-400 text-center"><ShoppingBag className="w-9 h-9" /><p className="text-sm max-w-xs">{t('pos.empty')}</p></div>
@@ -368,17 +387,15 @@ export default function PosPage() {
         <div className={`${box} divide-y divide-gray-100 dark:divide-zinc-800`}>
           {cart.map((l) => (
             <div key={l.key} className="p-3 flex items-center gap-3">
+              {/* الصورة والاسم: ضغطة = معلومات المنتج (المخزون، الخيارات، توريد/جرد) */}
+              <button type="button" disabled={l.service || !l.productId} onClick={() => setInfoLine(l)} aria-label={t('pos.info')} className="shrink-0 disabled:cursor-default">
               <span className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">{l.image ? <img src={l.image} alt="" className="w-full h-full object-cover" /> : l.service ? <ReceiptIcon className="w-5 h-5 text-indigo-400" /> : <Package className="w-5 h-5 text-gray-400" />}</span>
+              </button>
               <div className="flex-1 min-w-0 space-y-1">
-                <div className="flex items-center gap-1.5 min-w-0">
+                <button type="button" disabled={l.service || !l.productId} onClick={() => setInfoLine(l)} className="block w-full min-w-0 text-start disabled:cursor-default">
                   <p className="text-sm font-semibold truncate"><bdi>{l.name}</bdi></p>
-                  {/* معلومات المنتج: المخزون والخيارات (وتوريد/جرد لصاحب صلاحية المنتجات) */}
-                  {!l.service && l.productId && (
-                    <button type="button" onClick={() => setInfoLine(l)} title={t('pos.info')} aria-label={t('pos.info')}
-                      className="shrink-0 w-6 h-6 grid place-items-center rounded-full text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"><CircleHelp className="w-4 h-4" /></button>
-                  )}
-                </div>
-                {l.parts.length > 0 && <VariantParts parts={l.parts} className="text-xs text-gray-500" />}
+                  {l.parts.length > 0 && <VariantParts parts={l.parts} className="text-xs text-gray-500" />}
+                </button>
                 <div className="flex items-center gap-1">
                   <input type="number" inputMode="numeric" dir="ltr" min="0" value={l.price} onChange={(e) => setCart((c) => setLine(c, l.key, { price: e.target.value === '' ? '' : Number(e.target.value) }))} className="w-24 px-2 py-1 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-sm font-bold" />
                   <span className="text-[11px] text-gray-400">DA</span>
@@ -394,17 +411,22 @@ export default function PosPage() {
         </div>
       )}
 
+      {cart.some((l) => !l.service && l.productId) && <p className="text-center text-[11px] text-gray-400">{t('pos.tap_for_info')}</p>}
+
       {cart.length > 0 && (
         <>
           <CustomerBox customer={customer} onPick={() => setPickingCustomer(true)} onClear={() => setCustomer(NO_CUSTOMER)} />
-          {!editing && (
-            <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => setPayLater(true)} className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl border border-orange-300 dark:border-orange-500/40 bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300 text-sm font-bold disabled:opacity-60"><Clock className="w-4 h-4" />{t('pos.pay_later')}</button>
-          )}
-          <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20">
-            <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => confirm()} className="w-full flex items-center justify-between gap-2 px-5 py-4 rounded-2xl bg-emerald-600 text-white font-bold shadow-lg disabled:opacity-60">
+          <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20 flex gap-2">
+            <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => confirm()} className="flex-1 min-w-0 flex items-center justify-between gap-2 px-5 py-4 rounded-2xl bg-emerald-600 text-white font-bold shadow-lg disabled:opacity-60">
               <span className="flex items-center gap-2">{saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}{t(editing ? 'pos.save_edit' : 'pos.confirm', { count: cart.reduce((s, l) => s + l.quantity, 0) })}</span>
               <span className="text-lg font-black" dir="ltr">{money(total)} DA</span>
             </button>
+            {!editing && (
+              <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => setPayLater(true)}
+                className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-2xl border border-orange-300 dark:border-orange-500/50 bg-orange-50 dark:bg-zinc-900 text-orange-700 dark:text-orange-300 text-[11px] font-bold leading-tight shadow-lg disabled:opacity-60">
+                <Clock className="w-4 h-4" />{t('pos.pay_later')}
+              </button>
+            )}
           </div>
         </>
       )}

@@ -156,7 +156,9 @@
     "no_camera": "Camera unavailable — type the barcode",
     "https": "The camera needs https — type the barcode",
     "open_order": "Open the order",
-    "sell": "Sell"
+    "sell": "Sell",
+    "expand": "Expand",
+    "shrink": "Shrink"
   },
   "product": {
     "new": "New product",
@@ -1025,7 +1027,9 @@
     "info_barcode": "Barcode",
     "info_options": "Other options",
     "info_missing": "Product not found in stock (maybe deleted)",
-    "order_found": "Scanned order"
+    "order_found": "Scanned order",
+    "more": "Add",
+    "tap_for_info": "Tap a product to see its stock and details"
   },
   "quick": {
     "title": "Quick new product",

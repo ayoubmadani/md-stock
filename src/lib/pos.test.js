@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addScanned, addService, cartTotal, findPickable, lineInfo, orderToCart, pickedHit, saleBody, setLine } from './pos';
+import { addScanned, addService, cartTotal, findPickable, hitLabel, lineInfo, orderToCart, pickedHit, saleBody, setLine } from './pos';
 
 const simple = { product: { id: 'p1', name: 'Mug', price: 900, image: null }, variant: null };
 const variant = { product: { id: 'p2', name: 'Set', price: 2500 }, variant: { id: 'v1', price: 2900, parts: [{ value: 'M' }] } };
@@ -131,5 +131,12 @@ describe('lineInfo (info modal from a cart line)', () => {
   });
   it('product gone (deleted / archived elsewhere) → null', () => {
     expect(lineInfo(products, { productId: 'zz' })).toBeNull();
+  });
+});
+
+describe('hitLabel (green flash on the camera after a scan)', () => {
+  it('product name, plus the option in words (text value, or the attribute for colour / image)', () => {
+    expect(hitLabel({ product: { name: 'Parfum' }, variant: null })).toBe('Parfum');
+    expect(hitLabel({ product: { name: 'T-shirt' }, variant: { parts: [{ mode: 'text', value: 'M', attr: 'Taille' }, { mode: 'color', value: '#f00', attr: 'Couleur' }] } })).toBe('T-shirt — M / Couleur');
   });
 });

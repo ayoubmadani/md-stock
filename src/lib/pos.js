@@ -82,3 +82,9 @@ export function lineInfo(products, line) {
   const src = variant || product;
   return { product, variant, stock: src.stock, status: src.status, price: src.price, barcode: src.barcode ?? null };
 }
+
+/** اسم ما مُسح كما يظهر على الكاميرا: «المنتج — M / Couleur» (اللون والصورة باسم الخاصية) */
+export function hitLabel(hit) {
+  const parts = (hit.variant?.parts || []).map((p) => (p.mode === 'text' ? p.value : p.attr)).filter(Boolean);
+  return parts.length ? `${hit.product.name} — ${parts.join(' / ')}` : hit.product.name;
+}
