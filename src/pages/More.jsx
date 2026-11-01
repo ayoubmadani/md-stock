@@ -8,6 +8,7 @@ import { disablePush, enablePush, isIos, isStandalone, pushState } from '../lib/
 import { playCoin } from '../lib/coin';
 import { Toggle } from '../components/product';
 import { navVisible, useAuth } from '../lib/auth';
+import { FEATURES } from '../lib/features';
 import { Avatar } from '../components/Accounts';
 
 export const MORE = [
@@ -15,7 +16,7 @@ export const MORE = [
   { to: '/customers', key: 'customers', icon: Contact, perm: 'pos.sell' },
   { to: '/abandoned', key: 'abandoned', icon: ShoppingCart, perm: 'order.view' },
   { to: '/profit', key: 'profit', icon: TrendingUp, storeOwner: true },
-  { to: '/meta', key: 'meta', icon: Megaphone, storeOwner: true },
+  ...(FEATURES.metaAds ? [{ to: '/meta', key: 'meta', icon: Megaphone, storeOwner: true }] : []),
   { to: '/stores', key: 'stores', icon: Store, all: true },
   { to: '/landing', key: 'landing', icon: LayoutTemplate, storeOwner: true },
   { to: '/messages', key: 'messages', icon: MessageSquare, perm: 'messages.read' },

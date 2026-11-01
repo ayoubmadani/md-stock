@@ -8,6 +8,8 @@ import { api, errorMessage } from '../lib/api';
 import { localDate, periodRange } from '../lib/periods';
 import { campaignsFor } from '../lib/campaign-links';
 import { money } from '../lib/orders';
+import { FEATURES } from '../lib/features';
+
 
 const input = 'w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400';
 const label = 'text-xs font-semibold text-gray-500';
@@ -149,7 +151,7 @@ export default function AdsSheet({ storeId, product, onClose, onChanged }) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <MetaCampaigns storeId={storeId} product={product} onChanged={onChanged} />
+          {FEATURES.metaAds && <MetaCampaigns storeId={storeId} product={product} onChanged={onChanged} />}
           <p className={label}>{t('ads.manual')}</p>
           <form onSubmit={add} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">

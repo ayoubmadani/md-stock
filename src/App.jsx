@@ -26,6 +26,7 @@ import WalletPage from './pages/Wallet';
 import ProfitPage from './pages/Profit';
 import AbandonedPage from './pages/Abandoned';
 import MetaPage from './pages/Meta';
+import { FEATURES } from './lib/features';
 import PixelsPage from './pages/Pixels';
 import StoresPage from './pages/Stores';
 import StoreForm from './pages/StoreForm';
@@ -116,7 +117,7 @@ export default function App() {
             <Route path="more" element={<MorePage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="wallet" element={<RequirePerm owner><WalletPage /></RequirePerm>} />
-            <Route path="meta" element={<RequirePerm owner><MetaPage /></RequirePerm>} />
+            {FEATURES.metaAds && <Route path="meta" element={<RequirePerm owner><MetaPage /></RequirePerm>} />}
             <Route path="pixels" element={<RequirePerm owner><PixelsPage /></RequirePerm>} />
             <Route path="stores" element={<StoresPage />} />
             <Route path="stores/new" element={<StoreForm />} />

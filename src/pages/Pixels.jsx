@@ -8,6 +8,8 @@ import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { EMPTY_PIXEL, pixelError, pixelPayload } from '../lib/pixel-form';
 import { Toggle, input, label } from '../components/product';
+import { FEATURES } from '../lib/features';
+
 
 const TYPES = [
   { id: 'facebook', icon: Facebook, color: 'bg-[#1877F2] text-white' },
@@ -109,10 +111,12 @@ export default function PixelsPage() {
         </button>
       </div>
 
-      <Link to="/meta" className="flex items-center gap-3 rounded-2xl bg-[#1877F2]/10 p-3 text-sm">
-        <Megaphone className="w-5 h-5 text-[#1877F2] shrink-0" />
-        <span className="flex-1 text-[#1877F2] dark:text-blue-300 font-semibold">{t('pixels.from_meta')}</span>
-      </Link>
+      {FEATURES.metaAds && (
+        <Link to="/meta" className="flex items-center gap-3 rounded-2xl bg-[#1877F2]/10 p-3 text-sm">
+          <Megaphone className="w-5 h-5 text-[#1877F2] shrink-0" />
+          <span className="flex-1 text-[#1877F2] dark:text-blue-300 font-semibold">{t('pixels.from_meta')}</span>
+        </Link>
+      )}
 
       {list.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-gray-400">
