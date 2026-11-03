@@ -258,7 +258,7 @@ export default function DeliveryRatesPage() {
         )}
 
       {dirty.size > 0 && (
-        <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20">
+        <div className="pt-2">
           <button type="button" disabled={busy === 'save'} onClick={saveDirty} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-bold shadow-lg disabled:opacity-60">
             {busy === 'save' && <Loader2 className="w-4 h-4 animate-spin" />}{t('rates.save', { count: dirty.size })}
           </button>

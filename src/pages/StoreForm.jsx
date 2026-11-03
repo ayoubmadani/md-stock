@@ -180,8 +180,8 @@ export default function StoreForm({ onboarding = false }) {
         <input value={f.heroSubtitle} onChange={set('heroSubtitle')} placeholder={t('stores.hero_subtitle')} className={input} />
       </Section>
 
-      {/* يلتصق بأسفل الشاشة داخل عمود النموذج نفسه (فوق الشريط السفلي في الهاتف) */}
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20 pt-2">
+      {/* زر الحفظ في آخر الصفحة */}
+      <div className="pt-2">
         <button disabled={saving} className="w-full flex items-center justify-center gap-2 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60">
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}{isNew ? t('stores.create') : t('inventory.save')}
         </button>

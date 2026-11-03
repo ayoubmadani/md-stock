@@ -29,3 +29,8 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
 /* لوحة المفاتيح مفتوحة (آيفون): المودل يأخذ الجزء الظاهر فوقها فقط — lib/keyboard.js */
 html.kb .fixed.inset-0 { top: var(--vvt, 0px); bottom: auto; height: var(--vvh, 100%); }
 html.kb .fixed.inset-0 > * { max-height: calc(var(--vvh, 100dvh) - 8px) !important; }
+
+/* الوضع الليلي: حدود الخانات أوضح (zinc-800 على خلفية zinc-950 لا تُرى) — الخانات فقط، لا عند التركيز ولا عند الخطأ */
+.dark :is(input:not([type='checkbox']):not([type='radio']):not([type='range']), select, textarea)[class*='dark:border-zinc-800']:not(:focus):not([class*='border-rose']):not([class*='border-red']) {
+  border-color: var(--color-zinc-600);
+}

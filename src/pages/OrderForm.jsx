@@ -266,7 +266,7 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
   const ship = form.isDigital || free ? 0 : Number(form.priceShip || 0);
 
   return (
-    <form onSubmit={save} className={`max-w-xl mx-auto space-y-3 ${embedded ? 'pb-4' : 'pb-28 md:pb-6'}`}>
+    <form onSubmit={save} className="max-w-xl mx-auto space-y-3 pb-6">
       <div className="flex items-center justify-between">
         <button type="button" onClick={() => (embedded ? onClose() : navigate(-1))} className="flex items-center gap-1 text-sm text-gray-500"><ArrowRight className="w-4 h-4 ltr:rotate-180" />{t('product.back')}</button>
         <h1 className="font-bold">{isNew ? t('orders.form.new') : t('orders.form.edit')}</h1>
@@ -346,7 +346,7 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
       </div>
 
       {!locked && (
-        <div className={embedded ? 'sticky bottom-0 -mx-4 p-4 bg-gray-50/95 dark:bg-zinc-950/95 z-30' : 'fixed md:static bottom-16 inset-x-0 p-4 md:p-0 bg-gray-50/95 dark:bg-zinc-950/95 md:bg-transparent z-30'}>
+        <div className="pt-2">
           <button disabled={saving} className="w-full max-w-xl mx-auto flex items-center justify-center gap-2 py-3.5 bg-indigo-600 text-white font-bold rounded-xl disabled:opacity-60">
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}{isNew ? t('orders.form.create') : t('inventory.save')}
           </button>
