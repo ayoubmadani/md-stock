@@ -916,7 +916,9 @@
     "add_product": "Photos du produit",
     "from_product": "Photos du produit",
     "add_n": "Ajouter ({{count}})",
-    "already_added": "Ajoutée"
+    "already_added": "Ajoutée",
+    "regenerate": "Régénérer avec l'IA",
+    "regenerate_confirm": "« {{name}} » sera redessinée par l'IA et son contenu actuel remplacé (même lien et domaine). Une page est décomptée de votre quota. Continuer ?"
   },
   "keys": {
     "new": "Nouvelle clé",

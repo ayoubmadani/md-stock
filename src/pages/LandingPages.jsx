@@ -2,7 +2,7 @@
 // تفعيل/إيقاف، نسخ، حذف، تغيير المنتج، ربط دومين، المنصة — تصميم الصفحة نفسه في محرر اللوحة
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Copy, ExternalLink, Globe, LayoutTemplate, Loader2, Monitor, MoreVertical, Package, Plus, Power, Send, Trash2, X } from 'lucide-react';
+import { Copy, ExternalLink, Globe, LayoutTemplate, Loader2, Monitor, MoreVertical, Package, Plus, Power, Send, Sparkles, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -23,7 +23,7 @@ function Sheet({ title, onClose, children }) {
 }
 
 // إجراءات صفحة واحدة
-function PageSheet({ page, storeId, products, onClose, onChanged }) {
+function PageSheet({ page, storeId, products, onClose, onChanged, onRegenerate }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(null);
   const [domains, setDomains] = useState(null);
@@ -47,6 +47,7 @@ function PageSheet({ page, storeId, products, onClose, onChanged }) {
         <button type="button" disabled={!!busy} onClick={() => run('pub', () => api.post(`/builder-pages/${page.id}/publish`), t('lp.published_ok'))} className={action}>{busy === 'pub' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 text-emerald-500" />}{page.publishedUrl ? t('lp.republish') : t('lp.publish')}</button>
         <button type="button" disabled={!!busy} onClick={() => run('toggle', () => api.post(`/builder-pages/${page.id}/toggle-status`))} className={action}>{busy === 'toggle' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Power className={`w-4 h-4 ${page.isActive ? 'text-emerald-500' : 'text-gray-400'}`} />}{page.isActive ? t('lp.disable') : t('lp.enable')}</button>
         <button type="button" disabled={!!busy} onClick={() => run('dup', () => api.post(`/builder-pages/${page.id}/duplicate`), t('lp.duplicated'), true)} className={action}>{busy === 'dup' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4 text-gray-500" />}{t('lp.duplicate')}</button>
+        <button type="button" disabled={!!busy} onClick={onRegenerate} className={action}><Sparkles className="w-4 h-4 text-violet-500" />{t('lp.regenerate')}</button>
         <button type="button" disabled={!!busy} onClick={() => window.confirm(t('lp.confirm_delete', { name: page.name })) && run('del', () => api.delete(`/builder-pages/${page.id}`), t('lp.deleted'), true)} className={`${action} text-rose-600`}><Trash2 className="w-4 h-4" />{t('lp.delete')}</button>
       </div>
 
@@ -88,6 +89,7 @@ export default function LandingPagesPage() {
   const [products, setProducts] = useState([]);
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState(null);
+  const [regen, setRegen] = useState(null); // صفحة يُعاد إنتاجها بالذكاء الاصطناعي
 
   const load = useCallback(() => {
     api.get(`/builder-pages/store/${storeId}`).then((r) => setPages(Array.isArray(r.data) ? r.data : r.data?.data ?? [])).catch(() => setPages([]));
@@ -135,7 +137,8 @@ export default function LandingPagesPage() {
         )}
 
       {creating && <NewLandingSheet storeId={storeId} products={products} onClose={() => setCreating(false)} onDone={() => { setCreating(false); load(); }} />}
-      {current && <PageSheet page={current} storeId={storeId} products={products} onClose={() => setOpen(null)} onChanged={load} />}
+      {current && !regen && <PageSheet page={current} storeId={storeId} products={products} onClose={() => setOpen(null)} onChanged={load} onRegenerate={() => setRegen(current)} />}
+      {regen && <NewLandingSheet storeId={storeId} products={products} page={regen} onClose={() => setRegen(null)} onDone={() => { setRegen(null); setOpen(null); load(); }} />}
     </div>
   );
 }

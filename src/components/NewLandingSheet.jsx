@@ -45,10 +45,11 @@ function ProductPhotosPicker({ urls, chosen, max, onPick, onClose }) {
   );
 }
 
-export default function NewLandingSheet({ storeId, products, onClose, onDone }) {
+// page: إعادة إنتاج صفحة موجودة بالذكاء الاصطناعي (صفحة صور جديدة تستبدل محتواها — نفس الرابط والدومين)
+export default function NewLandingSheet({ storeId, products, onClose, onDone, page = null }) {
   const { t, i18n } = useTranslation();
   const [mode, setMode] = useState('image');
-  const [productId, setProductId] = useState('');
+  const [productId, setProductId] = useState(page?.productId || '');
   const [name, setName] = useState('');
   const [lang, setLang] = useState(['ar', 'fr', 'en'].includes(i18n.language) ? i18n.language : 'ar');
   const [color, setColor] = useState(null);
@@ -108,9 +109,16 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
   const create = async () => {
     let pageId;
     try {
-      go('create');
-      const { data: page } = await api.post('/builder-pages', { name: name.trim() || productName || t('lp.untitled'), storeId, productId: productId || undefined });
-      pageId = page.id;
+      if (page) {
+        // إعادة الإنتاج: نفس الصفحة — محتواها يُستبدل بعد نجاح التصميم فقط
+        if (!window.confirm(t('lp.regenerate_confirm', { name: page.name }))) return;
+        pageId = page.id;
+        if (productId !== (page.productId || '')) await api.patch(`/builder-pages/${pageId}/product`, { productId: productId || null });
+      } else {
+        go('create');
+        const { data: created } = await api.post('/builder-pages', { name: name.trim() || productName || t('lp.untitled'), storeId, productId: productId || undefined });
+        pageId = created.id;
+      }
       if (mode === 'empty' || !productId) { toast.success(t('lp.created')); return onDone(); }
       if (mode === 'blocks') {
         go('ai');
@@ -125,7 +133,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
       go('photos');
       const files = (await Promise.all(photos.map((x) => (x.file ? x.file : x.stored ? fetchStoredPhoto(pageId, x.stored).catch(() => null) : fetchProductPhoto(pageId, productId, x.n).catch(() => null))))).filter(Boolean);
       if (!files.length) throw new Error(t('lp.no_photos'));
-      const tree = await generateImagePage({ pageId, files, productId, language: lang, primaryColor: color || undefined, onStep: go, onPreview });
+      const tree = await generateImagePage({ pageId, storeId, files, productId, language: lang, primaryColor: color || undefined, onStep: go, onPreview });
       await finish(pageId, tree);
     } catch (e) {
       if (e?.design && pageId) setRetry({ pageId, design: e.design });
@@ -152,7 +160,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && !busy && onClose()}>
       <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-5 space-y-3 max-h-[92dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-        <div className="flex items-center justify-between"><p className="font-bold">{t('lp.new')}</p>{!busy && <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>}</div>
+        <div className="flex items-center justify-between"><p className="font-bold">{page ? `${t('lp.regenerate')} · ${page.name}` : t('lp.new')}</p>{!busy && <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>}</div>
 
         {busy ? (
           <div className="space-y-3 py-2">
@@ -176,13 +184,13 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-3 gap-1.5">
+            {!page && <div className="grid grid-cols-3 gap-1.5">
               {MODES.map((m) => (
                 <button key={m.id} type="button" onClick={() => setMode(m.id)} className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border-2 text-[11px] font-bold ${mode === m.id ? 'border-violet-500 text-violet-600 dark:text-violet-400' : 'border-gray-100 dark:border-zinc-800 text-gray-500'}`}>
                   <m.icon className="w-5 h-5" />{t(`lp.mode_${m.id}`)}
                 </button>
               ))}
-            </div>
+            </div>}
             {mode === 'image' && usage && <p className={`text-[11px] font-semibold ${limitReached || noQuota ? 'text-rose-600' : 'text-gray-500'}`}>{noQuota ? t('lp.no_quota') : t('lp.usage', { used: usage.used, limit: usage.limit })}</p>}
 
             <div className="space-y-1.5"><label className={label}>{t('lp.product')}</label>
@@ -247,12 +255,12 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone }) 
               </div>
             )}
 
-            <div className="space-y-1.5"><label className={label}>{t('lp.name')}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('lp.name_ph')} className={input} /></div>
+            {!page && <div className="space-y-1.5"><label className={label}>{t('lp.name')}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('lp.name_ph')} className={input} /></div>}
 
             {mode !== 'empty' && !productId && <p className="text-[11px] text-amber-600">{t('lp.ai_need_product')}</p>}
             <button type="button" disabled={(mode !== 'empty' && !productId) || (mode === 'empty' && !name.trim() && !productId) || (mode === 'image' && (!photos.length || loadingPhotos)) || limitReached || noQuota} onClick={create}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold disabled:opacity-50">
-              {mode !== 'empty' && <Sparkles className="w-4 h-4" />}{t(`lp.create_${mode}`)}
+              {mode !== 'empty' && <Sparkles className="w-4 h-4" />}{page ? t('lp.regenerate') : t(`lp.create_${mode}`)}
             </button>
           </>
         )}

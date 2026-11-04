@@ -916,7 +916,9 @@
     "add_product": "Product photos",
     "from_product": "Product photos",
     "add_n": "Add ({{count}})",
-    "already_added": "Added"
+    "already_added": "Added",
+    "regenerate": "Regenerate with AI",
+    "regenerate_confirm": "“{{name}}” will be redesigned by AI and its current content replaced (same link and domain). One page counts against your quota. Continue?"
   },
   "keys": {
     "new": "New key",
