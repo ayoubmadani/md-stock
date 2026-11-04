@@ -672,7 +672,11 @@
     "hero_desktop": "Desktop (wide)",
     "hero_mobile": "Phone (tall)",
     "hero_mobile_hint": "Phone visitors see the phone cover, everyone else the desktop one. Without a phone cover, the desktop cover shows everywhere.",
-    "name_before_logo": "Flip the order: name before the logo"
+    "name_before_logo": "Flip the order: name before the logo",
+    "country": "Country",
+    "country_DZ": "Algeria (58 provinces)",
+    "country_DN": "Algeria (69 provinces)",
+    "country_TN": "Tunisia"
   },
   "themes": {
     "current": "Current theme",

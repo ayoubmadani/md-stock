@@ -53,6 +53,7 @@ export default function StoreForm({ onboarding = false }) {
   const [f, setF] = useState(isNew ? EMPTY_STORE : null);
   const [subdomain, setSubdomain] = useState('');
   const [wilayas, setWilayas] = useState([]);
+  const [countries, setCountries] = useState(['DZ']);
   const [saving, setSaving] = useState(false);
   const set = (k) => (v) => setF((s) => ({ ...s, [k]: v?.target ? (v.target.type === 'checkbox' ? v.target.checked : v.target.value) : v }));
 
@@ -61,6 +62,9 @@ export default function StoreForm({ onboarding = false }) {
     api.get(`/stores/${id}`).then(({ data }) => { const st = data?.data || data; setF(storeToForm(st)); setSubdomain(st.subdomain); })
       .catch((e) => { toast.error(errorMessage(e, t('inventory.error'))); nav('/stores'); });
   }, [id, isNew, nav, t]);
+  useEffect(() => {
+    api.get('/shipping/countries').then(({ data }) => { if (Array.isArray(data) && data.length) setCountries(data); }).catch(() => {});
+  }, []);
   useEffect(() => {
     if (!f?.country) return;
     api.get('/shipping/wilayas', { params: { country: f.country } }).then(({ data }) => setWilayas(Array.isArray(data) ? data : [])).catch(() => setWilayas([]));
@@ -145,6 +149,12 @@ export default function StoreForm({ onboarding = false }) {
       </Section>
 
       <Section title={t('stores.selling')}>
+        {isNew && countries.length > 1 && (
+          <div className="space-y-1.5"><label className={label}>{t('stores.country')}</label>
+            <select value={f.country} onChange={(e) => setF((s) => ({ ...s, country: e.target.value, wilaya: '' }))} className={input}>
+              {countries.map((cc) => <option key={cc} value={cc}>{t(`stores.country_${cc}`, { defaultValue: cc })}</option>)}
+            </select></div>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5"><label className={label}>{t('stores.language')}</label>
             <select value={f.language} onChange={set('language')} className={input}>{['ar', 'fr', 'en'].map((l) => <option key={l} value={l}>{t(`stores.lang_${l}`)}</option>)}</select></div>

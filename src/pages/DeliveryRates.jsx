@@ -93,7 +93,9 @@ export default function DeliveryRatesPage() {
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(null);
   const [sheet, setSheet] = useState(null); // 'bulk' | 'import' | 'profile'
-  const [form, setForm] = useState({ mode: 'create', name: '' }); // إنشاء/تسمية حساب أسعار
+  const [form, setForm] = useState({ mode: 'create', name: '' });
+  const [countries, setCountries] = useState(['DZ']);
+  useEffect(() => { api.get('/shipping/countries').then(({ data }) => { if (Array.isArray(data) && data.length) setCountries(data); }).catch(() => {}); }, []); // إنشاء/تسمية حساب أسعار
   const [communesOf, setCommunesOf] = useState(null); // الولاية المفتوحة بلدياتها
   const [bulk, setBulk] = useState({ home: '', office: '', ret: '' });
   const [accounts, setAccounts] = useState(null);
@@ -149,7 +151,7 @@ export default function DeliveryRatesPage() {
     try {
       if (form.mode === 'create') {
         // نسخة من أسعار الحساب الحالي — تُعدّل بعدها
-        const { data } = await api.post('/shipping/profiles', { name, copyFromId: profileId || undefined, country: profile?.country || 'DZ' });
+        const { data } = await api.post('/shipping/profiles', { name, copyFromId: profileId || undefined, country: form.country || profile?.country || 'DZ' });
         await loadProfiles(data?.id);
         toast.success(t('rates.profile_created'));
       } else {
@@ -199,7 +201,7 @@ export default function DeliveryRatesPage() {
             <button type="button" onClick={() => { setForm({ mode: 'rename', name: profile?.name || '' }); setSheet('profile'); }} title={t('rates.profile_rename')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-500"><Pencil className="w-4 h-4" /></button>
             {profile && !profile.isDefault && <button type="button" disabled={busy === 'profile'} onClick={removeProfile} title={t('rates.profile_delete')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-rose-500 disabled:opacity-50"><Trash2 className="w-4 h-4" /></button>}
           </div>
-          <button type="button" onClick={() => { setForm({ mode: 'create', name: '' }); setSheet('profile'); }} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400"><Plus className="w-4 h-4" />{t('rates.profile_new')}</button>
+          <button type="button" onClick={() => { setForm({ mode: 'create', name: '', country: profile?.country || 'DZ' }); setSheet('profile'); }} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400"><Plus className="w-4 h-4" />{t('rates.profile_new')}</button>
           {!usedHere && profile && (
             <button type="button" disabled={busy === 'assign'} onClick={useForStore} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 text-sm font-bold disabled:opacity-50">
               {busy === 'assign' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}{t('rates.use_here')}
@@ -281,7 +283,12 @@ export default function DeliveryRatesPage() {
       {sheet === 'profile' && (
         <Sheet title={form.mode === 'create' ? t('rates.profile_new') : t('rates.profile_rename')} onClose={() => setSheet(null)}>
           <input autoFocus value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} onKeyDown={(e) => e.key === 'Enter' && saveProfile()} maxLength={80} placeholder={t('rates.profile_name')} className={input} />
-          {form.mode === 'create' && profile && <p className="text-[11px] text-gray-400">{t('rates.profile_copy_hint', { name: profile.name })}</p>}
+          {form.mode === 'create' && countries.length > 1 && (
+            <select value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} className={input}>
+              {countries.map((cc) => <option key={cc} value={cc}>{t(`stores.country_${cc}`, { defaultValue: cc })}</option>)}
+            </select>
+          )}
+          {form.mode === 'create' && profile && (form.country || 'DZ') === (profile.country || 'DZ') && <p className="text-[11px] text-gray-400">{t('rates.profile_copy_hint', { name: profile.name })}</p>}
           <button type="button" disabled={!form.name.trim() || busy === 'profile'} onClick={saveProfile} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">
             {busy === 'profile' && <Loader2 className="w-4 h-4 animate-spin" />}{form.mode === 'create' ? t('rates.profile_create') : t('inventory.save')}
           </button>
