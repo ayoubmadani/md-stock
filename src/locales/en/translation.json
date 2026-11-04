@@ -284,6 +284,7 @@
       "unpaid": "Pay later"
     },
     "form": {
+      "addons": "Add-ons",
       "new": "New order",
       "edit": "Edit order",
       "create": "Create order",

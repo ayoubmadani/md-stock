@@ -35,7 +35,41 @@ export function findVariant(variants, currentAttrs, key, value) {
   return (variants || []).find((v) => available(v) && Array.isArray(v.name) && v.name.some((a) => attrKey(a) === key && a.value === value)) || null;
 }
 
-export const itemsTotal = (items) => (items || []).reduce((s, it) => s + Number(it.finalPrice || 0) * (it.quantity || 1), 0);
+/** إضافات المنتج المفعّلة (للتعديل في الطلب) */
+export const productAddons = (product) => (product?.addons || []).filter((a) => a && a.isActive !== false && a.name);
+
+/** الإضافات بكمية مستقلة (separate): سعرها × كميتها، تُضاف مرة واحدة لسطر الطلب (القديمة لكل قطعة داخل finalPrice).
+ *  بعد تعديل التاجر (addonQty): الأسعار من المنتج × الكمية */
+export const addonsExtra = (it) => {
+  if (it?.addonQty) {
+    const price = new Map(productAddons(it.product).map((a) => [a.id, Number(a.price) || 0]));
+    return Object.entries(it.addonQty).reduce((s, [id, n]) => s + (price.get(id) ?? 0) * Number(n || 0), 0);
+  }
+  return (it?.addons || []).reduce((s, a) => s + (a.separate ? Number(a.price || 0) * Number(a.qty || 1) : 0), 0);
+};
+
+export const itemsTotal = (items) => (items || []).reduce((s, it) => s + Number(it.finalPrice || 0) * (it.quantity || 1) + addonsExtra(it), 0);
+
+/** كميات الإضافات الحالية للسطر: { معرّف: كمية } (القديمة لكل قطعة = كمية القطع) */
+export const itemAddonQty = (it) => {
+  if (it?.addonQty) return it.addonQty;
+  const out = {};
+  for (const a of it?.addons || []) out[a.id] = a.separate ? Number(a.qty || 1) : Number(it.quantity || 1);
+  return out;
+};
+
+/** التاجر يغيّر كمية إضافة في الطلب (0 = حذفها) → { addonQty, finalPrice? }.
+ *  أول تعديل لسطر بإضافات قديمة (سعرها داخل finalPrice لكل قطعة): نطرحها من finalPrice ونحوّلها لكمية مستقلة = القطع، فلا يتغيّر المجموع */
+export function editAddon(it, id, n) {
+  const patch = {};
+  if (!it.addonQty) {
+    const oldInside = (it.addons || []).filter((a) => !a.separate).reduce((s, a) => s + Number(a.price || 0), 0);
+    if (oldInside) patch.finalPrice = Number(it.finalPrice || 0) - oldInside;
+  }
+  const next = { ...itemAddonQty(it) };
+  if (n > 0) next[id] = Math.min(99, Math.floor(n)); else delete next[id];
+  return { ...patch, addonQty: next };
+}
 
 /** توصيل مجاني: عرض أو منتج مجاني التوصيل، وإلا عتبة المتجر إن كانت مفعّلة */
 export function isFreeShipping(order, store) {
@@ -69,6 +103,8 @@ export function orderPayload(form, { free, storeId } = {}) {
       variantDetailId: it.variantDetailId || null,
       offerId: it.offerId || null,
       finalPrice: Number(it.finalPrice || 0),
+      // عدّل التاجر الإضافات: السيرفر يحفظها بكمياتها ويحسب سعرها من المنتج (بدونها يحتفظ بالقديمة)
+      ...(it.addonQty ? { addonQty: it.addonQty } : {}),
     };
     if (storeId) {
       return { storeId, ...customer, priceLoss: 0, platform: 'dashboard', ...line, totalPrice: line.finalPrice * line.quantity };

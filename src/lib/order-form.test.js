@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { attrGroups, findVariant, itemsTotal, isFreeShipping, shipPrice, orderPayload, missingFields } from './order-form.js';
+import { attrGroups, findVariant, itemsTotal, isFreeShipping, shipPrice, orderPayload, missingFields, editAddon, itemAddonQty } from './order-form.js';
 
 const v = (id, attrs, extra = {}) => ({ id, name: attrs.map(([attrName, value]) => ({ attrName, value })), stock: 5, ...extra });
 const variants = [v('a', [['Size', 'M'], ['Color', 'Red']]), v('b', [['Size', 'L'], ['Color', 'Red']]), v('c', [['Size', 'L'], ['Color', 'Blue']], { stock: 0 })];
@@ -25,6 +25,10 @@ describe('findVariant', () => {
 describe('totals and shipping', () => {
   const items = [{ finalPrice: 1500, quantity: 2 }, { finalPrice: 1000, quantity: 1 }];
   it('sums price × quantity', () => expect(itemsTotal(items)).toBe(4000));
+  it('adds separate add-ons (price × their own qty) once per line; old per-piece add-ons are already in the price', () => {
+    const withAddons = [{ finalPrice: 1000, quantity: 2, addons: [{ id: 'c', name: 'جبن', price: 100, qty: 3, separate: true }, { id: 's', name: 'صلصة', price: 50 }] }];
+    expect(itemsTotal(withAddons)).toBe(2300);
+  });
   it('a free-shipping product or offer makes the whole order free', () => {
     expect(isFreeShipping({ items: [{ ...items[0], product: { shippingFree: true } }] }, null)).toBe(true);
     expect(isFreeShipping({ items: [{ ...items[0], offer: { shippingFree: true } }] }, null)).toBe(true);
@@ -68,5 +72,38 @@ describe('missingFields', () => {
   });
   it('a digital order needs an email or WhatsApp instead of an address', () => {
     expect(missingFields({ customerName: 'a', customerPhone: '1', isDigital: true, items: [{}] })).toEqual(['contact']);
+  });
+});
+
+describe('editing add-ons in an order', () => {
+  const product = { addons: [{ id: 'c', name: 'جبن', price: 100, maxQty: 3 }, { id: 's', name: 'صلصة', price: 50 }, { id: 'x', name: 'مخفي', price: 9, isActive: false }] };
+
+  it('current quantities come from the saved line (separate keep their qty)', () => {
+    expect(itemAddonQty({ product, addons: [{ id: 'c', price: 100, qty: 2, separate: true }] })).toEqual({ c: 2 });
+    expect(itemAddonQty({ product, addonQty: { s: 1 } })).toEqual({ s: 1 });
+  });
+
+  it('set a quantity: total = price × qty + add-ons, payload sends addonQty', () => {
+    let it = { product, productId: 'p', quantity: 2, finalPrice: 1000, addons: null };
+    it = { ...it, ...editAddon(it, 'c', 3) };
+    expect(it.addonQty).toEqual({ c: 3 });
+    expect(itemsTotal([it])).toBe(2300);
+    expect(orderPayload({ items: [it] })[0].addonQty).toEqual({ c: 3 });
+    it = { ...it, ...editAddon(it, 'c', 0) };
+    expect(it.addonQty).toEqual({});
+    expect(itemsTotal([it])).toBe(2000);
+  });
+
+  it('an old per-piece add-on (price inside finalPrice) is converted without changing the total', () => {
+    let it = { product, productId: 'p', quantity: 2, finalPrice: 1050, addons: [{ id: 's', name: 'صلصة', price: 50 }] };
+    expect(itemsTotal([it])).toBe(2100);
+    it = { ...it, ...editAddon(it, 'c', 1) };
+    expect(it.finalPrice).toBe(1000);
+    expect(it.addonQty).toEqual({ s: 2, c: 1 });
+    expect(itemsTotal([it])).toBe(2200);
+  });
+
+  it('untouched line: no addonQty in the payload (the server keeps its add-ons)', () => {
+    expect('addonQty' in orderPayload({ items: [{ productId: 'p', quantity: 1, finalPrice: 10 }] })[0]).toBe(false);
   });
 });

@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money } from '../lib/orders';
-import { attrGroups, findVariant, isFreeShipping, itemsTotal, missingFields, orderPayload, shipPrice } from '../lib/order-form';
+import { attrGroups, editAddon, findVariant, isFreeShipping, itemAddonQty, itemsTotal, missingFields, orderPayload, productAddons, shipPrice } from '../lib/order-form';
 
 const input = 'w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400 disabled:opacity-60';
 const label = 'text-xs font-semibold text-gray-500 dark:text-zinc-400';
@@ -105,6 +105,36 @@ function ItemCard({ item, options, disabled, onChange, onRemove }) {
           </div>
         </div>
       ))}
+
+      {/* الإضافات: التاجر يضيفها أو يحذفها ويغيّر كميتها (منفصلة عن كمية المنتج، سعرها من المنتج) */}
+      {productAddons(item.product).length > 0 && (() => {
+        const q = itemAddonQty(item);
+        const set = (id, n) => onChange(editAddon(item, id, n));
+        return (
+          <div className="space-y-1.5">
+            <p className="text-xs font-bold text-gray-500">{t('orders.form.addons')}</p>
+            {productAddons(item.product).map((a) => {
+              const n = q[a.id] || 0;
+              return (
+                <div key={a.id} className={`flex items-center gap-2 rounded-xl border px-2 py-1.5 ${n ? 'border-orange-300 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30' : 'border-gray-200 dark:border-zinc-800'}`}>
+                  <button type="button" disabled={disabled} onClick={() => set(a.id, n ? 0 : 1)} className="flex-1 min-w-0 flex items-center gap-2 text-start text-sm">
+                    <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 text-[11px] ${n ? 'bg-orange-500 border-orange-500 text-white' : 'border-gray-300 dark:border-zinc-600'}`}>{n ? '✓' : ''}</span>
+                    <span className="truncate font-semibold">{a.name}</span>
+                    <span className="text-xs text-gray-400 shrink-0" dir="ltr">+{money(Number(a.price) || 0)} DA</span>
+                  </button>
+                  {n > 0 && (
+                    <div className="flex items-center gap-1 shrink-0" dir="ltr">
+                      <button type="button" disabled={disabled} onClick={() => set(a.id, n - 1)} className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center"><Minus className="w-3.5 h-3.5" /></button>
+                      <span className="w-6 text-center text-sm font-bold">{n}</span>
+                      <button type="button" disabled={disabled || n >= 99} onClick={() => set(a.id, n + 1)} className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center disabled:opacity-40"><Plus className="w-3.5 h-3.5" /></button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {offers.length > 0 && (
         <select value={item.offerId || ''} disabled={disabled} onChange={(e) => pickOffer(e.target.value)} className={`${input} py-2.5 text-sm`}>
