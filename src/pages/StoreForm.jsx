@@ -53,7 +53,7 @@ export default function StoreForm({ onboarding = false }) {
   const [f, setF] = useState(isNew ? EMPTY_STORE : null);
   const [subdomain, setSubdomain] = useState('');
   const [wilayas, setWilayas] = useState([]);
-  const [countries, setCountries] = useState(['DZ']);
+  const [divisions, setDivisions] = useState([]); // الجزائر: 58 أو 69 ولاية
   const [saving, setSaving] = useState(false);
   const set = (k) => (v) => setF((s) => ({ ...s, [k]: v?.target ? (v.target.type === 'checkbox' ? v.target.checked : v.target.value) : v }));
 
@@ -63,12 +63,13 @@ export default function StoreForm({ onboarding = false }) {
       .catch((e) => { toast.error(errorMessage(e, t('inventory.error'))); nav('/stores'); });
   }, [id, isNew, nav, t]);
   useEffect(() => {
-    api.get('/shipping/countries').then(({ data }) => { if (Array.isArray(data) && data.length) setCountries(data); }).catch(() => {});
-  }, []);
+    if (!isNew) return;
+    api.get('/shipping/countries/DZ/divisions').then(({ data }) => setDivisions(Array.isArray(data) ? data : [])).catch(() => {});
+  }, [isNew]);
   useEffect(() => {
     if (!f?.country) return;
-    api.get('/shipping/wilayas', { params: { country: f.country } }).then(({ data }) => setWilayas(Array.isArray(data) ? data : [])).catch(() => setWilayas([]));
-  }, [f?.country]);
+    api.get('/shipping/wilayas', { params: { country: f.country, ...(f.division ? { division: f.division } : {}) } }).then(({ data }) => setWilayas(Array.isArray(data) ? data : [])).catch(() => setWilayas([]));
+  }, [f?.country, f?.division]);
 
   const save = async (e) => {
     e.preventDefault();
@@ -149,11 +150,12 @@ export default function StoreForm({ onboarding = false }) {
       </Section>
 
       <Section title={t('stores.selling')}>
-        {isNew && countries.length > 1 && (
-          <div className="space-y-1.5"><label className={label}>{t('stores.country')}</label>
-            <select value={f.country} onChange={(e) => setF((s) => ({ ...s, country: e.target.value, wilaya: '' }))} className={input}>
-              {countries.map((cc) => <option key={cc} value={cc}>{t(`stores.country_${cc}`, { defaultValue: cc })}</option>)}
-            </select></div>
+        {isNew && divisions.length > 1 && (
+          <div className="space-y-1.5"><label className={label}>{t('stores.division')}</label>
+            <select value={f.division} onChange={(e) => setF((s) => ({ ...s, division: e.target.value, wilaya: '' }))} className={input}>
+              {divisions.map((d) => <option key={d.code || 'base'} value={d.code}>{t(`stores.division_${d.code || 'base'}`, { defaultValue: d.ar || d.code })}</option>)}
+            </select>
+            {f.division && <p className="text-[11px] text-gray-400">{t('stores.division_hint')}</p>}</div>
         )}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5"><label className={label}>{t('stores.language')}</label>

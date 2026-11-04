@@ -66,3 +66,13 @@ describe('nameBeforeLogo (قلب الترتيب بين الشعار والاسم
     expect(storeToForm({}).nameBeforeLogo).toBe(false);
   });
 });
+
+describe('Algeria division (58 / 69 wilayas)', () => {
+  it('the store stays Algerian (DZ) and carries the chosen division', () => {
+    const p = storePayload({ ...EMPTY_STORE, name: 'x', division: '69' }, { subdomain: 'x-1' });
+    expect(p.store.country).toBe('DZ');
+    expect(p.store.division).toBe('69');
+    expect(storePayload({ ...EMPTY_STORE, name: 'x' }, { subdomain: 'x-1' }).store.division).toBe('');
+    expect(storeToForm({ country: 'DZ', division: '69' }).division).toBe('69');
+  });
+});

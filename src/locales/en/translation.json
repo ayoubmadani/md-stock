@@ -673,10 +673,10 @@
     "hero_mobile": "Phone (tall)",
     "hero_mobile_hint": "Phone visitors see the phone cover, everyone else the desktop one. Without a phone cover, the desktop cover shows everywhere.",
     "name_before_logo": "Flip the order: name before the logo",
-    "country": "Country",
-    "country_DZ": "Algeria (58 provinces)",
-    "country_DN": "Algeria (69 provinces)",
-    "country_TN": "Tunisia"
+    "division": "Division",
+    "division_base": "Algeria (58 provinces)",
+    "division_69": "Algeria (69 provinces)",
+    "division_hint": "The store uses your first 69-province delivery account — create it first in Delivery rates."
   },
   "themes": {
     "current": "Current theme",

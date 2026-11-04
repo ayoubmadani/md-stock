@@ -3,7 +3,7 @@
 export const EMPTY_STORE = {
   name: '', logo: null, favicon: null, showStoreName: false, nameBeforeLogo: false, primaryColor: '#4f46e5', secondaryColor: '#f59e0b',
   phone: '', whatsapp: '', email: '', wilaya: '', address: '',
-  language: 'ar', currency: 'DZD', country: 'DZ',
+  language: 'ar', currency: 'DZD', country: 'DZ', division: '',
   cart: false, supportQty: true, supportFreeShipping: false, freeShippingMinAmount: '',
   showTopBar: true, topBarText: '', heroImage: null, heroImageMobile: null, heroTitle: '', heroSubtitle: '',
 };
@@ -20,7 +20,7 @@ const s = (v) => String(v ?? '').trim();
 export function storePayload(f, { subdomain }) {
   return {
     store: {
-      name: s(f.name), subdomain, currency: f.currency, country: f.country, language: f.language,
+      name: s(f.name), subdomain, currency: f.currency, country: f.country, division: f.division || '', language: f.language,
       cart: !!f.cart, supportQty: !!f.supportQty, supportFreeShipping: !!f.supportFreeShipping,
       freeShippingMinAmount: f.supportFreeShipping && f.freeShippingMinAmount !== '' ? Number(f.freeShippingMinAmount) : null,
     },
@@ -37,7 +37,7 @@ export const storeToForm = (st) => ({
   primaryColor: st.design?.primaryColor || EMPTY_STORE.primaryColor, secondaryColor: st.design?.secondaryColor || EMPTY_STORE.secondaryColor,
   phone: st.contact?.phone || '', whatsapp: st.contact?.whatsapp || '', email: st.contact?.email || '',
   wilaya: st.contact?.wilaya || '', address: st.contact?.address || '',
-  language: st.language || 'ar', currency: st.currency || 'DZD', country: st.country || 'DZ',
+  language: st.language || 'ar', currency: st.currency || 'DZD', country: st.country || 'DZ', division: st.division || '',
   cart: !!st.cart, supportQty: st.supportQty ?? true, supportFreeShipping: !!st.supportFreeShipping,
   freeShippingMinAmount: st.freeShippingMinAmount == null ? '' : String(st.freeShippingMinAmount),
   showTopBar: st.topBar?.enabled ?? true, topBarText: st.topBar?.text || '',
