@@ -237,8 +237,8 @@
     "barcodes_done": "{{count}} barcodes generated ✓",
     "addons": {
       "title": "Add-ons (optional)",
-      "hint": "Add-ons the customer picks with the product; their price is added. ×: maximum quantity (empty = 1).",
-      "max_qty": "Max quantity",
+      "hint": "Add-ons the customer picks with the product; their price is added. ×: max per piece, doubled for 2 pieces (empty = 1).",
+      "max_qty": "Max quantity per piece",
       "name": "Add-on name",
       "price": "Price",
       "add": "New add-on",
