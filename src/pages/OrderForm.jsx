@@ -325,7 +325,7 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
               <label className={label}>{t('orders.form.f_wilaya')}</label>
               <select value={form.customerWilayaId || ''} onChange={(e) => pickWilaya(e.target.value)} className={input}>
                 <option value="">—</option>
-                {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name || w.name}</option>)}
+                {wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name || w.name}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">

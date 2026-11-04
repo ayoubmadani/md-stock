@@ -138,7 +138,7 @@ export default function StoreForm({ onboarding = false }) {
           <label className={label}>{t('stores.wilaya')}</label>
           <select value={f.wilaya} onChange={set('wilaya')} className={input}>
             <option value="">—</option>
-            {wilayas.map((w) => <option key={w.id} value={w.name}>({w.id}) {w.name}</option>)}
+            {wilayas.map((w) => <option key={w.id} value={w.name}>({w.code ?? w.id}) {w.name}</option>)}
           </select>
         </div>
         <div className="space-y-1.5"><label className={label}>{t('stores.address')}</label><input value={f.address} onChange={set('address')} className={input} /></div>

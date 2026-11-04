@@ -170,7 +170,7 @@ export default function ConfirmationPage() {
           </div>
           <select value={wilayaId} onChange={(e) => setWilayaId(e.target.value)} className={input}>
             <option value="">{t('confirm.all_wilayas')}</option>
-            {wilayas.map((w) => <option key={w.id} value={w.id}>({w.id}) {w.ar_name || w.name}</option>)}
+            {wilayas.map((w) => <option key={w.id} value={w.id}>({w.code ?? w.id}) {w.ar_name || w.name}</option>)}
           </select>
           {results === null ? <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
             : results.length === 0 ? <p className="text-center text-sm text-gray-400 py-12">{t('confirm.no_results')}</p>
