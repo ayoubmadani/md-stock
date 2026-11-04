@@ -6,7 +6,7 @@ import { Check, ChevronDown, Globe, Loader2, MapPin, Phone, Plus, Search, Shield
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { POS_STATUSES, STATUSES, STATUS_DOT, money, orderAmounts, paymentState, sumCounts } from '../lib/orders';
-import { OrderStatusBadge, StatusSheet, timeAgo } from '../components/orders';
+import { OrderStatusBadge, ShipStatusBadge, StatusSheet, timeAgo } from '../components/orders';
 
 const PAGE_SIZE = 50; // نفس حد الخادم
 
@@ -50,6 +50,7 @@ function OrderCard({ order, canManage, onStatus }) {
           <span className="flex items-center gap-1 min-w-0 truncate"><MapPin className="w-3.5 h-3.5 shrink-0" />{order.customerWilaya.ar_name}</span>
         )}
         <span className="flex-1" />
+        {order.status === 'shipping' && <ShipStatusBadge order={order} />}
         <span onClick={(e) => e.stopPropagation()}>
           <OrderStatusBadge order={order} onClick={canManage ? () => onStatus(order) : undefined} />
         </span>

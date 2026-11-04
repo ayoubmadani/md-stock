@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { money, nextActions, paymentState, whatsappLink } from '../lib/orders';
-import { NextStepCard, OrderStatusBadge, SendConfirmationSheet, ShipSheet, StatusSheet, timeAgo } from '../components/orders';
+import { NextStepCard, OrderStatusBadge, SendConfirmationSheet, ShipSheet, ShipStatusBadge, StatusSheet, timeAgo } from '../components/orders';
+import { shipStatusInfo } from '../lib/shipping-status';
 import { VariantParts } from '../components/inventory';
 import { CustomerPickerSheet } from '../components/customers';
 
@@ -179,6 +180,14 @@ export default function OrderDetail() {
           )}
           {order.shippingTrackingId && (
             <p className="flex items-center gap-1 text-xs text-gray-500 mt-1"><Truck className="w-3.5 h-3.5" /><span dir="ltr">{order.shippingTrackingId}</span></p>
+          )}
+          {order.shippingTrackingId && shipStatusInfo(order) && (
+            <div className="mt-1.5 space-y-1">
+              <ShipStatusBadge order={order} />
+              {shipStatusInfo(order).urgent && order.status === 'shipping' && (
+                <p className="text-[11px] font-bold text-amber-700 dark:text-amber-300">{t('orders.ship_status.call_hint')}</p>
+              )}
+            </div>
           )}
         </div>
         <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />

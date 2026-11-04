@@ -326,7 +326,23 @@
     "channel_shop": "Ventes en boutique",
     "add_customer": "Ajouter un client",
     "change_customer": "Changer de client",
-    "customer_set": "Client : {{name}}"
+    "customer_set": "Client : {{name}}",
+    "ship_status": {
+      "pending": "En attente de ramassage",
+      "picked_up": "Ramassé",
+      "in_transit": "En transit",
+      "out_for_delivery": "En cours de livraison",
+      "failed_delivery": "Tentative échouée",
+      "ready_for_pickup": "Disponible au bureau",
+      "delivered": "Livré",
+      "returning": "Retour en cours",
+      "returned": "Retourné",
+      "cancelled": "Annulé",
+      "exception": "Problème (perdu ou endommagé)",
+      "unknown": "Statut inconnu",
+      "title": "Livreur",
+      "call_hint": "Appelez le client maintenant, avant le retour du colis"
+    }
   },
   "library": {
     "title_products": "Images des produits",

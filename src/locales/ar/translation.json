@@ -326,7 +326,23 @@
     "channel_shop": "طلبات المحل",
     "add_customer": "إضافة زبون",
     "change_customer": "تغيير الزبون",
-    "customer_set": "الزبون: {{name}}"
+    "customer_set": "الزبون: {{name}}",
+    "ship_status": {
+      "pending": "في انتظار الاستلام",
+      "picked_up": "تم الاستلام من المتجر",
+      "in_transit": "قيد النقل",
+      "out_for_delivery": "خرج للتوصيل",
+      "failed_delivery": "محاولة تسليم فاشلة",
+      "ready_for_pickup": "في المكتب بانتظار الزبون",
+      "delivered": "تم التسليم",
+      "returning": "في طريق الإرجاع",
+      "returned": "تم الإرجاع",
+      "cancelled": "ملغى",
+      "exception": "مشكلة (مفقود أو متضرر)",
+      "unknown": "حالة غير معروفة",
+      "title": "شركة التوصيل",
+      "call_hint": "اتصل بالزبون الآن قبل أن يرجع الطرد"
+    }
   },
   "library": {
     "title_products": "صور المنتجات",

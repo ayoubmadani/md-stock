@@ -326,7 +326,23 @@
     "channel_shop": "In-shop sales",
     "add_customer": "Add customer",
     "change_customer": "Change customer",
-    "customer_set": "Customer: {{name}}"
+    "customer_set": "Customer: {{name}}",
+    "ship_status": {
+      "pending": "Waiting for pickup",
+      "picked_up": "Picked up",
+      "in_transit": "In transit",
+      "out_for_delivery": "Out for delivery",
+      "failed_delivery": "Delivery attempt failed",
+      "ready_for_pickup": "At the desk, waiting for the customer",
+      "delivered": "Delivered",
+      "returning": "Returning",
+      "returned": "Returned",
+      "cancelled": "Cancelled",
+      "exception": "Problem (lost or damaged)",
+      "unknown": "Unknown status",
+      "title": "Courier",
+      "call_hint": "Call the customer now, before the parcel is returned"
+    }
   },
   "library": {
     "title_products": "Product images",

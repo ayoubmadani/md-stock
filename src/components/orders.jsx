@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { STATUS_CLS, STATUS_DOT, allowedStatuses, needsCustomer, nextActions, statusPayload } from '../lib/orders';
 import { useAuth } from '../lib/auth';
+import { shipStatusInfo } from '../lib/shipping-status';
 import { CustomerPickerSheet } from './customers';
 
 // order: الطلب نفسه — «مسلّم» يُسمّى «تم البيع» للبيع في المحل و«تم التسليم» للرقمي
@@ -20,6 +21,18 @@ export function OrderStatusBadge({ order, onClick }) {
   return onClick
     ? <button type="button" onClick={onClick} className={cls}>{label}</button>
     : <span className={cls}>{label}</span>;
+}
+
+/** حالة الطرد عند شركة التوصيل (خرج للتوصيل، محاولة فاشلة...) — النص الخام للشركة في التلميح */
+export function ShipStatusBadge({ order, className = '' }) {
+  const { t } = useTranslation();
+  const s = shipStatusInfo(order);
+  if (!s) return null;
+  return (
+    <span title={s.raw} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold whitespace-nowrap ${s.tone} ${className}`}>
+      <Truck className="w-3 h-3 shrink-0" />{t(`orders.ship_status.${s.code}`)}
+    </span>
+  );
 }
 
 /** «منذ 5 د» بلغة الواجهة */
