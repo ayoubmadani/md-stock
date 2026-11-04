@@ -421,6 +421,8 @@ export function AddonsEditor({ addons, onChange }) {
         <div key={a.id} className={`flex items-center gap-2 ${a.isActive === false ? 'opacity-50' : ''}`}>
           <input value={a.name} onChange={(e) => set(a.id, { name: e.target.value })} placeholder={t('product.addons.name')} className={`${small} flex-1 min-w-0`} />
           <input type="number" inputMode="decimal" min={0} dir="ltr" value={a.price} onChange={(e) => set(a.id, { price: e.target.value })} placeholder={t('product.addons.price')} className={`${small} w-24 shrink-0`} />
+          {/* أقصى كمية يختارها الزبون (فارغ = 1) */}
+          <input type="number" inputMode="numeric" min={1} max={99} step={1} dir="ltr" value={a.maxQty ?? ''} onChange={(e) => set(a.id, { maxQty: e.target.value })} placeholder="×1" title={t('product.addons.max_qty')} aria-label={t('product.addons.max_qty')} className={`${small} w-14 shrink-0`} />
           <button type="button" onClick={() => set(a.id, { isActive: a.isActive === false })} title={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} className="p-2 rounded-lg text-gray-400 shrink-0">
             {a.isActive === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>

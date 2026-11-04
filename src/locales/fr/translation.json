@@ -237,7 +237,8 @@
     "barcodes_done": "{{count}} codes-barres générés ✓",
     "addons": {
       "title": "Suppléments (optionnel)",
-      "hint": "Suppléments que le client choisit avec le produit ; leur prix s’ajoute.",
+      "hint": "Suppléments que le client ajoute au produit, leur prix s’ajoute au prix. × : quantité maximale (vide = 1).",
+      "max_qty": "Quantité max",
       "name": "Nom du supplément",
       "price": "Prix",
       "add": "Nouveau supplément",

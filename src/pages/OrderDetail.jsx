@@ -99,7 +99,8 @@ export default function OrderDetail() {
 
   const items = order.items || [];
   const wa = whatsappLink(order.customerWhatsapp || order.customerPhone);
-  const subtotal = items.reduce((s, i) => s + Number(i.finalPrice || 0) * Number(i.quantity || 1), 0);
+  // + الإضافات بكمية مستقلة (separate): سعرها × كميتها فوق سعر المنتج × كميته
+  const subtotal = items.reduce((s, i) => s + Number(i.finalPrice || 0) * Number(i.quantity || 1) + (i.addons || []).reduce((t, a) => t + (a.separate ? Number(a.price || 0) * Number(a.qty || 1) : 0), 0), 0);
 
   const copy = async () => {
     try {
@@ -246,7 +247,7 @@ export default function OrderDetail() {
               <p className="text-sm font-semibold truncate"><bdi>{it.product?.name || it.title || '—'}</bdi></p>
               {Array.isArray(it.variantDetail?.name) && <VariantParts parts={it.variantDetail.name} className="text-xs text-gray-500 mt-0.5" />}
               {!it.productId && <p className="text-[11px] text-gray-400">{t('pos.service')}{it.cost != null && <> · {t('pos.service_cost')}: <bdi dir="ltr">{money(it.cost)}</bdi></>}</p>}
-              {it.addons?.length > 0 && <p className="text-[11px] text-gray-400 truncate">+ {it.addons.map((a) => a.name).join('، ')}</p>}
+              {it.addons?.length > 0 && <p className="text-[11px] text-gray-400 truncate">+ {it.addons.map((a) => `${a.name}${Number(a.qty) > 1 ? ` ×${a.qty}` : ''}`).join('، ')}</p>}
             </div>
             <div className="text-end shrink-0">
               <p className="text-sm font-bold" dir="ltr">{money(it.finalPrice)} DA</p>

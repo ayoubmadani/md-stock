@@ -121,9 +121,18 @@ describe('add-ons (الإضافات)', () => {
   it('the payload drops nameless rows, trims names, numbers the price and keeps hidden ones', () => {
     const addons = [{ id: 'a', name: ' جبن ', price: '300', isActive: true }, { id: 'b', name: '', price: '50' }, { id: 'c', name: 'صلصة', price: '', isActive: false }];
     expect(productPayload(base, { attributes: [], offers: [], images: [], addons }).addons).toEqual([
-      { id: 'a', name: 'جبن', price: 300, isActive: true },
-      { id: 'c', name: 'صلصة', price: 0, isActive: false },
+      { id: 'a', name: 'جبن', price: 300, isActive: true, maxQty: 1 },
+      { id: 'c', name: 'صلصة', price: 0, isActive: false, maxQty: 1 },
     ]);
+  });
+
+  it('max quantity: empty = 1, whole number between 1 and 99', () => {
+    const q = (maxQty) => productPayload(base, { attributes: [], offers: [], images: [], addons: [{ id: 'a', name: 'جبن', price: '1', maxQty }] }).addons[0].maxQty;
+    expect(q('')).toBe(1);
+    expect(q('3')).toBe(3);
+    expect(q('2.7')).toBe(2);
+    expect(q('0')).toBe(1);
+    expect(q('500')).toBe(99);
   });
 
   it('no add-ons list → the field is not sent (the server keeps what it has)', () => {

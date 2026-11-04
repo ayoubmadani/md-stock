@@ -46,7 +46,7 @@ export function productPayload(form, { attributes, offers, images, addons }) {
   };
   if (!attributes.length) out.stock = Number(form.stock) || 0;
   // الإضافات: الأسطر بلا اسم تُتجاهل (نفس اللوحة)
-  if (addons) out.addons = addons.filter((a) => a.name?.trim()).map((a) => ({ id: String(a.id), name: a.name.trim(), price: Number(a.price) || 0, isActive: a.isActive !== false }));
+  if (addons) out.addons = addons.filter((a) => a.name?.trim()).map((a) => ({ id: String(a.id), name: a.name.trim(), price: Number(a.price) || 0, isActive: a.isActive !== false, maxQty: Math.min(99, Math.max(1, Math.floor(Number(a.maxQty) || 1))) }));
   return out;
 }
 
