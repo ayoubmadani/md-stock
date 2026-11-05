@@ -96,15 +96,15 @@ export default function ThemesPage() {
       api.get('/theme/plan-sub').then((r) => r.data ?? []).catch(() => []),
       api.get('/theme/plan-info').then((r) => r.data?.planThemeIds ?? []).catch(() => []),
       api.get(`/stores/${storeId}`).then((r) => r.data?.data ?? r.data ?? null).catch(() => null),
-    ]).then(([m, p, ids, st]) => { setMine(m); setPlan(p); setPlanIds(ids); setActiveId(st?.themeId ?? null); setStoreNiche(st?.niche?.id ?? ''); });
+    ]).then(([m, p, ids, st]) => { setMine(m); setPlan(p); setPlanIds(ids); setActiveId(st?.themeId ?? null); setStoreNiche((prev) => { const sn = st?.niche?.id ?? ''; if (prev === null && sn) setType(sn); return sn; }); });
   }, [storeId]);
   useEffect(() => { load(); }, [load]);
   useEffect(() => { api.get('/niches').then((r) => { const d = r.data?.data ?? r.data; setNiches(Array.isArray(d) ? d : []); }).catch(() => {}); }, []);
   useEffect(() => {
     if (tab !== 'gallery' || storeNiche === null) return;
     setGallery(null);
-    // type = المجال المختار؛ الترتيب حسب مجال المتجر: مصممة له ← تناسبه ← عامة ← الباقي
-    api.get('/theme', { params: { ...(type ? { niche: type } : {}), ...(storeNiche ? { forNiche: storeNiche } : {}) } })
+    // فلتر بالمجال فقط (يبدأ بمجال المتجر): ثيمات المجال ثم العامة. «الكل» = كل الثيمات، مجال المتجر أولاً
+    api.get('/theme', { params: type ? { niche: type, forNiche: type, withGeneral: 1 } : (storeNiche ? { forNiche: storeNiche } : {}) })
       .then((r) => setGallery(r.data?.data ?? [])).catch(() => setGallery([]));
   }, [tab, type, storeNiche]);
 
@@ -200,12 +200,9 @@ export default function ThemesPage() {
             : gallery.length === 0 ? <p className="text-center text-sm text-gray-400 py-12">{t('themes.empty')}</p>
             : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {gallery.map((th, i) => {
+                {gallery.map((th) => {
                   const st = themeStatus(th, ctx);
-                  // عنوان قسم عند تغيّر علاقة الثيم بمجال المتجر
-                  const header = th.nicheMatch && th.nicheMatch !== gallery[i - 1]?.nicheMatch
-                    ? <p key={`h-${th.nicheMatch}`} className="col-span-full text-sm font-black pt-1">{t(`themes.section_${th.nicheMatch}`)}</p> : null;
-                  return [header, (
+                  return (
                     <div key={th.id} className="rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
                       <div className="relative">
                         <Thumb src={th.imageUrl} />
@@ -223,7 +220,7 @@ export default function ThemesPage() {
                           : <button type="button" disabled={!!busy} onClick={() => install(th)} className={`${btn} bg-indigo-600 text-white`}>{busy === th.id && <Loader2 className="w-3.5 h-3.5 animate-spin" />}{st === 'paid' ? t('themes.buy') : t('themes.install')}</button>}
                       </div>
                     </div>
-                  )];
+                  );
                 })}
               </div>
             )}
