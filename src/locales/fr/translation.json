@@ -706,7 +706,12 @@
     "wallet_note": "Le prix est débité du portefeuille ; le thème reste dans « Mes thèmes » pour toutes vos boutiques.",
     "section_mine": "Mes thèmes",
     "section_plan": "Thèmes de votre plan",
-    "section_plan_hint": "Disponibles tant que votre abonnement est actif"
+    "section_plan_hint": "Disponibles tant que votre abonnement est actif",
+    "general": "🌐 Général",
+    "section_primary": "Conçus pour votre domaine",
+    "section_secondary": "Conviennent aussi à votre domaine",
+    "section_general": "Thèmes généraux",
+    "section_other": "Autres thèmes"
   },
   "sub": {
     "month": "Mensuel",

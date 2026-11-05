@@ -10,6 +10,8 @@ import { themeName, themeStatus } from '../lib/themes';
 import { input } from '../components/product';
 
 const PREVIEW = 'https://mdstore.top/show/';
+// اسم المجال بلغة التاجر
+const nicheName = (n, lang) => (lang?.startsWith('ar') ? n.name_ar : lang?.startsWith('fr') ? n.name_fr : n.name_en) || n.name_en;
 
 function Thumb({ src, short }) {
   return (
@@ -81,7 +83,8 @@ export default function ThemesPage() {
   const [plan, setPlan] = useState([]);
   const [planIds, setPlanIds] = useState([]);
   const [activeId, setActiveId] = useState(null);
-  const [types, setTypes] = useState([]);
+  const [niches, setNiches] = useState([]); // المجالات المترجمة بدل أنواع الثيمات
+  const [storeNiche, setStoreNiche] = useState(null); // مجال المتجر ← ترتيب الثيمات
   const [type, setType] = useState('');
   const [gallery, setGallery] = useState(null);
   const [busy, setBusy] = useState(null);
@@ -92,16 +95,18 @@ export default function ThemesPage() {
       api.get('/theme/my').then((r) => r.data ?? []).catch(() => []),
       api.get('/theme/plan-sub').then((r) => r.data ?? []).catch(() => []),
       api.get('/theme/plan-info').then((r) => r.data?.planThemeIds ?? []).catch(() => []),
-      api.get(`/stores/${storeId}`).then((r) => (r.data?.data ?? r.data)?.themeId ?? null).catch(() => null),
-    ]).then(([m, p, ids, active]) => { setMine(m); setPlan(p); setPlanIds(ids); setActiveId(active); });
+      api.get(`/stores/${storeId}`).then((r) => r.data?.data ?? r.data ?? null).catch(() => null),
+    ]).then(([m, p, ids, st]) => { setMine(m); setPlan(p); setPlanIds(ids); setActiveId(st?.themeId ?? null); setStoreNiche(st?.niche?.id ?? ''); });
   }, [storeId]);
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { api.get('/theme/type').then((r) => setTypes(r.data ?? [])).catch(() => {}); }, []);
+  useEffect(() => { api.get('/niches').then((r) => { const d = r.data?.data ?? r.data; setNiches(Array.isArray(d) ? d : []); }).catch(() => {}); }, []);
   useEffect(() => {
-    if (tab !== 'gallery') return;
+    if (tab !== 'gallery' || storeNiche === null) return;
     setGallery(null);
-    api.get('/theme', { params: { type } }).then((r) => setGallery(r.data?.data ?? [])).catch(() => setGallery([]));
-  }, [tab, type]);
+    // type = المجال المختار؛ الترتيب حسب مجال المتجر: مصممة له ← تناسبه ← عامة ← الباقي
+    api.get('/theme', { params: { ...(type ? { niche: type } : {}), ...(storeNiche ? { forNiche: storeNiche } : {}) } })
+      .then((r) => setGallery(r.data?.data ?? [])).catch(() => setGallery([]));
+  }, [tab, type, storeNiche]);
 
   const activate = async (th, viaPlan) => {
     const id = th?.id ?? null;
@@ -185,17 +190,22 @@ export default function ThemesPage() {
       {tab === 'gallery' && (
         <>
           <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 [scrollbar-width:none]">
-            {[{ id: '', name: t('themes.all') }, ...types].map((ty) => (
-              <button key={ty.id || 'all'} type="button" onClick={() => setType(ty.id)} className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border ${type === ty.id ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300'}`}>{ty.name}</button>
+            {[{ id: '', label: t('themes.all') }, ...[...niches]
+              .sort((a, b) => (a.id === storeNiche ? -1 : b.id === storeNiche ? 1 : nicheName(a, i18n.language).localeCompare(nicheName(b, i18n.language))))
+              .map((n) => ({ id: n.id, label: `${n.icon} ${nicheName(n, i18n.language)}` }))].map((ty) => (
+              <button key={ty.id || 'all'} type="button" onClick={() => setType(ty.id)} className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border ${type === ty.id ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300'}`}>{ty.label}</button>
             ))}
           </div>
           {gallery === null ? <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
             : gallery.length === 0 ? <p className="text-center text-sm text-gray-400 py-12">{t('themes.empty')}</p>
             : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {gallery.map((th) => {
+                {gallery.map((th, i) => {
                   const st = themeStatus(th, ctx);
-                  return (
+                  // عنوان قسم عند تغيّر علاقة الثيم بمجال المتجر
+                  const header = th.nicheMatch && th.nicheMatch !== gallery[i - 1]?.nicheMatch
+                    ? <p key={`h-${th.nicheMatch}`} className="col-span-full text-sm font-black pt-1">{t(`themes.section_${th.nicheMatch}`)}</p> : null;
+                  return [header, (
                     <div key={th.id} className="rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
                       <div className="relative">
                         <Thumb src={th.imageUrl} />
@@ -206,13 +216,14 @@ export default function ThemesPage() {
                       </div>
                       <div className="p-2.5 space-y-2">
                         <p className="text-xs font-bold truncate"><bdi>{themeName(th, i18n.language)}</bdi></p>
+                        <p className="text-[10px] text-gray-400 truncate -mt-1.5">{th.niche ? `${th.niche.icon} ${nicheName(th.niche, i18n.language)}` : t('themes.general')}</p>
                         {st === 'active' ? ActiveTag
                           : st === 'installed' ? <button type="button" disabled={!!busy} onClick={() => activate(th)} className={`${btn} bg-gray-100 dark:bg-zinc-800`}>{t('themes.activate')}</button>
                           : st === 'plan' ? <button type="button" disabled={!!busy} onClick={() => activate(th, true)} className={`${btn} bg-amber-500 text-white`}>{busy === th.id && <Loader2 className="w-3.5 h-3.5 animate-spin" />}{t('themes.activate')}</button>
                           : <button type="button" disabled={!!busy} onClick={() => install(th)} className={`${btn} bg-indigo-600 text-white`}>{busy === th.id && <Loader2 className="w-3.5 h-3.5 animate-spin" />}{st === 'paid' ? t('themes.buy') : t('themes.install')}</button>}
                       </div>
                     </div>
-                  );
+                  )];
                 })}
               </div>
             )}

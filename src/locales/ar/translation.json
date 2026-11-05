@@ -706,7 +706,12 @@
     "wallet_note": "يُخصم السعر من رصيد المحفظة، ويبقى الثيم في «ثيماتي» لكل متاجرك.",
     "section_mine": "ثيماتي",
     "section_plan": "ثيمات خطتك",
-    "section_plan_hint": "متاحة ما دام اشتراكك فعّالاً"
+    "section_plan_hint": "متاحة ما دام اشتراكك فعّالاً",
+    "general": "🌐 عام",
+    "section_primary": "مصممة لمجال متجرك",
+    "section_secondary": "تناسب مجالك أيضاً",
+    "section_general": "ثيمات عامة",
+    "section_other": "ثيمات أخرى"
   },
   "sub": {
     "month": "شهري",

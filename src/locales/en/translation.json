@@ -706,7 +706,12 @@
     "wallet_note": "The price is taken from your wallet; the theme stays in “My themes” for all your stores.",
     "section_mine": "My themes",
     "section_plan": "Your plan themes",
-    "section_plan_hint": "Available while your subscription is active"
+    "section_plan_hint": "Available while your subscription is active",
+    "general": "🌐 General",
+    "section_primary": "Made for your niche",
+    "section_secondary": "Also suit your niche",
+    "section_general": "General themes",
+    "section_other": "Other themes"
   },
   "sub": {
     "month": "Monthly",
