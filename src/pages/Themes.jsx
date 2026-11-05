@@ -189,13 +189,14 @@ export default function ThemesPage() {
 
       {tab === 'gallery' && (
         <>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 [scrollbar-width:none]">
-            {[{ id: '', label: t('themes.all') }, ...[...niches]
+          {/* فلتر بالمجال — قائمة منسدلة (مجال المتجر أولاً) */}
+          <select value={type} onChange={(e) => setType(e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-semibold outline-none focus:border-indigo-400">
+            <option value="">{t('themes.all')}</option>
+            {[...niches]
               .sort((a, b) => (a.id === storeNiche ? -1 : b.id === storeNiche ? 1 : nicheName(a, i18n.language).localeCompare(nicheName(b, i18n.language))))
-              .map((n) => ({ id: n.id, label: `${n.icon} ${nicheName(n, i18n.language)}` }))].map((ty) => (
-              <button key={ty.id || 'all'} type="button" onClick={() => setType(ty.id)} className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border ${type === ty.id ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300'}`}>{ty.label}</button>
-            ))}
-          </div>
+              .map((n) => <option key={n.id} value={n.id}>{n.icon} {nicheName(n, i18n.language)}</option>)}
+          </select>
           {gallery === null ? <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
             : gallery.length === 0 ? <p className="text-center text-sm text-gray-400 py-12">{t('themes.empty')}</p>
             : (
