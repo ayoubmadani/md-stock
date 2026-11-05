@@ -1,7 +1,7 @@
 // أجزاء نموذج المنتج للهاتف: الصور، الوصف، الخصائص، النسخ، العروض
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check, Ruler, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
@@ -184,8 +184,12 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
     onChange({ ...attr, variants: [...attr.variants, newValue(value)] });
   };
   return (
-    <div className="rounded-xl border border-gray-100 dark:border-zinc-800 p-3 space-y-3">
+    // كل خاصية بطاقة مستقلة واضحة (خلفية + إطار + أيقونة نوعها) حتى لا تبدو اللون والمقاس كتلة واحدة
+    <div className="rounded-2xl border border-gray-200 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/40 p-3 space-y-3 shadow-sm">
       <div className="flex items-center gap-2">
+        <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${attr.type === 'color' ? 'bg-pink-100 text-pink-600 dark:bg-pink-500/15 dark:text-pink-300' : /size|taille|مقاس|حجم/i.test(attr.name || '') ? 'bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-300' : 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300'}`}>
+          {attr.type === 'color' ? <Palette className="w-4 h-4" /> : /size|taille|مقاس|حجم/i.test(attr.name || '') ? <Ruler className="w-4 h-4" /> : <Tag className="w-4 h-4" />}
+        </span>
         <input value={attr.name} onChange={(e) => onChange({ ...attr, name: e.target.value })} placeholder={t('product.attr.name')} aria-invalid={duplicate} className={`${small} flex-1 min-w-0 font-semibold ${duplicate ? '!border-rose-500' : ''}`} />
         <button type="button" onClick={onRemove} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>
       </div>
@@ -198,7 +202,15 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
           ))}
         </div>
       )}
-      <div className="flex flex-wrap gap-1.5">
+      {/* خانة القيمة فوق القيم: إضافة قيمة لا تُزيح الخانة والزر إلى الأسفل */}
+      {mode === 'text' && (
+        <div className="flex gap-2">
+          <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addValue(text); setText(''); } }}
+            placeholder={t('product.attr.value')} className={`${small} flex-1 min-w-0`} />
+          <button type="button" onClick={() => { addValue(text); setText(''); }} className="px-3 rounded-xl bg-indigo-600 text-white"><Plus className="w-4 h-4" /></button>
+        </div>
+      )}
+      {attr.variants.length > 0 && <div className="flex flex-wrap gap-1.5">
         {attr.variants.map((v) => (
           <span key={v.id} className="inline-flex items-center gap-1 ps-1 pe-1.5 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 text-sm">
             {mode === 'color' ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value })} aria-label={t('product.attr.edit_color')} className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
@@ -213,7 +225,7 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
             <button type="button" onClick={() => onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== v.id) })} className="text-gray-400"><X className="w-3.5 h-3.5" /></button>
           </span>
         ))}
-      </div>
+      </div>}
       {pickFor && (
         <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 sm:p-4" onClick={(e) => e.target === e.currentTarget && setPickFor(null)}>
           <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
@@ -235,13 +247,6 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
             </div>
             <button type="button" onClick={() => { onChange(linkVariantImage(attr, pickFor, null)); setPickFor(null); }} className="w-full py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-semibold text-gray-500">{t('product.attr.unlink_image')}</button>
           </div>
-        </div>
-      )}
-      {mode === 'text' && (
-        <div className="flex gap-2">
-          <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addValue(text); setText(''); } }}
-            placeholder={t('product.attr.value')} className={`${small} flex-1 min-w-0`} />
-          <button type="button" onClick={() => { addValue(text); setText(''); }} className="px-3 rounded-xl bg-indigo-600 text-white"><Plus className="w-4 h-4" /></button>
         </div>
       )}
       {mode === 'color' && (
@@ -275,7 +280,7 @@ export function AttributesEditor({ attributes, images, onChange }) {
   const add = (type) => onChange([...attributes, newAttribute(type, uniqueAttrName(attributes, t(`product.attr.default_${type}`)))]);
   const dups = duplicateAttrIds(attributes);
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {attributes.length === 0 && <p className="text-xs text-gray-400">{t('product.attr.none')}</p>}
       {attributes.map((a) => (
         <AttributeCard key={a.id} attr={a} images={images} duplicate={dups.has(a.id)} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
