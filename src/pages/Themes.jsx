@@ -104,7 +104,7 @@ export default function ThemesPage() {
     if (tab !== 'gallery' || storeNiche === null) return;
     setGallery(null);
     // فلتر بالمجال فقط (يبدأ بمجال المتجر): ثيمات المجال ثم العامة. «الكل» = كل الثيمات، مجال المتجر أولاً
-    api.get('/theme', { params: type ? { niche: type, forNiche: type, withGeneral: 1 } : (storeNiche ? { forNiche: storeNiche } : {}) })
+    api.get('/theme/gallery', { params: type ? { niche: type, forNiche: type, withGeneral: 1 } : (storeNiche ? { forNiche: storeNiche } : {}) })
       .then((r) => setGallery(r.data?.data ?? [])).catch(() => setGallery([]));
   }, [tab, type, storeNiche]);
 
