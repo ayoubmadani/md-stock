@@ -365,7 +365,13 @@
     "title_store": "Images de la boutique",
     "title_logo": "Logos",
     "title_favicon": "Favicons",
-    "title_hero": "Images de couverture"
+    "title_hero": "Images de couverture",
+    "selected_count": "{{count}} sélectionnée(s)",
+    "cancel_select": "Annuler la sélection",
+    "delete_selected": "Supprimer ({{count}})",
+    "confirm_delete_many": "Supprimer définitivement {{count}} image(s) de la bibliothèque ?",
+    "deleted_many": "{{count}} image(s) supprimée(s)",
+    "folders": "Dossiers"
   },
   "categories": {
     "new": "Nouvelle catégorie",

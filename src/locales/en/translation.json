@@ -365,7 +365,13 @@
     "title_store": "Store images",
     "title_logo": "Logos",
     "title_favicon": "Favicons",
-    "title_hero": "Cover images"
+    "title_hero": "Cover images",
+    "selected_count": "{{count}} selected",
+    "cancel_select": "Cancel selection",
+    "delete_selected": "Delete ({{count}})",
+    "confirm_delete_many": "Permanently delete {{count}} image(s) from the library?",
+    "deleted_many": "{{count}} image(s) deleted",
+    "folders": "Folders"
   },
   "categories": {
     "new": "New category",

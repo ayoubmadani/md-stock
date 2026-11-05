@@ -1,13 +1,14 @@
 // مكتبة الصور (نفس مكتبة لوحة التاجر): الصور المرفوعة سابقاً في المجلد، رفع مع ضغط، اختيار واحد أو عدة، حذف
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, Check, ClipboardPaste, ImagePlus, Loader2, Trash2, X, Pencil } from 'lucide-react';
+import { Camera, Check, ClipboardPaste, FolderOpen, ImagePlus, Loader2, Trash2, X, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import CameraCapture from './CameraCapture';
 import { ACCEPT, COMPRESS, compress } from '../lib/upload';
 import ImageEditor from './ImageEditor';
 import { clipboardImages, pastedImages } from '../lib/clipboard';
+import { longPress } from '../lib/long-press';
 
 const PAGE = 18;
 /**
@@ -16,7 +17,12 @@ const PAGE = 18;
  * onPick(urls[])
  */
 /** edit: نوع المحرر (logo | favicon | cover | cover_mobile | image) — قص قبل الرفع */
-export default function ImageLibrary({ folder = 'products', max = 1, edit = null, onPick, onClose }) {
+// كل مجلدات مكتبة صور التاجر — زر المجلدات يعرض أي مجلد (الرفع يذهب إلى المجلد المعروض)
+export const LIBRARY_FOLDERS = ['products', 'productVariant', 'category', 'store', 'logo', 'favicon', 'hero'];
+
+export default function ImageLibrary({ folder: initialFolder = 'products', max = 1, edit = null, onPick, onClose }) {
+  const [folder, setFolder] = useState(initialFolder);
+  const [folderMenu, setFolderMenu] = useState(false);
   const { t } = useTranslation();
   const [images, setImages] = useState(null);
   const [page, setPage] = useState(1);
@@ -24,7 +30,9 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = null
   const [loadingMore, setLoadingMore] = useState(false);
   const [selected, setSelected] = useState([]); // روابط بترتيب الاختيار
   const [progress, setProgress] = useState(null); // { done, total, pct }
-  const [manage, setManage] = useState(false);
+  // تحديد جماعي للحذف: ضغطة مطوّلة على صورة (أو زر سلة المهملات) ← تتحدد، ثم النقر يحدد/يلغي البقية
+  const [bulk, setBulk] = useState(null); // null = خارج وضع التحديد، وإلا Set من معرّفات الصور
+  const [deleting, setDeleting] = useState(false);
   const [camera, setCamera] = useState(false);
   const multi = max > 1;
 
@@ -121,27 +129,49 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = null
     return () => document.removeEventListener('paste', onPaste);
   }, [camera]);
 
-  const remove = async (img) => {
-    if (!window.confirm(t('library.confirm_delete'))) return;
+  const toggleBulk = (id) => setBulk((b) => { const n = new Set(b || []); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const removeSelected = async () => {
+    const ids = [...(bulk || [])];
+    if (!ids.length || !window.confirm(t('library.confirm_delete_many', { count: ids.length }))) return;
+    setDeleting(true);
     try {
-      await api.delete(`/images/${img.id}`);
-      setImages((l) => l.filter((x) => x.id !== img.id));
-      setSelected((s) => s.filter((u) => u !== img.url));
+      await api.delete('/images/batch', { data: { ids } });
+      const gone = new Set(ids);
+      const urls = new Set((images || []).filter((x) => gone.has(x.id)).map((x) => x.url));
+      setImages((l) => l.filter((x) => !gone.has(x.id)));
+      setSelected((sel) => sel.filter((u) => !urls.has(u)));
+      setBulk(null);
+      toast.success(t('library.deleted_many', { count: ids.length }));
     } catch (e) {
       toast.error(errorMessage(e, t('inventory.error')));
+    } finally {
+      setDeleting(false);
     }
   };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg h-[88dvh] sm:h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between gap-2 p-4 pb-3">
-          <div className="min-w-0">
+        <div className="relative flex items-center justify-between gap-2 p-4 pb-3">
+          <button type="button" onClick={() => setFolderMenu((v) => !v)} title={t('library.folders')}
+            className={`p-2 rounded-lg shrink-0 ${folderMenu ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10' : 'text-gray-400'}`}><FolderOpen className="w-5 h-5" /></button>
+          {folderMenu && (
+            <div className="absolute top-14 start-4 z-10 w-56 p-1.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl">
+              {LIBRARY_FOLDERS.map((f) => (
+                <button key={f} type="button" onClick={() => { setFolderMenu(false); if (f !== folder) { setImages(null); setBulk(null); setFolder(f); } }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-start ${f === folder ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 font-bold' : 'text-gray-700 dark:text-zinc-200'}`}>
+                  <FolderOpen className="w-4 h-4 shrink-0 opacity-70" /><span className="flex-1 truncate">{t(`library.title_${f}`)}</span>{f === folder && <Check className="w-4 h-4" />}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
             <p className="font-bold">{t(`library.title_${folder}`, t('library.title_products'))}</p>
             {multi && <p className="text-xs text-gray-400">{t('library.pick_up_to', { max })}</p>}
           </div>
           <div className="flex items-center gap-1">
-            <button type="button" onClick={() => setManage((m) => !m)} className={`p-2 rounded-lg ${manage ? 'bg-rose-50 text-rose-500 dark:bg-rose-500/10' : 'text-gray-400'}`} title={t('library.manage')}><Trash2 className="w-5 h-5" /></button>
+            {bulk && <span className="text-xs font-bold text-rose-500 px-1">{t('library.selected_count', { count: bulk.size })}</span>}
+            <button type="button" onClick={() => setBulk((b) => (b ? null : new Set()))} className={`p-2 rounded-lg ${bulk ? 'bg-rose-50 text-rose-500 dark:bg-rose-500/10' : 'text-gray-400'}`} title={bulk ? t('library.cancel_select') : t('library.manage')}>{bulk ? <X className="w-5 h-5" /> : <Trash2 className="w-5 h-5" />}</button>
             <button type="button" onClick={onClose} className="p-2 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
           </div>
         </div>
@@ -152,16 +182,16 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = null
               <Loader2 className="w-4 h-4 animate-spin" />{t('library.uploading', { done: progress.done + 1, total: progress.total })}
             </div>
           ) : (
-            // معرض الصور، أو التصوير مباشرة بالكاميرا الخلفية
+            // معرض الصور، أو التصوير مباشرة بالكاميرا الخلفية، أو اللصق — الأيقونة فوق النص (لا يلتف «Appareil photo» بجانبها)
             <div className="grid grid-cols-3 gap-2">
-              <label className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer">
+              <label className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-xs font-bold whitespace-nowrap text-gray-500 dark:text-zinc-400 cursor-pointer">
                 <ImagePlus className="w-5 h-5" />{t('library.from_gallery')}
                 <input type="file" accept={ACCEPT} multiple={multi} hidden onChange={(e) => { receive([...e.target.files]); e.target.value = ''; }} />
               </label>
-              <button type="button" onClick={() => setCamera(true)} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold">
+              <button type="button" onClick={() => setCamera(true)} className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-zinc-400 whitespace-nowrap">
                 <Camera className="w-5 h-5" />{t('library.from_camera')}
               </button>
-              <button type="button" onClick={paste} className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+              <button type="button" onClick={paste} className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-xs font-bold whitespace-nowrap text-gray-500 dark:text-zinc-400">
                 <ClipboardPaste className="w-5 h-5" />{t('library.paste')}
               </button>
             </div>
@@ -177,18 +207,25 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = null
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((img) => {
                     const n = selected.indexOf(img.url);
+                    const marked = !!bulk?.has(img.id);
+                    const press = longPress({
+                      onLong: () => { if (img.id) setBulk((b) => new Set([...(b || []), img.id])); navigator.vibrate?.(30); },
+                      onClick: () => (bulk ? img.id && toggleBulk(img.id) : edit && !multi ? editExisting(img) : toggle(img.url)),
+                    });
                     return (
                       <div key={img.id || img.url} className="relative aspect-square">
-                        <button type="button" onClick={() => (manage ? remove(img) : edit && !multi ? editExisting(img) : toggle(img.url))}
-                          className={`w-full h-full rounded-xl overflow-hidden border-2 ${n >= 0 ? 'border-indigo-500' : 'border-transparent'}`}>
+                        <button type="button" {...press}
+                          className={`w-full h-full rounded-xl overflow-hidden border-2 select-none [-webkit-touch-callout:none] ${marked ? 'border-rose-500' : n >= 0 && !bulk ? 'border-indigo-500' : 'border-transparent'}`}>
                           <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover bg-gray-100 dark:bg-zinc-800" />
                         </button>
-                        {edit && multi && !manage && (
+                        {edit && multi && !bulk && (
                           <button type="button" onClick={() => editExisting(img)} aria-label={t('image_editor.edit')}
                             className="absolute bottom-1.5 start-1.5 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center"><Pencil className="w-3.5 h-3.5" /></button>
                         )}
-                        {manage ? (
-                          <span className="pointer-events-none absolute inset-0 rounded-xl bg-rose-600/40 flex items-center justify-center"><Trash2 className="w-6 h-6 text-white" /></span>
+                        {bulk ? (
+                          <span className={`pointer-events-none absolute top-1.5 end-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center ${marked ? 'bg-rose-500 border-rose-500 text-white' : 'bg-black/30 border-white'}`}>
+                            {marked && <Check className="w-4 h-4" />}
+                          </span>
                         ) : n >= 0 && (
                           <span className="pointer-events-none absolute top-1.5 end-1.5 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">
                             {multi ? n + 1 : <Check className="w-4 h-4" />}
@@ -210,7 +247,14 @@ export default function ImageLibrary({ folder = 'products', max = 1, edit = null
         {camera && <CameraCapture onClose={() => setCamera(false)} onCapture={(file) => { setCamera(false); receive([file]); }} />}
         {editing && <ImageEditor file={editing.file} kind={edit} onCancel={() => setEditing(null)} onDone={edited} />}
 
-        {multi && (
+        {bulk ? (
+          <div className="p-4 pt-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <button type="button" disabled={!bulk.size || deleting} onClick={removeSelected}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-rose-600 text-white font-bold disabled:opacity-50">
+              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}{t('library.delete_selected', { count: bulk.size })}
+            </button>
+          </div>
+        ) : multi && (
           <div className="p-4 pt-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <button type="button" disabled={!selected.length} onClick={() => onPick(selected)}
               className="w-full py-3.5 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">

@@ -365,7 +365,13 @@
     "title_store": "صور المتجر",
     "title_logo": "الشعارات",
     "title_favicon": "أيقونات التبويب",
-    "title_hero": "صور الغلاف"
+    "title_hero": "صور الغلاف",
+    "selected_count": "{{count}} محددة",
+    "cancel_select": "إلغاء التحديد",
+    "delete_selected": "حذف ({{count}})",
+    "confirm_delete_many": "حذف {{count}} صورة نهائياً من المكتبة؟",
+    "deleted_many": "تم حذف {{count}} صورة",
+    "folders": "المجلدات"
   },
   "categories": {
     "new": "تصنيف جديد",
