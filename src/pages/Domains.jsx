@@ -68,7 +68,7 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
   );
 }
 
-const TABS = ['store', 'custom', 'pages'];
+const TABS = ['store', 'custom', 'pages', 'tests'];
 
 export default function DomainsPage() {
   const { t } = useTranslation();
@@ -199,7 +199,7 @@ export default function DomainsPage() {
       </div>
 
       {/* تبويبات القائمة */}
-      <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
+      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
         {TABS.map((k) => (
           <button key={k} type="button" onClick={() => setTab(k)} className={`py-2 rounded-lg text-xs font-bold ${tab === k ? 'bg-white dark:bg-zinc-800 shadow-sm' : 'text-gray-500'}`}>
             {t(`domains.tab_${k}`)} <span className="opacity-60" dir="ltr">{groups[k].length}</span>

@@ -437,7 +437,8 @@
     "target": "يعرض",
     "target_store": "المتجر",
     "target_page": "صفحة هبوط",
-    "split_test": "اختبار A/B"
+    "split_test": "اختبار A/B",
+    "tab_tests": "اختبارات A/B"
   },
   "camera": {
     "fallback": "جارٍ فتح كاميرا الهاتف…",

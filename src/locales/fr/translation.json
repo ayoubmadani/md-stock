@@ -437,7 +437,8 @@
     "target": "Affiche",
     "target_store": "La boutique",
     "target_page": "Une landing page",
-    "split_test": "Test A/B"
+    "split_test": "Test A/B",
+    "tab_tests": "Tests A/B"
   },
   "camera": {
     "fallback": "Ouverture de l'appareil photo du téléphone…",

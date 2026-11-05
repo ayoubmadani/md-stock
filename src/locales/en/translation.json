@@ -437,7 +437,8 @@
     "target": "Shows",
     "target_store": "The store",
     "target_page": "A landing page",
-    "split_test": "A/B test"
+    "split_test": "A/B test",
+    "tab_tests": "A/B tests"
   },
   "camera": {
     "fallback": "Opening the phone camera…",

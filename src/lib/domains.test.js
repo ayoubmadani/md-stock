@@ -53,3 +53,14 @@ describe('suggestSubdomain', () => {
     expect(suggestSubdomain('---')).toBeNull();
   });
 });
+
+describe('groupDomains — A/B test domains have their own tab', () => {
+  it('a domain running an A/B test goes to "tests", not "pages"', () => {
+    const g = groupDomains([
+      { id: 'lp', domain: 'promo.mdstore.top', isActive: true, scope: 'landing_page', builderPageId: 'p1' },
+      { id: 'ab', domain: 'test.mdstore.top', isActive: true, scope: 'landing_page', builderPageId: null, splitTestId: 't1' },
+    ]);
+    expect(g.pages.map((d) => d.id)).toEqual(['lp']);
+    expect(g.tests.map((d) => d.id)).toEqual(['ab']);
+  });
+});

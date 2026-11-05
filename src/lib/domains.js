@@ -3,14 +3,16 @@
 export const DNS_RECORD = [['type', 'CNAME'], ['host', '@'], ['value', 'mdstore.top'], ['ttl', 'Auto']];
 
 const isSub = (d) => d.domain.endsWith('.mdstore.top');
-const isPage = (d) => d.scope === 'landing_page';
+const isTest = (d) => !!d.splitTestId;
+const isPage = (d) => d.scope === 'landing_page' && !isTest(d);
 
-/** روابط المتجر (*.mdstore.top)، الدومينات المخصصة (المنتظرة أولاً)، والمربوطة بصفحات هبوط */
+/** روابط المتجر (*.mdstore.top)، الدومينات المخصصة (المنتظرة أولاً)، المربوطة بصفحات هبوط، ودومينات اختبارات A/B */
 export function groupDomains(list) {
   return {
-    store: list.filter((d) => !isPage(d) && isSub(d)),
-    custom: list.filter((d) => !isPage(d) && !isSub(d)).sort((a, b) => Number(!!a.isActive) - Number(!!b.isActive)),
+    store: list.filter((d) => !isPage(d) && !isTest(d) && isSub(d)),
+    custom: list.filter((d) => !isPage(d) && !isTest(d) && !isSub(d)).sort((a, b) => Number(!!a.isActive) - Number(!!b.isActive)),
     pages: list.filter(isPage),
+    tests: list.filter(isTest),
   };
 }
 
