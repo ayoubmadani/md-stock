@@ -70,7 +70,8 @@ export default function ConfirmationPage() {
   const { storeId } = useAuth();
   const [tab, setTab] = useState('saved');
   const [saved, setSaved] = useState(null);
-  const [auto, setAuto] = useState({ enabled: false, companyId: null });
+  const [auto, setAuto] = useState({ enabled: false, companyId: null, agentIds: [] });
+  const [autoAgents, setAutoAgents] = useState([]); // مؤكّدو شركة الإرسال التلقائي (فارغ إن كانت لا تسمح)
   const [accounts, setAccounts] = useState([]);
   const [wilayas, setWilayas] = useState([]);
   const [q, setQ] = useState('');
@@ -98,6 +99,11 @@ export default function ConfirmationPage() {
     return () => clearTimeout(id);
   }, [tab, q, wilayaId, storeId]);
 
+  useEffect(() => {
+    setAutoAgents([]);
+    if (!storeId || !auto.companyId) return;
+    api.get(`/stores/${storeId}/confirmation/companies/${auto.companyId}/agents`).then((r) => setAutoAgents(r.data || [])).catch(() => setAutoAgents([]));
+  }, [storeId, auto.companyId]);
   const updateAuto = async (next) => {
     setBusy('auto');
     try { const { data } = await api.put(`/stores/${storeId}/confirmation/auto`, next); setAuto(data); toast.success(t('confirm.auto_saved')); } catch (e) { toast.error(errorMessage(e, t('inventory.error'))); } finally { setBusy(null); }
@@ -142,6 +148,25 @@ export default function ConfirmationPage() {
                 {saved.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
               <p className="text-[11px] text-gray-400">{t('confirm.auto_hint')}</p>
+              {autoAgents.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <p className="text-xs font-bold text-gray-500">{t('confirm.auto_agents')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {autoAgents.map((a) => {
+                      const on = (auto.agentIds || []).includes(a.id);
+                      const ids = on ? (auto.agentIds || []).filter((x) => x !== a.id) : [...(auto.agentIds || []), a.id];
+                      return (
+                        <button key={a.id} type="button" disabled={busy === 'auto'} onClick={() => updateAuto({ enabled: auto.enabled, companyId: auto.companyId, agentIds: ids })}
+                          className={`px-3 py-2 rounded-xl border-2 text-start disabled:opacity-50 ${on ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-gray-100 dark:border-zinc-800'}`}>
+                          <span className="block text-sm font-bold">{on ? '✓ ' : ''}{a.name}</span>
+                          <span className="block text-[11px] text-gray-500">{t('orders.actions.stats_line', a.stats || { confirmed: 0, delivered: 0 })}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] text-gray-400">{t('confirm.auto_agents_hint')}</p>
+                </div>
+              )}
             </div>
           )}
           {saved.length === 0 ? (

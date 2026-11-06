@@ -856,7 +856,9 @@
     "all_wilayas": "All wilayas",
     "no_results": "No results",
     "already": "Saved ✓",
-    "save": "Save to my companies"
+    "save": "Save to my companies",
+    "auto_agents": "Preferred confirmers (optional)",
+    "auto_agents_hint": "Each new order to the chosen ones alone for 2 h, then to the whole team."
   },
   "messages": {
     "tab_inbox": "New",

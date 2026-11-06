@@ -856,7 +856,9 @@
     "all_wilayas": "Toutes les wilayas",
     "no_results": "Aucun résultat",
     "already": "Enregistrée ✓",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "auto_agents": "Confirmateurs préférés (optionnel)",
+    "auto_agents_hint": "Chaque nouvelle commande aux choisis seuls 2 h, puis à toute l'équipe."
   },
   "messages": {
     "tab_inbox": "Nouveaux",
