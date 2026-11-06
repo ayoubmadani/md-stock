@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
+import { applyZoom } from '../lib/camera';
 
 // ملصقات التوصيل (ZR…) باركود Code128 طويل وكثيف: دقة الكاميرا الافتراضية (640×480) لا تكفي ← دقة عالية + تركيز مستمر،
 // و«محاولة أصعب» محصورة في أنواع المنتجات والشحن الشائعة (أسرع من كل الأنواع)
@@ -48,7 +49,11 @@ export default function Scanner({ onDetected, paused = false, continuous = false
           navigator.vibrate?.(60);
           onDetectedRef.current(result.getText());
         })
-        .then((c) => { if (cancelled) c.stop(); else controls = c; })
+        .then((c) => {
+          if (cancelled) { c.stop(); return; }
+          controls = c;
+          applyZoom(videoRef.current?.srcObject?.getVideoTracks?.()[0]);
+        })
         .catch((e) => { if (!cancelled) setError(e?.name === 'NotAllowedError' ? t('scan.denied') : window.isSecureContext ? t('scan.no_camera') : t('scan.https')); });
     }, 150);
     return () => { cancelled = true; clearTimeout(timer); controls?.stop(); };
@@ -78,6 +83,9 @@ export default function Scanner({ onDetected, paused = false, continuous = false
             <span className="flex-1 min-w-0 truncate"><bdi>{flash.text}</bdi></span>
             {flash.price != null && <span className="shrink-0" dir="ltr">{Number(flash.price).toLocaleString('en-US')} DA</span>}
           </div>
+        )}
+        {!compact && !error && !flash && (
+          <p className="absolute inset-x-4 bottom-3 text-center text-[11px] text-white/80 pointer-events-none">{t('scan.distance_hint')}</p>
         )}
         {error && <p className="absolute inset-x-4 bottom-4 text-center text-sm text-white bg-black/60 rounded-xl p-2">{error}</p>}
       </div>

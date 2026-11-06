@@ -164,7 +164,8 @@
     "return_question": "Le colis retourné est arrivé ?",
     "return_hint": "Confirmez seulement si vous avez le colis : la commande passe « retournée » et le stock est rétabli.",
     "return_confirm": "Oui, retour reçu",
-    "returned_done": "Retour enregistré"
+    "returned_done": "Retour enregistré",
+    "distance_hint": "Pas lu ? Éloignez un peu le téléphone (~20 cm)"
   },
   "product": {
     "new": "Nouveau produit",

@@ -164,7 +164,8 @@
     "return_question": "Has the returned parcel arrived?",
     "return_hint": "Confirm only if you have the parcel: the order becomes \"returned\" and stock comes back.",
     "return_confirm": "Yes, return received",
-    "returned_done": "Return recorded"
+    "returned_done": "Return recorded",
+    "distance_hint": "Not reading? Move the phone back a little (~20 cm)"
   },
   "product": {
     "new": "New product",
