@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Barcode, Check, Clock, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Receipt, Trash2, Truck, Undo2, UserPlus } from 'lucide-react';
+import { ArrowRight, Barcode, Check, Clock, Copy, Loader2, MapPin, MessageCircle, Pencil, Phone, PhoneCall, Printer, Receipt, Trash2, Truck, Undo2, UserPlus } from 'lucide-react';
+import { printLabels } from '../lib/labels';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -179,7 +180,10 @@ export default function OrderDetail() {
             </p>
           )}
           {order.shippingTrackingId && (
-            <p className="flex items-center gap-1 text-xs text-gray-500 mt-1"><Truck className="w-3.5 h-3.5" /><span dir="ltr">{order.shippingTrackingId}</span></p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="flex items-center gap-1 text-xs text-gray-500"><Truck className="w-3.5 h-3.5" /><span dir="ltr">{order.shippingTrackingId}</span></p>
+              <PrintLabelButton storeId={storeId} orderId={order.id} />
+            </div>
           )}
           {order.shippingTrackingId && shipStatusInfo(order) && (
             <div className="mt-1.5 space-y-1">
@@ -276,5 +280,25 @@ export default function OrderDetail() {
       {sheet && <StatusSheet order={order} onClose={() => setSheet(false)} onChanged={(s, patch) => { setSheet(false); setOrder((o) => ({ ...o, ...patch, status: s })); }} />}
       {pickingClient && <CustomerPickerSheet storeId={storeId} onClose={() => setPickingClient(false)} onPick={setClient} />}
     </div>
+  );
+}
+
+// ملصق الشحن (بوليصة بالباركود) للطلب المرفوع لشركة التوصيل
+function PrintLabelButton({ storeId, orderId }) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+  const print = async () => {
+    setBusy(true);
+    try {
+      const { links } = await printLabels(storeId, [orderId]);
+      if (!links.length) toast.error(t('orders.print_label_error'));
+    } catch { toast.error(t('orders.print_label_error')); }
+    finally { setBusy(false); }
+  };
+  return (
+    <button type="button" onClick={print} disabled={busy}
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-900 dark:bg-zinc-700 text-white text-[11px] font-bold disabled:opacity-50">
+      {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Printer className="w-3 h-3" />}{t('orders.print_label')}
+    </button>
   );
 }

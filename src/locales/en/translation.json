@@ -342,7 +342,9 @@
       "unknown": "Unknown status",
       "title": "Courier",
       "call_hint": "Call the customer now, before the parcel is returned"
-    }
+    },
+    "print_label": "Print label",
+    "print_label_error": "Could not print the label"
   },
   "library": {
     "title_products": "Product images",

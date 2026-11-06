@@ -342,7 +342,9 @@
       "unknown": "Statut inconnu",
       "title": "Livreur",
       "call_hint": "Appelez le client maintenant, avant le retour du colis"
-    }
+    },
+    "print_label": "Imprimer l'étiquette",
+    "print_label_error": "Impossible d'imprimer l'étiquette"
   },
   "library": {
     "title_products": "Images des produits",
