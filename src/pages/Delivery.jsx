@@ -6,7 +6,7 @@ import { CheckCircle2, ChevronLeft, Loader2, Pencil, Plus, Search, Star, Trash2,
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { canSave, credentialKeys, editPayload, visibleAccounts } from '../lib/shipping-accounts';
+import { canSave, credentialKeys, editPayload, visibleAccounts, credentialLabel } from '../lib/shipping-accounts';
 import { input, label } from '../components/product';
 
 function Logo({ p, size = 'w-11 h-11' }) {
@@ -66,7 +66,7 @@ function AddSheet({ storeId, providers, onClose, onSaved }) {
               <div className="space-y-1.5"><label className={label}>{t('delivery.account_name')}</label><input value={name} onChange={(e) => setName(e.target.value)} className={input} /></div>
               {credentialKeys(sel.name).map((k) => (
                 <div key={k} className="space-y-1.5">
-                  <label className={label}>{k === 'id' ? 'API ID' : k === 'key' ? 'API Key' : 'API Token'}</label>
+                  <label className={label}>{credentialLabel(k)}</label>
                   <input dir="ltr" type="password" autoComplete="off" value={creds[k] || ''} onChange={(e) => { setCreds((c) => ({ ...c, [k]: e.target.value })); setTest(null); }} className={input} />
                 </div>
               ))}
@@ -113,7 +113,7 @@ function EditSheet({ storeId, account, provider, onClose, onSaved }) {
           <div className="space-y-1.5"><label className={label}>{t('delivery.account_name')}</label><input value={name} onChange={(e) => setName(e.target.value)} className={input} /></div>
           {credentialKeys(account.providerName).map((k) => (
             <div key={k} className="space-y-1.5">
-              <label className={label}>{k === 'id' ? 'API ID' : k === 'key' ? 'API Key' : 'API Token'}</label>
+              <label className={label}>{credentialLabel(k)}</label>
               <input dir="ltr" type="password" autoComplete="off" placeholder="••••••" value={creds[k] || ''} onChange={(e) => setCreds((c) => ({ ...c, [k]: e.target.value }))} className={input} />
             </div>
           ))}

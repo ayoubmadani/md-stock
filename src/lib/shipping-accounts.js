@@ -3,9 +3,12 @@
 export function credentialKeys(providerName) {
   if (!providerName) return [];
   if (['Yalidine', 'Yalitec'].includes(providerName)) return ['id', 'token'];
-  if (providerName === 'ZRExpress') return ['token', 'key'];
+  if (providerName === 'ZRExpress') return ['secretKey', 'tenantId']; // المنصة الجديدة api.zrexpress.app
   return ['token'];
 }
+
+const LABELS = { id: 'API ID', key: 'API Key', token: 'API Token', secretKey: 'Secret Key', tenantId: 'Tenant ID' };
+export const credentialLabel = (k) => LABELS[k] ?? k;
 
 export const canSave = (providerName, accountName, creds) =>
   !!String(accountName ?? '').trim() && credentialKeys(providerName).every((k) => String(creds?.[k] ?? '').trim());
