@@ -151,19 +151,67 @@ function PickSheet({ title, load, render, onPick, onClose, empty }) {
   );
 }
 
-/** إرسال الطلب لشركة تأكيد محفوظة */
+/** إرسال الطلب لشركة تأكيد محفوظة — ثم (إن كانت الشركة تسمح) اختيار مؤكّد أو أكثر: لهم الطلب وحدهم ساعتين */
 export function SendConfirmationSheet({ order, storeId, onClose, onDone }) {
   const { t } = useTranslation();
+  const [company, setCompany] = useState(null); // { ...الشركة, agents } ← شاشة اختيار المؤكّدين
+  const [picked, setPicked] = useState([]);
+  const [sending, setSending] = useState(false);
   const load = useCallback(() => api.get(`/stores/${storeId}/confirmation/saved`).then((r) => r.data || []), [storeId]);
+  const send = async (c, agentIds = []) => {
+    try {
+      const { data } = await api.post(`/stores/${storeId}/confirmation/send`, { companyId: c.id, orderIds: [order.id], ...(agentIds.length ? { agentIds } : {}) });
+      if (data?.sent) { toast.success(t('orders.actions.sent', { name: c.name })); onDone(); }
+      else toast.warning(t('orders.actions.not_sent'));
+    } catch (e) { toast.error(errorMessage(e, t('orders.save_failed'))); }
+  };
+
+  if (company) {
+    const toggle = (id) => setPicked((x) => (x.includes(id) ? x.filter((y) => y !== id) : [...x, id]));
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm p-5 space-y-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+          <div className="flex items-center justify-between">
+            <p className="font-bold">{t('orders.actions.pick_agent')}</p>
+            <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+          </div>
+          <p className="text-xs text-gray-500">{company.name}</p>
+          <div className="space-y-2 max-h-[45dvh] overflow-y-auto">
+            {company.agents.map((a) => (
+              <button key={a.id} type="button" onClick={() => toggle(a.id)}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 text-start ${picked.includes(a.id) ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-gray-100 dark:border-zinc-800'}`}>
+                <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${picked.includes(a.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300 dark:border-zinc-600'}`}>
+                  {picked.includes(a.id) && <Check className="w-3.5 h-3.5" />}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-bold truncate">{a.name}</span>
+                  <span className="block text-xs text-gray-400">{t('orders.actions.stats_line', a.stats || { confirmed: 0, delivered: 0 })}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-500">{t('orders.actions.agent_hint')}</p>
+          <button type="button" disabled={sending} onClick={async () => { setSending(true); try { await send(company, picked); } finally { setSending(false); } }}
+            className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">
+            {sending && <Loader2 className="w-4 h-4 animate-spin" />}{t('orders.actions.send')}
+          </button>
+        </div>
+      </div>
+    );
+  }
   return (
     <PickSheet title={t('orders.actions.send_confirm')} load={load} onClose={onClose} empty={t('orders.actions.no_companies')}
-      render={(c) => ({ main: c.name, sub: c.blocked ? t('orders.actions.company_blocked') : c.paused ? t('orders.actions.company_paused') : t('orders.actions.commission', { amount: c.commissionPerDelivered }), disabled: c.paused || c.blocked })}
+      render={(c) => ({
+        main: c.name,
+        sub: c.blocked ? t('orders.actions.company_blocked') : c.paused ? t('orders.actions.company_paused')
+          : `${t('orders.actions.commission', { amount: c.commissionPerDelivered })}${c.stats ? ` · ${t('orders.actions.stats_line', c.stats)}` : ''}`,
+        disabled: c.paused || c.blocked,
+      })}
       onPick={async (c) => {
-        try {
-          const { data } = await api.post(`/stores/${storeId}/confirmation/send`, { companyId: c.id, orderIds: [order.id] });
-          if (data?.sent) { toast.success(t('orders.actions.sent', { name: c.name })); onDone(); }
-          else toast.warning(t('orders.actions.not_sent'));
-        } catch (e) { toast.error(errorMessage(e, t('orders.save_failed'))); }
+        // الشركة تسمح باختيار مؤكّد؟ ← شاشة اختيار، وإلا إرسال مباشر
+        const agents = await api.get(`/stores/${storeId}/confirmation/companies/${c.id}/agents`).then((r) => r.data || []).catch(() => []);
+        if (agents.length) { setPicked([]); setCompany({ ...c, agents }); }
+        else await send(c);
       }} />
   );
 }

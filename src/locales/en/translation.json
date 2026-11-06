@@ -325,7 +325,11 @@
       "recalled": "Order recalled",
       "not_recalled": "It can't be recalled now",
       "shipped": "Sent to the delivery company {{tracking}}",
-      "default": "Default"
+      "default": "Default",
+      "pick_agent": "Choose confirmers (optional)",
+      "agent_hint": "No choice: any confirmer. The chosen get the order alone for 2 h.",
+      "send": "Send",
+      "stats_line": "{{confirmed}} confirmed · {{delivered}} delivered"
     },
     "next_step": "Next step",
     "filter_status": "Order status",

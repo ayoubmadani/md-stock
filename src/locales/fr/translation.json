@@ -325,7 +325,11 @@
       "recalled": "Commande récupérée",
       "not_recalled": "Impossible de la récupérer maintenant",
       "shipped": "Envoyée au transporteur {{tracking}}",
-      "default": "Par défaut"
+      "default": "Par défaut",
+      "pick_agent": "Choisir les confirmateurs (optionnel)",
+      "agent_hint": "Sans choix : n'importe quel confirmateur. Les choisis ont la commande seuls 2 h.",
+      "send": "Envoyer",
+      "stats_line": "{{confirmed}} confirmées · {{delivered}} livrées"
     },
     "next_step": "Étape suivante",
     "filter_status": "Statut des commandes",
