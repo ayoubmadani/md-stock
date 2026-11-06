@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
-import { applyZoom } from '../lib/camera';
 
 // ملصقات التوصيل (ZR…) باركود Code128 طويل وكثيف: دقة الكاميرا الافتراضية (640×480) لا تكفي ← دقة عالية + تركيز مستمر،
 // و«محاولة أصعب» محصورة في أنواع المنتجات والشحن الشائعة (أسرع من كل الأنواع)
@@ -52,7 +51,6 @@ export default function Scanner({ onDetected, paused = false, continuous = false
         .then((c) => {
           if (cancelled) { c.stop(); return; }
           controls = c;
-          applyZoom(videoRef.current?.srcObject?.getVideoTracks?.()[0]);
         })
         .catch((e) => { if (!cancelled) setError(e?.name === 'NotAllowedError' ? t('scan.denied') : window.isSecureContext ? t('scan.no_camera') : t('scan.https')); });
     }, 150);
@@ -64,7 +62,8 @@ export default function Scanner({ onDetected, paused = false, continuous = false
     <div className="space-y-3">
       <div className={`relative w-full overflow-hidden bg-black transition-all duration-300 ${compact ? 'h-24 rounded-2xl' : 'aspect-[4/3] rounded-3xl'} ${
         flash ? (flash.ok ? 'ring-4 ring-emerald-500 shadow-[0_0_30px_rgba(16,185,129,.45)]' : 'ring-4 ring-rose-500') : ''}`}>
-        {!paused && <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />}
+        {/* ×4 للعين فقط (تكبير الصورة داخل الإطار): القارئ يحلّل الإطار الكامل بدقته — يعمل في كل الهواتف */}
+        {!paused && <video ref={videoRef} className="w-full h-full object-cover" style={{ transform: 'scale(4)' }} muted playsInline />}
         {/* إطار التوجيه — لا يظهر في الشريط المصغّر */}
         {!compact && (
           <div className={`pointer-events-none absolute inset-x-8 top-1/2 -translate-y-1/2 h-28 rounded-2xl border-2 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)] ${

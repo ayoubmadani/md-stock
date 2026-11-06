@@ -45,6 +45,12 @@ describe('Scanner camera', () => {
     expect(hints.get(DecodeHintType.POSSIBLE_FORMATS)).toContain(BarcodeFormat.CODE_128);
   });
 
+  it('x4 is a visual zoom of the picture (works on every phone), not a camera zoom request', async () => {
+    await act(async () => { root.render(<Scanner onDetected={() => {}} />); });
+    const video = el.querySelector('video');
+    expect(video.style.transform).toBe('scale(4)');
+  });
+
   it('manual entry accepts letters (delivery tracking like 16-62F3TIA7LQ-ZR), not a digits-only keyboard', async () => {
     await act(async () => { root.render(<Scanner onDetected={() => {}} />); });
     const input = el.querySelector('input');
