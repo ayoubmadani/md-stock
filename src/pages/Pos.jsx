@@ -416,17 +416,27 @@ export default function PosPage() {
       {cart.length > 0 && (
         <>
           <CustomerBox customer={customer} onPick={() => setPickingCustomer(true)} onClear={() => setCustomer(NO_CUSTOMER)} />
-          <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20 flex gap-2">
-            <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => confirm()} className="flex-1 min-w-0 flex items-center justify-between gap-2 px-5 py-4 rounded-2xl bg-emerald-600 text-white font-bold shadow-lg disabled:opacity-60">
-              <span className="flex items-center gap-2">{saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}{t(editing ? 'pos.save_edit' : 'pos.confirm', { count: cart.reduce((s, l) => s + l.quantity, 0) })}</span>
-              <span className="text-lg font-black" dir="ltr">{money(total)} DA</span>
-            </button>
-            {!editing && (
-              <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => setPayLater(true)}
-                className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-2xl border border-orange-300 dark:border-orange-500/50 bg-orange-50 dark:bg-zinc-900 text-orange-700 dark:text-orange-300 text-[11px] font-bold leading-tight shadow-lg disabled:opacity-60">
-                <Clock className="w-4 h-4" />{t('pos.pay_later')}
+          {/* لوحة الدفع: المجموع في سطر، ثم زرّان بنفس الارتفاع ونص في سطر واحد */}
+          <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-4 z-20 rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 backdrop-blur p-3 space-y-3 shadow-lg">
+            <div className="flex items-end justify-between gap-3 px-1">
+              <div className="min-w-0">
+                <p className="text-xs text-gray-500">{t('pos.total')}</p>
+                <p className="text-[11px] text-gray-400">{t('pos.items_count', { count: cart.reduce((s, l) => s + l.quantity, 0) })}</p>
+              </div>
+              <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap" dir="ltr">{money(total)} <span className="text-sm font-bold">DA</span></p>
+            </div>
+            <div className="flex gap-2">
+              {!editing && (
+                <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => setPayLater(true)}
+                  className="shrink-0 h-12 px-4 flex items-center justify-center gap-1.5 rounded-xl border border-orange-300 dark:border-orange-500/50 text-orange-700 dark:text-orange-300 text-sm font-bold whitespace-nowrap disabled:opacity-60">
+                  <Clock className="w-4 h-4" />{t('pos.pay_later')}
+                </button>
+              )}
+              <button type="button" disabled={saving || cart.some((l) => l.price === '')} onClick={() => confirm()}
+                className="flex-1 min-w-0 h-12 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold whitespace-nowrap disabled:opacity-60">
+                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}{t(editing ? 'pos.save_btn' : 'pos.confirm_btn')}
               </button>
-            )}
+            </div>
           </div>
         </>
       )}

@@ -1081,7 +1081,10 @@
     "info_missing": "Product not found in stock (maybe deleted)",
     "order_found": "Scanned order",
     "more": "Add",
-    "tap_for_info": "Tap a product to see its stock and details"
+    "tap_for_info": "Tap a product to see its stock and details",
+    "confirm_btn": "Confirm sale",
+    "save_btn": "Save changes",
+    "items_count": "{{count}} item(s)"
   },
   "quick": {
     "title": "Quick new product",

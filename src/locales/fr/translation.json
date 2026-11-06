@@ -1081,7 +1081,10 @@
     "info_missing": "Produit introuvable dans le stock (peut-être supprimé)",
     "order_found": "Commande scannée",
     "more": "Ajouter",
-    "tap_for_info": "Touchez un produit pour voir son stock et ses infos"
+    "tap_for_info": "Touchez un produit pour voir son stock et ses infos",
+    "confirm_btn": "Valider la vente",
+    "save_btn": "Enregistrer",
+    "items_count": "{{count}} article(s)"
   },
   "quick": {
     "title": "Produit rapide",
