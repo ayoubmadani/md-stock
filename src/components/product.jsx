@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
-import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
+import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
 import { printLabel } from '../lib/label';
 import { useAuth } from '../lib/auth';
 import ImageLibrary from './ImageLibrary';
@@ -315,7 +315,7 @@ function ScanSheet({ onCode, onClose }) {
 /** باركود جديد غير مستعمل في المتجر (404 من البحث = متاح) */
 export async function freshBarcode(storeId) {
   for (let i = 0; i < 5; i++) {
-    const code = randomStoreEan13();
+    const code = randomStoreCode();
     try {
       await api.get(`/stores/${storeId}/inventory/barcode/${code}`);
     } catch (e) {

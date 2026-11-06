@@ -170,32 +170,36 @@ export default function OrderDetail() {
           : <span className="w-8" />}
       </div>
 
-      {/* الحالة */}
-      <div className={`${box} flex items-center justify-between gap-3`}>
-        <div className="min-w-0">
-          <p className="text-xs text-gray-400">{t('orders.status_label')}</p>
-          {order.confirmationCompany && (
-            <p className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-1 truncate">
-              <PhoneCall className="w-3.5 h-3.5 shrink-0" />{t('orders.at_company', { name: order.confirmationCompany.name })}
-            </p>
-          )}
-          {order.shippingTrackingId && (
-            <div className="flex items-center gap-2 mt-1">
-              <p className="flex items-center gap-1 text-xs text-gray-500"><Truck className="w-3.5 h-3.5" /><span dir="ltr">{order.shippingTrackingId}</span></p>
+      {/* الحالة — ثم سطر الشحن (رقم التتبع وأزراره) بعرض البطاقة حتى لا يتداخل مع الحالة */}
+      <div className={`${box} space-y-2`}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs text-gray-400">{t('orders.status_label')}</p>
+            {order.confirmationCompany && (
+              <p className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-1 truncate">
+                <PhoneCall className="w-3.5 h-3.5 shrink-0" />{t('orders.at_company', { name: order.confirmationCompany.name })}
+              </p>
+            )}
+          </div>
+          <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />
+        </div>
+        {order.shippingTrackingId && (
+          <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
+            <p className="flex items-center gap-1.5 text-xs text-gray-500"><Truck className="w-3.5 h-3.5 shrink-0" /><span dir="ltr" className="font-semibold break-all">{order.shippingTrackingId}</span></p>
+            <div className="flex flex-wrap gap-2">
               <PrintLabelButton storeId={storeId} orderId={order.id} />
               {can('order.manage') && ['confirmed', 'shipping'].includes(order.status) && <CancelShippingButton storeId={storeId} orderId={order.id} onDone={load} />}
             </div>
-          )}
-          {order.shippingTrackingId && shipStatusInfo(order) && (
-            <div className="mt-1.5 space-y-1">
-              <ShipStatusBadge order={order} />
-              {shipStatusInfo(order).urgent && order.status === 'shipping' && (
-                <p className="text-[11px] font-bold text-amber-700 dark:text-amber-300">{t('orders.ship_status.call_hint')}</p>
-              )}
-            </div>
-          )}
-        </div>
-        <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />
+            {shipStatusInfo(order) && (
+              <div className="space-y-1">
+                <ShipStatusBadge order={order} />
+                {shipStatusInfo(order).urgent && order.status === 'shipping' && (
+                  <p className="text-[11px] font-bold text-amber-700 dark:text-amber-300">{t('orders.ship_status.call_hint')}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* الخطوة التالية */}
@@ -298,8 +302,8 @@ function PrintLabelButton({ storeId, orderId }) {
   };
   return (
     <button type="button" onClick={print} disabled={busy}
-      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-900 dark:bg-zinc-700 text-white text-[11px] font-bold disabled:opacity-50">
-      {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Printer className="w-3 h-3" />}{t('orders.print_label')}
+      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-900 dark:bg-zinc-700 text-white text-xs font-bold whitespace-nowrap disabled:opacity-50">
+      {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Printer className="w-3.5 h-3.5" />}{t('orders.print_label')}
     </button>
   );
 }
@@ -320,8 +324,8 @@ function CancelShippingButton({ storeId, orderId, onDone }) {
   };
   return (
     <button type="button" onClick={cancel} disabled={busy}
-      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-red-200 dark:border-red-900 text-red-600 text-[11px] font-bold disabled:opacity-50">
-      {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}{t('orders.cancel_ship')}
+      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 dark:border-red-900 text-red-600 text-xs font-bold whitespace-nowrap disabled:opacity-50">
+      {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Undo2 className="w-3.5 h-3.5" />}{t('orders.cancel_ship')}
     </button>
   );
 }

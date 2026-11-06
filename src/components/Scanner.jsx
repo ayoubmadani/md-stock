@@ -73,7 +73,7 @@ export default function Scanner({ onDetected, paused = false, continuous = false
           onSubmit={(e) => { e.preventDefault(); const v = manual.trim(); if (!v) return; onDetected(v); if (continuous) setManual(''); }}
           className="relative flex-1"
         >
-          <input value={manual} onChange={(e) => setManual(e.target.value)} inputMode="numeric" dir="ltr" placeholder={t('scan.manual')}
+          <input value={manual} onChange={(e) => setManual(e.target.value)} inputMode="text" autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} dir="ltr" placeholder={t('scan.manual')}
             className="w-full pl-3 pr-11 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-base outline-none focus:border-indigo-400" />
           <button aria-label={t('scan.go')} className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-lg text-gray-500 hover:text-indigo-600"><Search className="w-5 h-5" /></button>
         </form>

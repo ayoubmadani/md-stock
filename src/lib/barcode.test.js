@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ean13CheckDigit, randomStoreEan13, isValidEan13, fillMissingBarcodes } from './barcode.js';
+import { ean13CheckDigit, randomStoreEan13, randomStoreCode, isValidEan13, fillMissingBarcodes } from './barcode.js';
 
 describe('EAN-13', () => {
   it('computes the check digit of a known code', () => {
@@ -26,5 +26,14 @@ describe('fillMissingBarcodes', () => {
   it('treats blank strings as missing', async () => {
     const out = await fillMissingBarcodes(['a'], { a: '  ' }, async () => '2000000000008');
     expect(out).toEqual({ a: '2000000000008' });
+  });
+});
+
+describe('randomStoreCode — short store barcode', () => {
+  it('4 characters, uppercase letters and digits, never O or I (read as 0 / 1)', () => {
+    for (let i = 0; i < 500; i++) expect(randomStoreCode()).toMatch(/^[0-9A-HJ-NP-Z]{4}$/);
+  });
+  it('varies', () => {
+    expect(new Set(Array.from({ length: 200 }, () => randomStoreCode())).size).toBeGreaterThan(190);
   });
 });

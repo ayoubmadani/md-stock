@@ -192,6 +192,7 @@ export function ShipSheet({ order, storeId, onClose, onDone }) {
  */
 export function NextStepCard({ order, onChanged, onShip, highlight = false, className = '' }) {
   const { t } = useTranslation();
+  const { storeId } = useAuth();
   const [busy, setBusy] = useState(null);
   const steps = nextActions(order);
   if (!steps.length) return null;
@@ -200,7 +201,9 @@ export function NextStepCard({ order, onChanged, onShip, highlight = false, clas
     if (a.action === 'ship') return onShip();
     setBusy(a.status);
     try {
-      await api.patch(`/orders/${order.id}`, statusPayload(order, a.status));
+      // مؤكد مرفوع لشركة التوصيل ← «قيد الشحن» عبر التسليم للموزّع (يسجّل وقت الشحن)
+      if (a.status === 'shipping' && order.shippingTrackingId) await api.post(`/stores/${storeId}/shipping/handover`, { orderIds: [order.id] });
+      else await api.patch(`/orders/${order.id}`, statusPayload(order, a.status));
       navigator.vibrate?.(40);
       toast.success(`${order.customerName || ''} ← ${statusLabel(t, a.status, order)}`);
       onChanged(a.status);

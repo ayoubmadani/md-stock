@@ -13,11 +13,19 @@ export function randomStoreEan13() {
   return body + ean13CheckDigit(body);
 }
 
+// باركود قصير للمتجر (زر «توليد»): 4 خانات حروف وأرقام — بلا O وI حتى لا تُقرأ 0 و1 (34⁴ ≈ 1.3 مليون رمز).
+// يُطبع CODE128 (label.js)، والتحقق من عدم تكرارها في المتجر عند freshBarcode
+const SHORT_CHARS = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+export function randomStoreCode() {
+  const pick = () => SHORT_CHARS[(crypto?.getRandomValues?.(new Uint32Array(1))[0] ?? Math.floor(Math.random() * 2 ** 32)) % SHORT_CHARS.length];
+  return Array.from({ length: 4 }, pick).join('');
+}
+
 /**
  * توليد جماعي: باركود لكل مفتاح بلا باركود (القائم يبقى)، بلا تكرار داخل الدفعة ولا مع القائم.
  * gen: دالة async تعطي باركوداً جديداً (freshBarcode يتحقق من المتجر). يُرجع { key: barcode } للجديد فقط.
  */
-export async function fillMissingBarcodes(keys, current, gen = async () => randomStoreEan13()) {
+export async function fillMissingBarcodes(keys, current, gen = async () => randomStoreCode()) {
   const used = new Set(Object.values(current).map((b) => String(b ?? '').trim()).filter(Boolean));
   const out = {};
   for (const k of keys) {

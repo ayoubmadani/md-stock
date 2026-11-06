@@ -31,4 +31,11 @@ describe('Scanner camera', () => {
     expect(start).toHaveBeenCalledTimes(1);
     expect(stop).not.toHaveBeenCalled();
   });
+
+  it('manual entry accepts letters (delivery tracking like 16-62F3TIA7LQ-ZR), not a digits-only keyboard', async () => {
+    await act(async () => { root.render(<Scanner onDetected={() => {}} />); });
+    const input = el.querySelector('input');
+    expect(input.getAttribute('inputmode')).not.toBe('numeric');
+    expect(input.getAttribute('autocapitalize')).toBe('characters');
+  });
 });

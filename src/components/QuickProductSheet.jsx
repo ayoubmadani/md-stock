@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { uploadImage, ACCEPT } from '../lib/upload';
 import { combos, quickErrors, quickProductBody, variantUpdates } from '../lib/quick-product';
-import { fillMissingBarcodes, randomStoreEan13 } from '../lib/barcode';
+import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
 import CameraCapture from './CameraCapture';
 import Scanner from './Scanner';
 import { input, label } from './product';
@@ -134,7 +134,7 @@ export default function QuickProductSheet({ storeId, barcode = '', onClose, onCr
             <div className="flex gap-2">
               <input dir="ltr" value={f.barcode} onChange={set('barcode')} placeholder="—" className={`${input} font-mono`} />
               <button type="button" onClick={() => setScanning((v) => !v)} className={`px-3 rounded-xl ${scanning ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300'}`}><ScanLine className="w-5 h-5" /></button>
-              <button type="button" onClick={() => set('barcode')(randomStoreEan13())} title={t('quick.generate')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300"><Wand2 className="w-5 h-5" /></button>
+              <button type="button" onClick={() => set('barcode')(randomStoreCode())} title={t('quick.generate')} className="px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300"><Wand2 className="w-5 h-5" /></button>
             </div>
             {scanning && <Scanner onDetected={(c) => { set('barcode')(String(c).trim()); setScanning(false); navigator.vibrate?.(40); }} />}
           </div>
@@ -179,7 +179,7 @@ export default function QuickProductSheet({ storeId, barcode = '', onClose, onCr
                   <div className="flex items-center gap-1.5">
                     <input dir="ltr" value={rw.barcode} onChange={(e) => setRow(c.key, { barcode: e.target.value })} placeholder={t('quick.barcode')} className={`${smallInput} flex-1 min-w-0 text-xs font-mono`} />
                     <button type="button" onClick={() => setScanFor(scanFor === c.key ? null : c.key)} className={`p-1.5 rounded-lg ${scanFor === c.key ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}><ScanLine className="w-4 h-4" /></button>
-                    <button type="button" onClick={() => setRow(c.key, { barcode: randomStoreEan13() })} className="p-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-500"><Wand2 className="w-4 h-4" /></button>
+                    <button type="button" onClick={() => setRow(c.key, { barcode: randomStoreCode() })} className="p-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-500"><Wand2 className="w-4 h-4" /></button>
                   </div>
                   {scanFor === c.key && <Scanner onDetected={(code) => { setRow(c.key, { barcode: String(code).trim() }); setScanFor(null); navigator.vibrate?.(40); }} />}
                 </div>
