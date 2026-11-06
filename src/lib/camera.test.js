@@ -3,11 +3,11 @@ import { applyZoom } from './camera';
 
 const track = (zoom) => ({ getCapabilities: () => (zoom ? { zoom } : {}), applyConstraints: vi.fn(async () => {}) });
 
-describe('applyZoom — x2 so the label is big while the phone stays far enough to focus', () => {
-  it('applies 2 when the camera allows it', async () => {
+describe('applyZoom — x4 so the label is big while the phone stays far enough to focus', () => {
+  it('applies 4 when the camera allows it', async () => {
     const t = track({ min: 1, max: 10 });
-    expect(await applyZoom(t)).toBe(2);
-    expect(t.applyConstraints).toHaveBeenCalledWith({ advanced: [{ zoom: 2 }] });
+    expect(await applyZoom(t)).toBe(4);
+    expect(t.applyConstraints).toHaveBeenCalledWith({ advanced: [{ zoom: 4 }] });
   });
   it('stays inside the camera range', async () => {
     expect(await applyZoom(track({ min: 1, max: 1.5 }))).toBe(1.5);
