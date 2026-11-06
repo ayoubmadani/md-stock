@@ -2,6 +2,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType } from '@zxing/library';
+
+// ملصقات التوصيل (ZR…) باركود Code128 طويل وكثيف: دقة الكاميرا الافتراضية (640×480) لا تكفي ← دقة عالية + تركيز مستمر،
+// و«محاولة أصعب» محصورة في أنواع المنتجات والشحن الشائعة (أسرع من كل الأنواع)
+const FORMATS = [BarcodeFormat.CODE_128, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E,
+  BarcodeFormat.CODE_39, BarcodeFormat.CODE_93, BarcodeFormat.ITF, BarcodeFormat.CODABAR, BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX];
+const HINTS = new Map([[DecodeHintType.TRY_HARDER, true], [DecodeHintType.POSSIBLE_FORMATS, FORMATS]]);
+const VIDEO = {
+  facingMode: { ideal: 'environment' },
+  width: { ideal: 1920 },
+  height: { ideal: 1080 },
+  advanced: [{ focusMode: 'continuous' }],
+};
 import { Check, Maximize2, Minimize2, Search, X } from 'lucide-react';
 
 // compact: شريط رفيع (السلة ممتلئة) مع زر تكبير/تصغير onToggleSize · flash: { ok, text, price } وميض بعد المسح · extra: زر بجانب الخانة
@@ -26,9 +39,9 @@ export default function Scanner({ onDetected, paused = false, continuous = false
     // تأخير صغير: React في التطوير يركّب المكوّن مرتين متتاليتين — بدون التأخير يُطلب الهاتف الكاميرا مرتين
     // وإيقاف الطلب الأول (يصل متأخراً على الهاتف) يقطع فيديو الثاني فتنغلق الكاميرا
     const timer = setTimeout(() => {
-      const reader = new BrowserMultiFormatReader();
+      const reader = new BrowserMultiFormatReader(HINTS, { delayBetweenScanAttempts: 150 });
       reader
-        .decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } } }, videoRef.current, (result) => {
+        .decodeFromConstraints({ video: VIDEO }, videoRef.current, (result) => {
           if (!result || doneRef.current) return;
           // مرة واحدة لكل مسح — إلا في الوضع المستمر (بيع في المحل: يمنع التكرار بنفسه)
           if (!continuousRef.current) doneRef.current = true;
