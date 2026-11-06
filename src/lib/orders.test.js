@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts, orderAmounts, needsCustomer } from './orders.js';
+import { allowedStatuses, nextActions, paymentState, statusPayload, whatsappLink, sumCounts, orderAmounts, needsCustomer, scanAction } from './orders.js';
 
 describe('allowedStatuses', () => {
   it('a regular order can take any status', () => {
@@ -120,5 +120,20 @@ describe('needsCustomer (shop order → «pay later» needs a customer)', () => 
     expect(needsCustomer({ ...shop, customerPhone: '0555123456' }, 'unpaid')).toBe(false);
     expect(needsCustomer(shop, 'cancelled')).toBe(false);
     expect(needsCustomer({ ...shop, platform: 'store' }, 'unpaid')).toBe(false);
+  });
+});
+
+describe('scanAction — the scanned delivery label decides', () => {
+  const o = (status, tracking = '16-62F3TIA7LQ-ZR') => ({ status, shippingTrackingId: tracking });
+  it('uploaded & confirmed → handover (now shipping)', () => {
+    expect(scanAction(o('confirmed'), '16-62f3tia7lq-zr ')).toBe('handover');
+  });
+  it('shipping → ask to confirm the returned parcel arrived', () => {
+    expect(scanAction(o('shipping'), '16-62F3TIA7LQ-ZR')).toBe('confirm_return');
+  });
+  it('our own order barcode, another code, or other statuses → nothing automatic', () => {
+    expect(scanAction(o('confirmed'), 'O100523')).toBeNull();
+    expect(scanAction(o('confirmed', null), '16-62F3TIA7LQ-ZR')).toBeNull();
+    expect(scanAction(o('delivered'), '16-62F3TIA7LQ-ZR')).toBeNull();
   });
 });

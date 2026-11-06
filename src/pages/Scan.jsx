@@ -6,6 +6,7 @@ import { Loader2, Package, Plus, ClipboardCheck, ScanLine, PackagePlus, Pencil, 
 import ScannedOrder from '../components/ScannedOrder';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
+import { scanAction } from '../lib/orders';
 import { useAuth } from '../lib/auth';
 import Scanner from '../components/Scanner';
 import QuickProductSheet from '../components/QuickProductSheet';
@@ -23,6 +24,7 @@ export default function ScanPage() {
   const [adjust, setAdjust] = useState(null);
   const [order, setOrder] = useState(null); // طلب ممسوح: يظهر هنا مع أزرار الخطوة التالية
   const [quick, setQuick] = useState(false);
+  const [askReturn, setAskReturn] = useState(false); // طرد «قيد الشحن» مُسح ← «وصل المرتجع؟»
 
   // منتج أولاً، ثم طلب (باركود الطلب أو رقم تتبع شركة التوصيل) — حسب صلاحيات العضو
   const lookup = useCallback(async (c) => {
@@ -42,9 +44,21 @@ export default function ScanPage() {
       if (can('order.view')) {
         try {
           const { data } = await api.get(`/orders/scan/${storeId}/${code}`);
-          const full = await api.get(`/orders/get-one/${data.id}`);
-          setOrder(full.data);
-          navigator.vibrate?.(60);
+          let full = (await api.get(`/orders/get-one/${data.id}`)).data;
+          // ملصق شركة التوصيل: حالة الطلب تحدد — مؤكد مرفوع ← «قيد الشحن» مباشرة، قيد الشحن ← سؤال الإرجاع
+          const action = can('order.manage') ? scanAction(full, c) : null;
+          setAskReturn(action === 'confirm_return');
+          if (action === 'handover') {
+            try {
+              await api.post(`/stores/${storeId}/shipping/handover`, { orderIds: [full.id] });
+              full = (await api.get(`/orders/get-one/${full.id}`)).data;
+              toast.success(t('scan.handed_over'));
+              navigator.vibrate?.([60, 40, 60]);
+            } catch { toast.error(t('scan.handover_error')); }
+          } else {
+            navigator.vibrate?.(60);
+          }
+          setOrder(full);
           return;
         } catch (e) {
           if (e.response?.status !== 404) throw e;
@@ -59,7 +73,7 @@ export default function ScanPage() {
     }
   }, [storeId, t, can, navigate]);
 
-  const again = () => { setCode(null); setHit(null); setOrder(null); };
+  const again = () => { setCode(null); setHit(null); setOrder(null); setAskReturn(false); };
   const stock = hit && hit !== 'none' ? (hit.variant ? hit.variant.stock : hit.product.stock) : 0;
 
   return (
@@ -113,7 +127,7 @@ export default function ScanPage() {
             </div>
           )}
 
-          {!loading && order && <ScannedOrder order={order} storeId={storeId} onChange={setOrder} />}
+          {!loading && order && <ScannedOrder order={order} storeId={storeId} onChange={(o) => { setOrder(o); setAskReturn(false); }} askReturn={askReturn} />}
 
           <button onClick={again} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 font-semibold">
             <ScanLine className="w-4 h-4" />{t('scan.again')}

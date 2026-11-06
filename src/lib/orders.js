@@ -104,3 +104,16 @@ export function orderAmounts(order) {
 
 /** طلب محل ← «دفع لاحقاً» يحتاج زبوناً (اسم وهاتف): بلا هاتف ← اختيار زبون أولاً (الخادم يرفض أيضاً) */
 export const needsCustomer = (order, status) => order?.platform === 'pos' && status === 'unpaid' && !String(order.customerPhone || '').trim();
+
+/**
+ * مسح ملصق شركة التوصيل (رقم التتبع): حالة الطلب تحدد ما يحدث —
+ * مؤكد مرفوع ← سُلّم للموزّع («قيد الشحن» مباشرة)، قيد الشحن ← سؤال «وصل الطرد المرتجع؟».
+ * باركود الطلب نفسه أو حالة أخرى: لا شيء تلقائي.
+ */
+export function scanAction(order, code) {
+  const norm = (s) => String(s ?? '').trim().toUpperCase();
+  if (!order?.shippingTrackingId || norm(code) !== norm(order.shippingTrackingId)) return null;
+  if (order.status === 'confirmed') return 'handover';
+  if (order.status === 'shipping') return 'confirm_return';
+  return null;
+}

@@ -158,7 +158,13 @@
     "open_order": "Ouvrir la commande",
     "sell": "Vendre",
     "expand": "Agrandir",
-    "shrink": "Réduire"
+    "shrink": "Réduire",
+    "handed_over": "Remis au livreur — commande en livraison",
+    "handover_error": "Impossible de passer en livraison",
+    "return_question": "Le colis retourné est arrivé ?",
+    "return_hint": "Confirmez seulement si vous avez le colis : la commande passe « retournée » et le stock est rétabli.",
+    "return_confirm": "Oui, retour reçu",
+    "returned_done": "Retour enregistré"
   },
   "product": {
     "new": "Nouveau produit",
@@ -344,7 +350,11 @@
       "call_hint": "Appelez le client maintenant, avant le retour du colis"
     },
     "print_label": "Imprimer l'étiquette",
-    "print_label_error": "Impossible d'imprimer l'étiquette"
+    "print_label_error": "Impossible d'imprimer l'étiquette",
+    "cancel_ship": "Annuler l'expédition",
+    "cancel_ship_confirm": "Annuler l'expédition ? Le colis est supprimé chez le transporteur et la commande redevient « confirmée ». Possible seulement avant le ramassage.",
+    "cancel_ship_done": "Expédition annulée — commande de nouveau confirmée",
+    "cancel_ship_error": "Impossible d'annuler l'expédition"
   },
   "library": {
     "title_products": "Images des produits",

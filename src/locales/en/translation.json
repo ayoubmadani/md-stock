@@ -158,7 +158,13 @@
     "open_order": "Open the order",
     "sell": "Sell",
     "expand": "Expand",
-    "shrink": "Shrink"
+    "shrink": "Shrink",
+    "handed_over": "Handed to courier — order now shipping",
+    "handover_error": "Could not move it to shipping",
+    "return_question": "Has the returned parcel arrived?",
+    "return_hint": "Confirm only if you have the parcel: the order becomes \"returned\" and stock comes back.",
+    "return_confirm": "Yes, return received",
+    "returned_done": "Return recorded"
   },
   "product": {
     "new": "New product",
@@ -344,7 +350,11 @@
       "call_hint": "Call the customer now, before the parcel is returned"
     },
     "print_label": "Print label",
-    "print_label_error": "Could not print the label"
+    "print_label_error": "Could not print the label",
+    "cancel_ship": "Cancel shipment",
+    "cancel_ship_confirm": "Cancel the shipment? The parcel is deleted at the delivery company and the order goes back to \"confirmed\". Only possible before pickup.",
+    "cancel_ship_done": "Shipment cancelled — order confirmed again",
+    "cancel_ship_error": "Could not cancel the shipment"
   },
   "library": {
     "title_products": "Product images",

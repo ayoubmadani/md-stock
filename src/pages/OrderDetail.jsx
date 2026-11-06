@@ -183,6 +183,7 @@ export default function OrderDetail() {
             <div className="flex items-center gap-2 mt-1">
               <p className="flex items-center gap-1 text-xs text-gray-500"><Truck className="w-3.5 h-3.5" /><span dir="ltr">{order.shippingTrackingId}</span></p>
               <PrintLabelButton storeId={storeId} orderId={order.id} />
+              {can('order.manage') && ['confirmed', 'shipping'].includes(order.status) && <CancelShippingButton storeId={storeId} orderId={order.id} onDone={load} />}
             </div>
           )}
           {order.shippingTrackingId && shipStatusInfo(order) && (
@@ -299,6 +300,28 @@ function PrintLabelButton({ storeId, orderId }) {
     <button type="button" onClick={print} disabled={busy}
       className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-900 dark:bg-zinc-700 text-white text-[11px] font-bold disabled:opacity-50">
       {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Printer className="w-3 h-3" />}{t('orders.print_label')}
+    </button>
+  );
+}
+
+// إلغاء الشحن (إنزال الطرد من شركة التوصيل) قبل أن يستلمه الموزّع — يعود الطلب «مؤكداً»
+function CancelShippingButton({ storeId, orderId, onDone }) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+  const cancel = async () => {
+    if (!window.confirm(t('orders.cancel_ship_confirm'))) return;
+    setBusy(true);
+    try {
+      await api.post(`/stores/${storeId}/shipping/orders/${orderId}/cancel`, {});
+      toast.success(t('orders.cancel_ship_done'));
+      onDone?.();
+    } catch (e) { toast.error(`${t('orders.cancel_ship_error')} — ${errorMessage(e)}`); }
+    finally { setBusy(false); }
+  };
+  return (
+    <button type="button" onClick={cancel} disabled={busy}
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-red-200 dark:border-red-900 text-red-600 text-[11px] font-bold disabled:opacity-50">
+      {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}{t('orders.cancel_ship')}
     </button>
   );
 }
