@@ -88,3 +88,6 @@ export function hitLabel(hit) {
   const parts = (hit.variant?.parts || []).map((p) => (p.mode === 'text' ? p.value : p.attr)).filter(Boolean);
   return parts.length ? `${hit.product.name} — ${parts.join(' / ')}` : hit.product.name;
 }
+
+/** رمز منتج له نسخ (مقاس/لون): يُختار النسخة قبل السلة — المخزون يُعدّ في النسخة */
+export const needsVariant = (hit) => !hit?.variant && Array.isArray(hit?.variants) && hit.variants.length > 0;

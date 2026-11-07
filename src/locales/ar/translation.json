@@ -1090,7 +1090,9 @@
     "tap_for_info": "اضغط على منتج لترى مخزونه ومعلوماته",
     "confirm_btn": "تأكيد البيع",
     "save_btn": "حفظ التعديل",
-    "items_count": "{{count}} قطعة"
+    "items_count": "{{count}} قطعة",
+    "choose_variant": "اختر المقاس/اللون",
+    "variant_stock": "المخزون: {{n}}"
   },
   "quick": {
     "title": "منتج جديد سريع",

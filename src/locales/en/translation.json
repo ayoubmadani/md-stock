@@ -1090,7 +1090,9 @@
     "tap_for_info": "Tap a product to see its stock and details",
     "confirm_btn": "Confirm sale",
     "save_btn": "Save changes",
-    "items_count": "{{count}} item(s)"
+    "items_count": "{{count}} item(s)",
+    "choose_variant": "Choose size / colour",
+    "variant_stock": "Stock: {{n}}"
   },
   "quick": {
     "title": "Quick new product",

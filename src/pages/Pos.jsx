@@ -10,7 +10,7 @@ import { api, errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { posProducts } from '../lib/bulk-select';
 import { money, paymentState } from '../lib/orders';
-import { addScanned, addService, cartTotal, findPickable, hitLabel, orderToCart, pickedHit, saleBody, setLine } from '../lib/pos';
+import { addScanned, addService, cartTotal, findPickable, hitLabel, needsVariant, orderToCart, pickedHit, saleBody, setLine } from '../lib/pos';
 import Scanner from '../components/Scanner';
 import ProductInfoSheet from '../components/ProductInfoSheet';
 import ScannedOrder from '../components/ScannedOrder';
@@ -264,6 +264,7 @@ export default function PosPage() {
   const [receipt, setReceipt] = useState(null);
   const [quick, setQuick] = useState(null); // null | { barcode }
   const [picking, setPicking] = useState(false);
+  const [chooseVariant, setChooseVariant] = useState(null); // رمز منتج له نسخ ← اختيار المقاس/اللون قبل السلة
   const [payLater, setPayLater] = useState(false);
   const [serving, setServing] = useState(false);
   const [infoLine, setInfoLine] = useState(null); // سطر السلة الذي تُعرض معلوماته
@@ -287,6 +288,7 @@ export default function PosPage() {
     try {
       const { data } = await api.get(`/stores/${storeId}/inventory/barcode/${encodeURIComponent(code)}`);
       if (data?.product?.isArchived) { beep(false); showFlash({ ok: false, text: t('pos.archived', { name: data.product.name }) }); return; }
+      if (needsVariant(data)) { beep(true); setChooseVariant(data); return; }
       setCart((c) => addScanned(c, data));
       beep(true);
       showFlash({ ok: true, text: hitLabel(data), price: data.variant?.price ?? data.product.price });
@@ -457,6 +459,27 @@ export default function PosPage() {
       )}
       {infoLine && <ProductInfoSheet storeId={storeId} line={infoLine} onClose={() => setInfoLine(null)} />}
       {serving && <ServiceSheet onClose={() => setServing(false)} onAdd={(svc) => { setCart((c) => addService(c, svc)); setServing(false); beep(true); }} />}
+      {chooseVariant && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => e.target === e.currentTarget && setChooseVariant(null)}>
+          <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm p-5 space-y-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0"><p className="font-bold">{t('pos.choose_variant')}</p><p className="text-xs text-gray-500 truncate">{chooseVariant.product.name}</p></div>
+              <button onClick={() => setChooseVariant(null)} className="p-1.5 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-2 max-h-[55dvh] overflow-y-auto">
+              {chooseVariant.variants.map((v) => (
+                <button key={v.id} type="button" disabled={v.stock <= 0}
+                  onClick={() => { const hit = { product: chooseVariant.product, variant: v }; setCart((c) => addScanned(c, hit)); showFlash({ ok: true, text: hitLabel(hit), price: v.price }); setChooseVariant(null); }}
+                  className="w-full flex items-center justify-between gap-3 p-3 rounded-xl border border-gray-100 dark:border-zinc-800 text-start disabled:opacity-40">
+                  <span className="min-w-0"><VariantParts parts={v.parts} /><span className="block text-xs text-gray-400">{t('pos.variant_stock', { n: v.stock })}</span></span>
+                  <span className="font-bold shrink-0" dir="ltr">{money(v.price)} DA</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {picking && <PickSheet storeId={storeId} cart={cart} onClose={() => setPicking(false)} onPick={(hit) => { setCart((c) => addScanned(c, hit)); beep(true); }}
         onRemove={(key) => setCart((c) => setLine(c, key, { quantity: (c.find((l) => l.key === key)?.quantity || 0) - 1 }))} />}
 

@@ -140,3 +140,12 @@ describe('hitLabel (green flash on the camera after a scan)', () => {
     expect(hitLabel({ product: { name: 'T-shirt' }, variant: { parts: [{ mode: 'text', value: 'M', attr: 'Taille' }, { mode: 'color', value: '#f00', attr: 'Couleur' }] } })).toBe('T-shirt — M / Couleur');
   });
 });
+
+describe('needsVariant — product code of a product with sizes/colours', () => {
+  it('asks to choose a variant before adding to the cart', async () => {
+    const { needsVariant } = await import('./pos');
+    expect(needsVariant({ product: { id: 'p' }, variant: null, variants: [{ id: 'v1' }] })).toBe(true);
+    expect(needsVariant({ product: { id: 'p' }, variant: { id: 'v1' } })).toBe(false);
+    expect(needsVariant({ product: { id: 'p' }, variant: null })).toBe(false);
+  });
+});
