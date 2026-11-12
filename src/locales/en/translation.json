@@ -1333,5 +1333,16 @@
     "open_in_chrome": "Open in Chrome",
     "copy_link": "Copy link",
     "copied": "Copied"
+  },
+  "product_links": {
+    "domain": "Product domain",
+    "pixels": "Product pixels",
+    "linked": "Domain linked — it shows only this product's page",
+    "confirm_unlink": "Unlink {{domain}} from this product? It will show the store.",
+    "domain_linked": "This domain shows only the product page",
+    "domain_pick": "Pick a domain to show only this product",
+    "no_free_domain": "No free domain — add a new one",
+    "pixels_hint": "These pixels run only on this product's page",
+    "product_badge": "Product"
   }
 }

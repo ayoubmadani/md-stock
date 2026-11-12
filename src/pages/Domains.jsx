@@ -1,7 +1,7 @@
 // الدومين: معلومات الربط في الأعلى، ثم تبويبات (روابط المتجر / المخصصة / صفحات الهبوط) بأزرار تحقق، ربط، فسخ، حذف
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Copy, Search, Wrench, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
+import { Check, Copy, Search, Wrench, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Package, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
@@ -48,16 +48,17 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
         <p className="flex-1 flex items-center gap-1.5 text-[11px] font-semibold min-w-0 ps-4">
           <span className={`shrink-0 ${d.isActive ? 'text-gray-500' : 'text-amber-500'}`}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
           {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{d.builderPage?.name || page?.name || (d.splitTestId ? t('domains.split_test') : t('domains.landing_page'))}</span></span>}
+          {d.scope === 'product' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 dark:bg-amber-500/10 min-w-0"><Package className="w-3 h-3 shrink-0" /><span className="truncate">{t('product_links.product_badge')}</span></span>}
         </p>
       {!sub && !d.isActive && (
           <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
           </button>
         )}
-        {d.scope !== 'landing_page' && (
+        {d.scope === 'store' && (
           <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-3.5 h-3.5" /></button>
         )}
-        {d.scope === 'landing_page' && (
+        {d.scope !== 'store' && (
           <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-3.5 h-3.5" /></button>
         )}
         <button type="button" onClick={copy} title={t('domains.copy')} aria-label={t('domains.copy')} className={`${btn} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600`}>{copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}</button>
@@ -171,7 +172,7 @@ export default function DomainsPage() {
     setBusy(d.id);
     try {
       await api.patch(`/domain/${d.id}/unassign-page`, { storeId });
-      setDomains((l) => l.map((x) => (x.id === d.id ? { ...x, scope: 'store', builderPageId: null } : x)));
+      setDomains((l) => l.map((x) => (x.id === d.id ? { ...x, scope: 'store', builderPageId: null, splitTestId: null, productId: null } : x)));
       toast.success(t('domains.unlinked'));
     } catch (err) {
       toast.error(errorMessage(err, t('inventory.error')));

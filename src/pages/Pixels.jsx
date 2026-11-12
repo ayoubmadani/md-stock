@@ -16,9 +16,9 @@ const TYPES = [
   { id: 'tiktok', icon: Music2, color: 'bg-black text-white dark:bg-white dark:text-black' },
   { id: 'google', icon: Search, color: 'bg-amber-500 text-white' },
 ];
-const typeOf = (id) => TYPES.find((x) => x.id === id) ?? TYPES[0];
+export const typeOf = (id) => TYPES.find((x) => x.id === id) ?? TYPES[0];
 
-function PixelSheet({ storeId, pixel, onClose, onSaved }) {
+export function PixelSheet({ storeId, pixel, productId = null, onClose, onSaved }) {
   const { t } = useTranslation();
   const [f, setF] = useState(() => (pixel ? { ...EMPTY_PIXEL, name: pixel.name || '', type: pixel.type, pixelId: pixel.pixelId, testEventCode: pixel.testEventCode || '', isActive: pixel.isActive } : EMPTY_PIXEL));
   const [saving, setSaving] = useState(false);
@@ -30,7 +30,7 @@ function PixelSheet({ storeId, pixel, onClose, onSaved }) {
     if (err) return toast.error(t(err));
     setSaving(true);
     try {
-      const body = pixelPayload(f, !!pixel);
+      const body = pixelPayload(f, !!pixel, productId);
       if (pixel) await api.patch(`/stores/pixels/${pixel.id}`, body);
       else await api.post(`/stores/${storeId}/pixels`, body);
       toast.success(t('inventory.saved'));
@@ -137,6 +137,7 @@ export default function PixelsPage() {
                       <span dir="ltr">{p.pixelId}</span>
                       {p.hasAccessToken && <span className="px-1.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 font-bold">CAPI</span>}
                       {p.scope === 'landing_page' && <span className="px-1.5 rounded bg-gray-100 dark:bg-zinc-800">{t('pixels.landing')}</span>}
+                      {p.scope === 'product' && <span className="px-1.5 rounded bg-amber-50 dark:bg-amber-500/10 text-amber-600">{t('product_links.product_badge')}</span>}
                     </span>
                   </span>
                 </button>

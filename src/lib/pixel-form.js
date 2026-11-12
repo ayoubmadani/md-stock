@@ -10,9 +10,9 @@ export function pixelError(f) {
   return null;
 }
 
-export function pixelPayload(f, editing = false) {
+export function pixelPayload(f, editing = false, productId = null) {
   const p = { name: f.name.trim(), type: f.type, pixelId: f.pixelId.trim(), isActive: f.isActive };
-  if (!editing) Object.assign(p, { scope: 'store', events: DEFAULT_EVENTS });
+  if (!editing) Object.assign(p, productId ? { scope: 'product', productId } : { scope: 'store' }, { events: DEFAULT_EVENTS });
   if (f.type === 'facebook') {
     if (f.accessToken.trim()) p.accessToken = f.accessToken.trim();
     else if (f.clearToken) p.accessToken = '';
@@ -20,3 +20,6 @@ export function pixelPayload(f, editing = false) {
   }
   return p;
 }
+
+/** بكسلات منتج واحد (تعمل في صفحته فقط) */
+export const productPixels = (list, productId) => list.filter((p) => p.scope === 'product' && p.productId === productId);

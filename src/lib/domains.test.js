@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupDomains, filterDomains, suggestSubdomain, DNS_RECORD } from './domains';
+import { groupDomains, filterDomains, suggestSubdomain, DNS_RECORD, productDomains } from './domains';
 
 describe('groupDomains', () => {
   const list = [
@@ -62,5 +62,24 @@ describe('groupDomains — A/B test domains have their own tab', () => {
     ]);
     expect(g.pages.map((d) => d.id)).toEqual(['lp']);
     expect(g.tests.map((d) => d.id)).toEqual(['ab']);
+  });
+});
+
+describe('product domains', () => {
+  const list = [
+    { id: 'sub', domain: 'bebe.mdstore.top', isActive: true, scope: 'store' },
+    { id: 'free', domain: 'shoes.com', isActive: true, scope: 'store' },
+    { id: 'lp', domain: 'promo.com', isActive: true, scope: 'landing_page', builderPageId: 'p1' },
+    { id: 'ab', domain: 'ab.com', isActive: true, scope: 'landing_page', splitTestId: 's1' },
+    { id: 'mine', domain: 'sac.com', isActive: true, scope: 'product', productId: 'P1' },
+    { id: 'other', domain: 'robe.com', isActive: true, scope: 'product', productId: 'P2' },
+  ];
+  it('a domain showing one product sits in the pages tab', () => {
+    expect(groupDomains(list).pages.map((d) => d.id)).toEqual(['lp', 'mine', 'other']);
+    expect(groupDomains(list).custom.map((d) => d.id)).toEqual(['free']);
+  });
+  it('for a product: its linked domain, and the domains still showing the store (free to link)', () => {
+    expect(productDomains(list, 'P1')).toEqual({ linked: list[4], free: [list[0], list[1]] });
+    expect(productDomains(list, 'P3').linked).toBeNull();
   });
 });

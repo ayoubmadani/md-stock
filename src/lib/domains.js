@@ -4,7 +4,7 @@ export const DNS_RECORD = [['type', 'CNAME'], ['host', '@'], ['value', 'mdstore.
 
 const isSub = (d) => d.domain.endsWith('.mdstore.top');
 const isTest = (d) => !!d.splitTestId;
-const isPage = (d) => d.scope === 'landing_page' && !isTest(d);
+const isPage = (d) => (d.scope === 'landing_page' || d.scope === 'product') && !isTest(d);
 
 /** روابط المتجر (*.mdstore.top)، الدومينات المخصصة (المنتظرة أولاً)، المربوطة بصفحات هبوط، ودومينات اختبارات A/B */
 export function groupDomains(list) {
@@ -22,6 +22,14 @@ export function filterDomains(list, q, pages = []) {
   if (!s) return list;
   const name = (d) => d.builderPage?.name ?? pages.find((p) => p.id === d.builderPageId)?.name ?? '';
   return list.filter((d) => d.domain.toLowerCase().includes(s) || name(d).toLowerCase().includes(s));
+}
+
+/** دومين منتج: المربوط به، والدومينات التي ما زالت تعرض المتجر (يمكن ربطها) */
+export function productDomains(list, productId) {
+  return {
+    linked: list.find((d) => d.scope === 'product' && d.productId === productId) ?? null,
+    free: list.filter((d) => d.scope === 'store' && !d.splitTestId),
+  };
 }
 
 const SUFFIX = '.mdstore.top';
