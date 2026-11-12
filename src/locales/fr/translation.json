@@ -1344,5 +1344,25 @@
     "no_free_domain": "Aucun domaine libre — ajoutez-en un",
     "pixels_hint": "Ces pixels fonctionnent sur la page de ce produit et sur toutes ses landing pages",
     "product_badge": "Produit"
+  },
+  "order_notes": {
+    "title": "Notes de la commande",
+    "add_ph": "Ajouter une note…",
+    "empty": "Aucune note",
+    "confirmer": "Confirmateur",
+    "reason_title": "Raison (optionnel)",
+    "text_ph": "Détails (optionnel)",
+    "skip": "Passer",
+    "save": "Enregistrer",
+    "reasons": {
+      "phone_off": "Téléphone éteint",
+      "no_answer": "Ne répond pas",
+      "changed_mind": "A changé d'avis",
+      "price": "Prix trop élevé",
+      "wrong_number": "Mauvais numéro",
+      "delay": "Livraison en retard",
+      "duplicate": "Commande en double",
+      "other": "Autre raison"
+    }
   }
 }

@@ -1,4 +1,6 @@
 // قائمة الطلبات للهاتف: تبويبات الحالات بعددها، بحث بالاسم أو الهاتف، وتغيير الحالة من البطاقة
+import { ReasonSheet } from '../components/OrderNotes';
+import { asksReason } from '../lib/order-notes';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -118,8 +120,10 @@ export default function OrdersPage() {
     }
   };
 
+  const [reasonFor, setReasonFor] = useState(null); // سبب اختياري بعد تغيير الحالة
   const onChanged = (order, next) => {
     setSheet(null);
+    if (order.status !== next && asksReason(next)) setReasonFor({ orderId: order.id, from: order.status, to: next, name: order.customerName });
     // خرج من التبويب الحالي ← يُحذف من القائمة
     setOrders((list) => (status && status !== next ? list.filter((o) => o.id !== order.id) : list.map((o) => (o.id === order.id ? { ...o, status: next } : o))));
     loadCounts();
@@ -219,6 +223,7 @@ export default function OrdersPage() {
       )}
 
       {sheet && <StatusSheet order={sheet} onClose={() => setSheet(null)} onChanged={(s) => onChanged(sheet, s)} />}
+      {reasonFor && <ReasonSheet change={reasonFor} onClose={() => setReasonFor(null)} />}
     </div>
   );
 }

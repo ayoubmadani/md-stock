@@ -1,4 +1,6 @@
 // صفحة طلب واحد: الزبون (اتصال/واتساب/نسخ)، العنوان، المنتجات، المبالغ، والحالة
+import { OrderNotesCard, ReasonSheet } from '../components/OrderNotes';
+import { asksReason } from '../lib/order-notes';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -88,6 +90,14 @@ export default function OrderDetail() {
   const [action, setAction] = useState(null); // 'confirm' | 'ship'
   const [recalling, setRecalling] = useState(false);
   const [sheet, setSheet] = useState(false);
+  const [reasonFor, setReasonFor] = useState(null); // سبب اختياري بعد تغيير الحالة
+  const [notesKey, setNotesKey] = useState(0);
+  // حالة جديدة: تُحدَّث الصفحة، ويُعرض «السبب» إن كانت ملغى/مرتجع/مؤجل/لا يرد
+  const statusChanged = (st, patch = null) => {
+    const from = order?.status;
+    setOrder((o) => ({ ...o, ...(patch || {}), status: st }));
+    if (from !== st && asksReason(st)) setReasonFor({ orderId: order.id, from, to: st, name: patch?.customerName || order.customerName });
+  };
   const [params] = useSearchParams();
   const scanned = params.get('scanned') === '1';
   const [copied, setCopied] = useState(false);
@@ -204,7 +214,10 @@ export default function OrderDetail() {
 
       {/* الخطوة التالية */}
       {order.platform === 'pos' && (order.status === 'unpaid' || order.payments?.length > 0) && <PaymentsCard order={order} canPay={can('order.manage')} onPaid={(o) => setOrder((x) => ({ ...x, ...o }))} />}
-      {can('order.manage') && <NextStepCard order={order} highlight={scanned} onShip={() => setAction('ship')} onChanged={(st) => setOrder((o) => ({ ...o, status: st }))} />}
+      {can('order.manage') && <NextStepCard order={order} highlight={scanned} onShip={() => setAction('ship')} onChanged={(st) => statusChanged(st)} />}
+
+      {/* ملاحظات الطلب (المتجر والمؤكّدون) */}
+      {order.platform !== 'pos' && <OrderNotesCard orderId={order.id} reloadKey={notesKey} />}
 
       {/* إجراءات */}
       {(canEdit || canSend || canRecall || canShip) && (
@@ -282,7 +295,8 @@ export default function OrderDetail() {
 
       {action === 'confirm' && <SendConfirmationSheet order={order} storeId={storeId} onClose={() => setAction(null)} onDone={() => { setAction(null); load(); }} />}
       {action === 'ship' && <ShipSheet order={order} storeId={storeId} onClose={() => setAction(null)} onDone={() => { setAction(null); load(); }} />}
-      {sheet && <StatusSheet order={order} onClose={() => setSheet(false)} onChanged={(s, patch) => { setSheet(false); setOrder((o) => ({ ...o, ...patch, status: s })); }} />}
+      {sheet && <StatusSheet order={order} onClose={() => setSheet(false)} onChanged={(s, patch) => { setSheet(false); statusChanged(s, patch); }} />}
+      {reasonFor && <ReasonSheet change={reasonFor} onClose={() => setReasonFor(null)} onSaved={() => setNotesKey((k) => k + 1)} />}
       {pickingClient && <CustomerPickerSheet storeId={storeId} onClose={() => setPickingClient(false)} onPick={setClient} />}
     </div>
   );
