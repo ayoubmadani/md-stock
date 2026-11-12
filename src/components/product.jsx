@@ -215,19 +215,29 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
           <button type="button" onClick={() => { addValue(text); setText(''); }} className="px-3 rounded-xl bg-indigo-600 text-white"><Plus className="w-4 h-4" /></button>
         </div>
       )}
-      {attr.variants.length > 0 && <div className="flex flex-wrap gap-1.5">
+      {/* لون/صورة: سطر لكل قيمة (اللون، اسمه، الصورة المربوطة) — النص: شارات صغيرة */}
+      {attr.variants.length > 0 && mode !== 'text' && <div className="space-y-1.5">
         {attr.variants.map((v) => (
-          <span key={v.id} className="inline-flex items-center gap-1 ps-1 pe-1.5 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 text-sm">
-            {mode === 'color' ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value, name: v.name && v.name !== v.value ? v.name : '' })} aria-label={t('product.attr.edit_color')} className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
-              : mode === 'image' ? <img src={v.value} alt="" className="w-8 h-8 rounded-md object-cover" />
-                : <span className="px-1.5 font-semibold">{v.value}</span>}
-            {mode !== 'text' && v.name && v.name !== v.value && <span className="text-xs font-semibold">{v.name}</span>}
+          <div key={v.id} className="flex items-center gap-2">
+            {mode === 'color'
+              ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value, name: v.name && v.name !== v.value ? v.name : '' })} aria-label={t('product.attr.edit_color')} className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
+              : <img src={v.value} alt="" className="w-9 h-9 shrink-0 rounded-lg object-cover" />}
+            <input value={v.name && v.name !== v.value ? v.name : ''} onChange={(e) => onChange(setValueName(attr, v.id, e.target.value))}
+              placeholder={t('product.attr.color_name')} className={`${small} flex-1 min-w-0`} />
             {attr.type === 'color' && (
               <button type="button" onClick={() => setPickFor(v.id)} aria-label={t('product.attr.link_image')}
-                className="w-7 h-7 rounded-md overflow-hidden border border-dashed border-gray-300 dark:border-zinc-600 flex items-center justify-center text-gray-400">
-                {v.imageUrl ? <img src={v.imageUrl} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                className="w-9 h-9 shrink-0 rounded-lg overflow-hidden border border-dashed border-gray-300 dark:border-zinc-600 flex items-center justify-center text-gray-400">
+                {v.imageUrl ? <img src={v.imageUrl} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="w-4 h-4" />}
               </button>
             )}
+            <button type="button" onClick={() => onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== v.id) })} className="p-1.5 text-gray-400"><X className="w-4 h-4" /></button>
+          </div>
+        ))}
+      </div>}
+      {attr.variants.length > 0 && mode === 'text' && <div className="flex flex-wrap gap-1.5">
+        {attr.variants.map((v) => (
+          <span key={v.id} className="inline-flex items-center gap-1 ps-1 pe-1.5 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 text-sm">
+            <span className="px-1.5 font-semibold">{v.value}</span>
             <button type="button" onClick={() => onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== v.id) })} className="text-gray-400"><X className="w-3.5 h-3.5" /></button>
           </span>
         ))}
