@@ -6,6 +6,8 @@ const uid = (p) => `${p}-${Date.now()}-${++seq}`;
 
 /** خاصية جديدة: المقاس يبدأ بالمقاسات المعتادة، اللون بوضع «لون» */
 export function newAttribute(type, name) {
+  // «خاصية» واحدة: نوع لون بثلاث طرق عرض (لون/صورة/نص)، تبدأ بالنص
+  if (type === 'attribute') return { id: uid('att'), type: 'color', name, displayMode: 'text', variants: [] };
   const base = { id: uid('att'), type, name };
   if (type === 'color') return { ...base, displayMode: 'color', variants: [] };
   if (type === 'size') return { ...base, variants: DEFAULT_SIZES.map((s) => ({ id: uid('var'), name: s, value: s })) };

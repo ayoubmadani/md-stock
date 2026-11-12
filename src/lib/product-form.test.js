@@ -163,3 +163,10 @@ describe('empty value rows (kept while editing)', () => {
     expect(validateProduct(base, { attributes: [{ ...attr, variants: [{ id: 'v2', name: '', value: '' }] }], offers: [] })).toContain('attr_empty');
   });
 });
+
+describe('one attribute kind', () => {
+  it('a new attribute opens in text mode (can switch to colour or image), with no name yet', async () => {
+    const { newAttribute } = await import('./product-form');
+    expect(newAttribute('attribute', '')).toMatchObject({ type: 'color', displayMode: 'text', name: '', variants: [] });
+  });
+});

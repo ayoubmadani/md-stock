@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check, Ruler, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, setValueName, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
+import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, setValueName, addValues, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -311,7 +311,6 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
 
 export function AttributesEditor({ attributes, images, onChange }) {
   const { t } = useTranslation();
-  const add = (type) => onChange([...attributes, newAttribute(type, uniqueAttrName(attributes, t(`product.attr.default_${type}`)))]);
   const dups = duplicateAttrIds(attributes);
   return (
     <div className="space-y-4">
@@ -319,14 +318,11 @@ export function AttributesEditor({ attributes, images, onChange }) {
       {attributes.map((a) => (
         <AttributeCard key={a.id} attr={a} images={images} duplicate={dups.has(a.id)} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
       ))}
-      {/* زر «المقاس» أُزيل: المقاس خاصية نصية عادية («+ خاصية» ثم الاسم) */}
-      <div className="grid grid-cols-2 gap-2">
-        {['color', 'text'].map((type) => (
-          <button key={type} type="button" onClick={() => add(type)} className="flex items-center justify-center gap-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-xs font-bold">
-            <Plus className="w-3.5 h-3.5" />{t(`product.attr.add_${type}`)}
-          </button>
-        ))}
-      </div>
+      {/* زر واحد: خاصية تبدأ بالنص ويمكن تحويلها لون أو صورة */}
+      <button type="button" onClick={() => onChange([...attributes, newAttribute('attribute', '')])}
+        className="w-full flex items-center justify-center gap-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-xs font-bold">
+        <Plus className="w-3.5 h-3.5" />{t('product.attr.add_text')}
+      </button>
     </div>
   );
 }
