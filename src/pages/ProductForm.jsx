@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, BarChart3, Globe, Loader2, Megaphone, Radar, Trash2 } from 'lucide-react';
-import { ProductDomainSheet, ProductPixelsSheet } from '../components/ProductLinks';
+import { ArrowRight, BarChart3, Loader2, Megaphone, Radar, Trash2 } from 'lucide-react';
+import { ProductPixelsSheet } from '../components/ProductLinks';
 import AdsSheet from '../components/AdsSheet';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
@@ -29,7 +29,7 @@ export default function ProductForm() {
   const [images, setImages] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [offers, setOffers] = useState([]);
-  const [links, setLinks] = useState(null); // 'domain' | 'pixels'
+  const [links, setLinks] = useState(null); // 'pixels'
   const [addons, setAddons] = useState([]);
   const [variants, setVariants] = useState([]); // لزر «توليد باركود للكل» فقط — تعديل النسخ في صفحة عرض المنتج
   const [ads, setAds] = useState(false);
@@ -113,7 +113,6 @@ export default function ProductForm() {
         <h1 className="font-bold">{isNew ? t('product.new') : t('product.edit')}</h1>
         {!isNew ? (
           <div className="flex items-center">
-            {isOwner && <button type="button" onClick={() => setLinks('domain')} className="p-2 rounded-xl text-emerald-600" title={t('product_links.domain')} aria-label={t('product_links.domain')}><Globe className="w-4 h-4" /></button>}
             {isOwner && <button type="button" onClick={() => setLinks('pixels')} className="p-2 rounded-xl text-amber-600" title={t('product_links.pixels')} aria-label={t('product_links.pixels')}><Radar className="w-4 h-4" /></button>}
             <button type="button" onClick={() => navigate(`/products/${id}/show`)} className="p-2 rounded-xl text-indigo-600" title={t('insights.stats')}><BarChart3 className="w-4 h-4" /></button>
             <button type="button" onClick={remove} className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"><Trash2 className="w-4 h-4" /></button>
@@ -193,7 +192,6 @@ export default function ProductForm() {
     </form>
     {/* خارج نموذج المنتج: نموذج داخل نموذج غير صالح */}
     {ads && <AdsSheet storeId={storeId} product={{ id, name: form.name }} onClose={() => setAds(false)} />}
-    {links === 'domain' && <ProductDomainSheet storeId={storeId} productId={id} onClose={() => setLinks(null)} />}
     {links === 'pixels' && <ProductPixelsSheet storeId={storeId} productId={id} onClose={() => setLinks(null)} />}
     </>
   );

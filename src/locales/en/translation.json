@@ -1342,7 +1342,7 @@
     "domain_linked": "This domain shows only the product page",
     "domain_pick": "Pick a domain to show only this product",
     "no_free_domain": "No free domain — add a new one",
-    "pixels_hint": "These pixels run only on this product's page",
+    "pixels_hint": "These pixels run on this product's page and on all its landing pages",
     "product_badge": "Product"
   }
 }
