@@ -221,7 +221,8 @@
       "no_product_images": "Add product images first (Images section above), then link each colour to its image.",
       "mode_text": "Text",
       "duplicate_name": "Duplicate name — each attribute needs its own name",
-      "color_name": "Colour name (Red, Black…)"
+      "color_name": "Colour name (Red, Black…)",
+      "add_value_btn": "Add a value"
     },
     "offer": {
       "title": "Offers",

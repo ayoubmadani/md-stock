@@ -221,7 +221,8 @@
       "no_product_images": "Ajoutez d'abord les images du produit (section Images), puis associez chaque couleur à son image.",
       "mode_text": "Texte",
       "duplicate_name": "Nom en double — chaque attribut doit avoir son propre nom",
-      "color_name": "Nom de la couleur (Rouge, Noir…)"
+      "color_name": "Nom de la couleur (Rouge, Noir…)",
+      "add_value_btn": "Ajouter une valeur"
     },
     "offer": {
       "title": "Offres",
