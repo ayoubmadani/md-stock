@@ -222,7 +222,9 @@
       "mode_text": "Texte",
       "duplicate_name": "Nom en double — chaque attribut doit avoir son propre nom",
       "color_name": "Nom de la couleur (Rouge, Noir…)",
-      "add_value_btn": "Ajouter une valeur"
+      "add_value_btn": "Ajouter une valeur",
+      "new_name_ph": "Nom de l'attribut : Taille, Couleur, Poids…",
+      "new_add": "Ajouter"
     },
     "offer": {
       "title": "Offres",

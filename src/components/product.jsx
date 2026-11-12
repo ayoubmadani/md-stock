@@ -215,16 +215,22 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
       {duplicate && <p className="text-[11px] font-semibold text-rose-500">{t('product.attr.duplicate_name')}</p>}
       {attr.type === 'color' && (
         <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-800">
-          {['color', 'image', 'text'].map((m) => (
+          {['text', 'color', 'image'].map((m) => (
             <button key={m} type="button" onClick={() => mode !== m && onChange({ ...attr, displayMode: m, variants: [] })}
               className={`py-1.5 rounded-lg text-xs font-bold ${mode === m ? 'bg-white dark:bg-zinc-900 shadow-sm' : 'text-gray-500'}`}>{t(`product.attr.mode_${m}`)}</button>
           ))}
         </div>
       )}
+      {/* زر الإضافة فوق القائمة؛ القيمة الجديدة تُضاف في أسفلها */}
+      <button type="button" onClick={mode === 'text' ? addEmptyText : mode === 'color' ? () => setColorSheet({ value: '#000000' }) : () => setLibrary(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+        {mode === 'color' ? <Palette className="w-4 h-4" /> : mode === 'image' ? <ImagePlus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+        {t(mode === 'color' ? 'product.attr.add_color_btn' : mode === 'image' ? 'product.attr.add_image' : 'product.attr.add_value_btn')}
+      </button>
       {/* لون/صورة: سطر لكل قيمة (اللون، اسمه، الصورة المربوطة) — النص: شارات صغيرة */}
       {attr.variants.length > 0 && mode !== 'text' && <div className="space-y-1.5">
-        {attr.variants.map((v) => (
+        {attr.variants.map((v, i) => (
           <div key={v.id} className="flex items-center gap-2">
+            <span className="w-5 shrink-0 text-center text-xs font-bold text-gray-400" dir="ltr">{i + 1}</span>
             {mode === 'color'
               ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value, name: v.name && v.name !== v.value ? v.name : '' })} aria-label={t('product.attr.edit_color')} className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
               : <img src={v.value} alt="" className="w-9 h-9 shrink-0 rounded-lg object-cover" />}
@@ -241,8 +247,9 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
         ))}
       </div>}
       {attr.variants.length > 0 && mode === 'text' && <div className="space-y-1.5">
-        {attr.variants.map((v) => (
+        {attr.variants.map((v, i) => (
           <div key={v.id} className="flex items-center gap-2">
+            <span className="w-5 shrink-0 text-center text-xs font-bold text-gray-400" dir="ltr">{i + 1}</span>
             <input value={v.value} autoFocus={focusId === v.id} onChange={(e) => editText(v.id, e.target.value)} onBlur={() => leaveText(v.id)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); addEmptyText(); } }}
               placeholder={t('product.attr.value')} className={`${small} flex-1 min-w-0`} />
@@ -278,16 +285,6 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
           </div>
         </div>
       )}
-      {mode === 'text' && (
-        <button type="button" onClick={addEmptyText} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
-          <Plus className="w-4 h-4" />{t('product.attr.add_value_btn')}
-        </button>
-      )}
-      {mode === 'color' && (
-        <button type="button" onClick={() => setColorSheet({ value: '#000000' })} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
-          <Palette className="w-4 h-4" />{t('product.attr.add_color_btn')}
-        </button>
-      )}
       {colorSheet && (
         <ColorSheet initial={colorSheet.value} initialName={colorSheet.name || ''} editing={!!colorSheet.id} existing={attr.variants.map((v) => v.value)} onClose={() => setColorSheet(null)}
           onSave={(value, name) => {
@@ -299,12 +296,29 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
       )}
       {mode === 'image' && (
         <>
-          <button type="button" onClick={() => setLibrary(true)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
-            <ImagePlus className="w-4 h-4" />{t('product.attr.add_image')}
-          </button>
           {library && <ImageLibrary folder="productVariant" max={1} edit="image" onPick={([u]) => { setLibrary(false); addValue(u); }} onClose={() => setLibrary(false)} />}
         </>
       )}
+    </div>
+  );
+}
+
+function NewAttributeRow({ attributes, onAdd }) {
+  const { t } = useTranslation();
+  const [name, setName] = useState('');
+  const add = () => {
+    const n = name.trim();
+    if (!n) return;
+    if (attributes.some((a) => String(a.name || '').trim().toLowerCase() === n.toLowerCase())) return toast.error(t('product.attr.duplicate_name'));
+    onAdd(n); setName('');
+  };
+  return (
+    <div className="flex gap-2">
+      <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }}
+        placeholder={t('product.attr.new_name_ph')} className={`${small} flex-1 min-w-0`} />
+      <button type="button" onClick={add} disabled={!name.trim()} className="shrink-0 flex items-center gap-1 px-4 rounded-xl bg-indigo-600 text-white text-sm font-bold disabled:opacity-40">
+        <Plus className="w-4 h-4" />{t('product.attr.new_add')}
+      </button>
     </div>
   );
 }
@@ -318,11 +332,8 @@ export function AttributesEditor({ attributes, images, onChange }) {
       {attributes.map((a) => (
         <AttributeCard key={a.id} attr={a} images={images} duplicate={dups.has(a.id)} onChange={(next) => onChange(attributes.map((x) => (x.id === a.id ? next : x)))} onRemove={() => onChange(attributes.filter((x) => x.id !== a.id))} />
       ))}
-      {/* زر واحد: خاصية تبدأ بالنص ويمكن تحويلها لون أو صورة */}
-      <button type="button" onClick={() => onChange([...attributes, newAttribute('attribute', '')])}
-        className="w-full flex items-center justify-center gap-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-xs font-bold">
-        <Plus className="w-3.5 h-3.5" />{t('product.attr.add_text')}
-      </button>
+      {/* اسم الخاصية يُكتب أولاً ثم «إضافة»: تُفتح على النص (يمكن تحويلها لون أو صورة) */}
+      <NewAttributeRow attributes={attributes} onAdd={(name) => onChange([...attributes, newAttribute('attribute', name)])} />
     </div>
   );
 }
