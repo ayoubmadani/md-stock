@@ -84,7 +84,7 @@ export default function TrialOffer({ data: preset = null, onClose = null }) {
                     <p className="text-xs text-gray-500">{t('trial.then', { price: money(perMonth(price, interval)), currency: plan.currency || 'DZD' })}</p>
                     {interval === 'year' && <p className="text-[11px] text-gray-400">{t('sub.billed_yearly', { price: money(price), currency: plan.currency || 'DZD' })}</p>}
                   </div>
-                  <p className="text-lg font-black text-emerald-500 shrink-0">{t('trial.free_days', { days: offer.days })}</p>
+                  <p className="text-lg font-black text-emerald-500 shrink-0">{t('trial.free_days', { days: plan.trialDays || offer.days })}</p>
                 </div>
                 <Features f={plan.features} />
                 <button type="button" disabled={!!busy} onClick={() => start(plan.id)}
