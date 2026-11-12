@@ -2,16 +2,20 @@
 // ويصبح بنسخ تلقائياً عند إضافة خيار (مقاس، لون، أو أي خيار يكتبه التاجر) — نفس جسم نموذج المنتج
 import { newAttribute, newValue, productPayload } from './product-form';
 
+/** قيم كل خيار المكتوبة فعلاً (الأسطر الفارغة تُتجاهل) */
+const filled = (values) => values.map((v) => String(v ?? '').trim()).filter(Boolean);
+export const filledValues = (attrs = []) => attrs.map((a) => filled(a.values));
+
 /** الخيارات التي لها قيم فقط ← خصائص (الخادم يولّد النسخ) */
 export const quickAttributes = (attrs = []) => attrs
-  .filter((a) => a.values.length)
-  .map((a) => ({ ...newAttribute('text', a.name.trim()), ...(a.kind === 'size' && { type: 'size' }), variants: a.values.map(newValue) }));
+  .filter((a) => filled(a.values).length)
+  .map((a) => ({ ...newAttribute('text', a.name.trim()), ...(a.kind === 'size' && { type: 'size' }), variants: filled(a.values).map(newValue) }));
 
 export function quickErrors(f) {
   const errs = [];
   if (!String(f.name || '').trim()) errs.push('name');
   if (!(Number(f.price) > 0)) errs.push('price');
-  if ((f.attrs || []).some((a) => a.values.length && !a.name.trim())) errs.push('attr_name');
+  if ((f.attrs || []).some((a) => filled(a.values).length && !a.name.trim())) errs.push('attr_name');
   return errs;
 }
 

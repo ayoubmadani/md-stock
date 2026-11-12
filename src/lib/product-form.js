@@ -39,7 +39,8 @@ export function productPayload(form, { attributes, offers, images, addons }) {
     isDigital: !!form.isDigital,
     isActive: form.isActive !== false,
     barcode: form.barcode?.trim() || null,
-    attributes,
+    // أسطر القيم الفارغة (أُضيفت ولم تُكتب) لا تُحفظ
+    attributes: attributes.map((a) => ({ ...a, variants: a.variants.filter((v) => String(v.value || '').trim()) })),
     variantDetails: [],
     offers: offers.map((o) => ({ id: o.id, name: o.name.trim(), subTitle: o.subTitle?.trim() || '', quantity: Number(o.quantity) || 0, price: Number(o.price) || 0, shippingFree: !!o.shippingFree })),
     images,
@@ -57,7 +58,8 @@ export function validateProduct(form, { attributes, offers }) {
   if (!(Number(form.price) > 0)) errs.push('price');
   const counts = {};
   for (const a of attributes) { const k = a.name?.trim().toLowerCase(); if (k) counts[k] = (counts[k] || 0) + 1; }
-  if (attributes.some((a) => !a.variants.length || a.variants.some((v) => !String(v.value || '').trim()))) errs.push('attr_empty');
+  // خاصية بلا أي قيمة مكتوبة (الأسطر الفارغة تُتجاهل عند الحفظ)
+  if (attributes.some((a) => !a.variants.some((v) => String(v.value || '').trim()))) errs.push('attr_empty');
   if (Object.values(counts).some((n) => n > 1)) errs.push('attr_duplicate');
   if (attributes.some((a) => !a.name?.trim())) errs.push('attr_name');
   if (offers.some((o) => !o.name?.trim() || !(Number(o.quantity) > 0) || !(Number(o.price) > 0))) errs.push('offer');

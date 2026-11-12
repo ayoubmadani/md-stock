@@ -151,3 +151,15 @@ describe('colour name', () => {
     expect(replaceValue(attr, 'v1', '#be123c').variants[0]).toMatchObject({ name: '#be123c', value: '#be123c' });
   });
 });
+
+describe('empty value rows (kept while editing)', () => {
+  const base = { name: 'Robe', price: '2000', stock: '' };
+  const attr = { id: 'a', name: 'Taille', type: 'text', variants: [{ id: 'v1', name: 'M', value: 'M' }, { id: 'v2', name: '', value: '  ' }] };
+  it('empty rows are dropped when saving and do not block saving', () => {
+    expect(productPayload(base, { attributes: [attr], offers: [], images: [] }).attributes[0].variants).toEqual([{ id: 'v1', name: 'M', value: 'M' }]);
+    expect(validateProduct(base, { attributes: [attr], offers: [] })).toEqual([]);
+  });
+  it('an attribute with only empty rows still needs a value', () => {
+    expect(validateProduct(base, { attributes: [{ ...attr, variants: [{ id: 'v2', name: '', value: '' }] }], offers: [] })).toContain('attr_empty');
+  });
+});

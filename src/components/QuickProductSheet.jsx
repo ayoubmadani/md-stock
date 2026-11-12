@@ -6,44 +6,37 @@ import { Camera, ImagePlus, Loader2, Minus, Plus, ScanLine, Trash2, Wand2, X } f
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { uploadImage, ACCEPT } from '../lib/upload';
-import { combos, quickErrors, quickProductBody, variantUpdates } from '../lib/quick-product';
+import { combos, filledValues, quickErrors, quickProductBody, variantUpdates } from '../lib/quick-product';
 import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
 import CameraCapture from './CameraCapture';
 import Scanner from './Scanner';
 import { input, label } from './product';
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
 const smallInput = 'px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-sm';
 
-// خيار واحد: اسمه + قيمه (المقاس بأزرار جاهزة)
+// خيار واحد: اسمه + قيمه (سطر لكل قيمة، وزر «إضافة قيمة» — السطر الفارغ يبقى ويُتجاهل عند الحفظ)
 function OptionCard({ opt, onChange, onRemove }) {
   const { t } = useTranslation();
-  const [val, setVal] = useState('');
-  const add = () => { const v = val.trim(); if (v && !opt.values.includes(v)) onChange({ ...opt, values: [...opt.values, v] }); setVal(''); };
-  const toggle = (v) => onChange({ ...opt, values: opt.values.includes(v) ? opt.values.filter((x) => x !== v) : SIZES.filter((x) => [...opt.values, v].includes(x)).concat(opt.values.filter((x) => !SIZES.includes(x))) });
-  const extra = opt.values.filter((v) => opt.kind !== 'size' || !SIZES.includes(v));
+  const [focus, setFocus] = useState(-1);
+  const setAt = (i, v) => onChange({ ...opt, values: opt.values.map((x, k) => (k === i ? v : x)) });
+  const addRow = () => { setFocus(opt.values.length); onChange({ ...opt, values: [...opt.values, ''] }); };
   return (
     <div className="rounded-xl border border-gray-100 dark:border-zinc-800 p-2.5 space-y-2">
       <div className="flex items-center gap-2">
         <input value={opt.name} onChange={(e) => onChange({ ...opt, name: e.target.value })} placeholder={t('quick.option_name')} className={`${smallInput} flex-1 min-w-0 font-bold`} />
         <button type="button" onClick={onRemove} className="p-1.5 rounded-lg text-gray-400 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>
       </div>
-      {opt.kind === 'size' && (
-        <div className="flex flex-wrap gap-1.5">
-          {SIZES.map((s) => <button key={s} type="button" onClick={() => toggle(s)} className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${opt.values.includes(s) ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 dark:border-zinc-700'}`}>{s}</button>)}
+      {opt.values.map((v, i) => (
+        <div key={i} className="flex items-center gap-1.5">
+          <input value={v} autoFocus={focus === i} onChange={(e) => setAt(i, e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addRow(); } }}
+            placeholder={opt.kind === 'color' ? t('quick.color_ph') : t('quick.value_ph')} className={`${smallInput} flex-1 min-w-0`} />
+          <button type="button" onClick={() => onChange({ ...opt, values: opt.values.filter((_, k) => k !== i) })} className="p-1.5 text-gray-400"><X className="w-4 h-4" /></button>
         </div>
-      )}
-      <div className="flex gap-1.5">
-        <input value={val} onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} placeholder={opt.kind === 'color' ? t('quick.color_ph') : t('quick.value_ph')} className={`${smallInput} flex-1 min-w-0`} />
-        <button type="button" onClick={add} className="px-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800"><Plus className="w-4 h-4" /></button>
-      </div>
-      {extra.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {extra.map((v) => (
-            <button key={v} type="button" onClick={() => onChange({ ...opt, values: opt.values.filter((x) => x !== v) })} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 text-xs font-bold">{v}<X className="w-3 h-3" /></button>
-          ))}
-        </div>
-      )}
+      ))}
+      <button type="button" onClick={addRow} className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border-2 border-dashed border-gray-200 dark:border-zinc-700 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+        <Plus className="w-3.5 h-3.5" />{t('product.attr.add_value_btn')}
+      </button>
     </div>
   );
 }
@@ -61,7 +54,7 @@ export default function QuickProductSheet({ storeId, barcode = '', onClose, onCr
   const fileRef = useRef(null);
   const set = (k) => (v) => setF((s) => ({ ...s, [k]: v?.target ? v.target.value : v }));
 
-  const list = combos(f.attrs.map((a) => a.values));
+  const list = combos(filledValues(f.attrs));
   const hasVariants = list.length > 0;
   const first = list[0]?.key;
   const row = (k) => rows[k] || { qty: '', barcode: k === first ? f.barcode : '' }; // الباركود الممسوح لأول تركيبة
@@ -149,7 +142,6 @@ export default function QuickProductSheet({ storeId, barcode = '', onClose, onCr
             <OptionCard key={a.id} opt={a} onChange={(next) => setF((x) => ({ ...x, attrs: x.attrs.map((y) => (y.id === a.id ? next : y)) }))} onRemove={() => setF((x) => ({ ...x, attrs: x.attrs.filter((y) => y.id !== a.id) }))} />
           ))}
           <div className="flex flex-wrap gap-1.5">
-            {!has('size') && <button type="button" onClick={() => addOption('size')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-700 text-xs font-bold text-indigo-600"><Plus className="w-3.5 h-3.5" />{t('quick.size')}</button>}
             {!has('color') && <button type="button" onClick={() => addOption('color')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-700 text-xs font-bold text-indigo-600"><Plus className="w-3.5 h-3.5" />{t('quick.color')}</button>}
             <button type="button" onClick={() => addOption('custom')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-700 text-xs font-bold text-indigo-600"><Plus className="w-3.5 h-3.5" />{t('quick.other_option')}</button>
           </div>

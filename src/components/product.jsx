@@ -187,17 +187,18 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
     if (attr.variants.some((x) => x.value === value)) return toast.error(t('product.attr.duplicate_value'));
     onChange({ ...attr, variants: [...attr.variants, newValue(value)] });
   };
-  // قيم النص: سطر لكل قيمة يُكتب مباشرة؛ قيمة فارغة عند مغادرة الخانة تُحذف، والمكررة تُرفض
+  // قيم النص: سطر لكل قيمة يُكتب مباشرة
   const [focusId, setFocusId] = useState(null);
   const addEmptyText = () => { const v = newValue(''); setFocusId(v.id); onChange({ ...attr, variants: [...attr.variants, v] }); };
   const editText = (id, text) => onChange({ ...attr, variants: attr.variants.map((x) => (x.id === id ? { ...x, value: text, name: text } : x)) });
+  // السطر الفارغ يبقى (يُتجاهل عند الحفظ)؛ المكرر يُرفض
   const leaveText = (id) => {
     const v = attr.variants.find((x) => x.id === id);
     const value = String(v?.value || '').trim();
-    if (!value) return onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== id) });
+    if (!value) return;
     if (attr.variants.some((x) => x.id !== id && x.value === value)) {
       toast.error(t('product.attr.duplicate_value'));
-      return onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== id) });
+      return editText(id, '');
     }
     if (value !== v.value) editText(id, value);
   };
@@ -245,6 +246,11 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
             <input value={v.value} autoFocus={focusId === v.id} onChange={(e) => editText(v.id, e.target.value)} onBlur={() => leaveText(v.id)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); addEmptyText(); } }}
               placeholder={t('product.attr.value')} className={`${small} flex-1 min-w-0`} />
+            {/* صورة المنتج المربوطة بهذه القيمة (تظهر للزبون عند اختيارها) */}
+            <button type="button" onClick={() => setPickFor(v.id)} aria-label={t('product.attr.link_image')}
+              className="w-9 h-9 shrink-0 rounded-lg overflow-hidden border border-dashed border-gray-300 dark:border-zinc-600 flex items-center justify-center text-gray-400">
+              {v.imageUrl ? <img src={v.imageUrl} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="w-4 h-4" />}
+            </button>
             <button type="button" onClick={() => onChange({ ...attr, variants: attr.variants.filter((x) => x.id !== v.id) })} className="p-1.5 text-gray-400"><X className="w-4 h-4" /></button>
           </div>
         ))}

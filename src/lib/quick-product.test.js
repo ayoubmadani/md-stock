@@ -41,3 +41,13 @@ describe('quick product variants', () => {
     expect(variantUpdates(server, rows)).toEqual([{ variantId: 'v1', stock: 3 }, { variantId: 'v2', barcode: '611' }]);
   });
 });
+
+describe('quick product: empty value rows', () => {
+  it('empty rows are ignored (attribute, errors, combinations)', async () => {
+    const { quickAttributes, quickErrors, filledValues } = await import('./quick-product');
+    const attrs = [{ id: '1', kind: 'custom', name: 'Taille', values: ['M', '  ', ''] }, { id: '2', kind: 'custom', name: '', values: [''] }];
+    expect(quickAttributes(attrs).map((a) => a.variants.map((v) => v.value))).toEqual([['M']]);
+    expect(quickErrors({ name: 'x', price: '10', attrs })).toEqual([]);
+    expect(filledValues(attrs)).toEqual([['M'], []]);
+  });
+});
