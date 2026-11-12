@@ -44,7 +44,7 @@ export function Toggle({ checked, onChange, children }) {
 // حد صور المنتج في خطة صاحب المتجر (الخادم يتحقق أيضاً)
 let planMax = null;
 const loadPlanMax = () => (planMax !== null ? Promise.resolve(planMax)
-  : api.get('/subscription/my').then(({ data }) => (planMax = Number(data?.plan?.features?.productImagesNumber) || 0)).catch(() => 0));
+  : api.get('/subscription/my').then(({ data }) => (planMax = Math.max(0, Number(data?.plan?.features?.productImagesNumber) || 0)) /* -1 = بلا حد ← 0 */).catch(() => 0));
 
 export function ImagesEditor({ images, onChange }) {
   const { t, i18n } = useTranslation();

@@ -18,14 +18,14 @@ export function Features({ f }) {
   if (!f) return null;
   const rows = [
     [Store, f.storeNumber, 'stores'], [Package, f.productNumber, 'products'], [Crown, f.landingPageNumber, 'pages'],
-    [Globe, f.domainNumber, 'domains'], [Users, f.maxMembers, 'members'],
+    [Globe, f.domainNumber, 'domains'], [Users, f.maxMembers, 'members'], [Package, f.orderNumber, 'orders'],
   ].filter(([, n]) => n);
   return (
     <div className="grid grid-cols-2 gap-2">
       {rows.map(([Icon, n, k]) => (
-        <span key={k} className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-zinc-300"><Icon className="w-3.5 h-3.5 text-indigo-500 shrink-0" /><b dir="ltr">{money(n)}</b> {t(`sub.f_${k}`)}</span>
+        <span key={k} className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-zinc-300"><Icon className="w-3.5 h-3.5 text-indigo-500 shrink-0" /><b dir="ltr">{Number(n) < 0 ? '∞' : money(n)}</b> {t(`sub.f_${k}`)}</span>
       ))}
-      {Number(f.commission) > 0 && <span className="text-xs text-amber-600 col-span-2">{t('sub.f_commission', { n: Number(f.commission) })}</span>}
+      {Number(f.orderNumber) >= 0 && Number(f.commission) > 0 && <span className="text-xs text-amber-600 col-span-2">{t('sub.f_extra_order', { n: Number(f.commission) })}</span>}
     </div>
   );
 }

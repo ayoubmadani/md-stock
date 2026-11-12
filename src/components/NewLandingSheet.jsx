@@ -191,7 +191,7 @@ export default function NewLandingSheet({ storeId, products, onClose, onDone, pa
                 </button>
               ))}
             </div>}
-            {mode === 'image' && usage && <p className={`text-[11px] font-semibold ${limitReached || noQuota ? 'text-rose-600' : 'text-gray-500'}`}>{noQuota ? t('lp.no_quota') : t('lp.usage', { used: usage.used, limit: usage.limit })}</p>}
+            {mode === 'image' && usage && <p className={`text-[11px] font-semibold ${limitReached || noQuota ? 'text-rose-600' : 'text-gray-500'}`}>{noQuota ? t('lp.no_quota') : t('lp.usage', { used: usage.used, limit: usage.limit < 0 ? '∞' : usage.limit })}</p>}
 
             <div className="space-y-1.5"><label className={label}>{t('lp.product')}</label>
               <select value={productId} onChange={(e) => setProductId(e.target.value)} className={input}>

@@ -760,7 +760,9 @@
     "f_pages": "صفحة هبوط",
     "f_domains": "دومين",
     "f_members": "عضو فريق",
-    "f_commission": "عمولة {{n}}% على الطلبات"
+    "f_commission": "عمولة {{n}}% على الطلبات",
+    "f_orders": "طلب / شهر",
+    "f_extra_order": "{{n}} د.ج لكل طلب زائد"
   },
   "team": {
     "tab_members": "الأعضاء",

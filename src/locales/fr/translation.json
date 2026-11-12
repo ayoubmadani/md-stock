@@ -760,7 +760,9 @@
     "f_pages": "pages",
     "f_domains": "domaines",
     "f_members": "membres",
-    "f_commission": "Commission {{n}}% par commande"
+    "f_commission": "Commission {{n}}% par commande",
+    "f_orders": "commandes / mois",
+    "f_extra_order": "{{n}} DA par commande en plus"
   },
   "team": {
     "tab_members": "Membres",

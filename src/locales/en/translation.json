@@ -760,7 +760,9 @@
     "f_pages": "landing pages",
     "f_domains": "domains",
     "f_members": "team members",
-    "f_commission": "{{n}}% commission per order"
+    "f_commission": "{{n}}% commission per order",
+    "f_orders": "orders / month",
+    "f_extra_order": "{{n}} DA per extra order"
   },
   "team": {
     "tab_members": "Members",
