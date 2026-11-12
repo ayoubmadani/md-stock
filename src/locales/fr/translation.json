@@ -1367,13 +1367,21 @@
   },
   "quota": {
     "title": "Commandes ce mois",
-    "unlimited": "Commandes confirmées illimitées dans votre offre",
-    "used": "{{used}} / {{limit}} commandes confirmées",
-    "fee": "Au-delà du quota : chaque commande confirmée coûte {{fee}} DA du portefeuille",
-    "over": "Quota du mois atteint — chaque commande confirmée en plus coûte {{fee}} DA. Passez à une offre supérieure.",
-    "debt": "Dette de {{debt}} DA — déduite à la prochaine recharge",
-    "debt_max": "Dette de {{debt}} DA (limite {{max}} DA) — déduite à la prochaine recharge",
+    "unlimited": "Commandes illimitées dans votre offre",
+    "used": "{{used}} / {{limit}} commandes",
+    "fee": "chaque commande en plus = {{fee}} DA de dette",
+    "debt": "Dette de {{debt}} DA (limite {{max}} DA) — jamais prélevée sans votre accord",
+    "debt_old": "Dette de {{debt}} DA d'un mois précédent — les commandes hors quota sont masquées jusqu'au paiement",
+    "pay_debt": "Payer {{amount}} DA",
+    "confirm_debt": "Payer la dette de {{amount}} DA depuis le portefeuille ? (solde {{balance}} DA)",
+    "hidden_current": "{{count}} commande(s) masquée(s) ce mois",
+    "hidden_old": "{{count}} commande(s) masquée(s) des mois précédents",
+    "reveal": "Afficher ({{amount}} DA)",
+    "confirm_reveal": "Afficher {{count}} commande(s) pour {{amount}} DA du portefeuille ? (solde {{balance}} DA — selon le solde, les plus anciennes d'abord)",
+    "balance": "Solde du portefeuille : {{balance}} DA",
+    "error": "Paiement impossible",
     "customer_hidden": "Client masqué",
-    "customer_hidden_hint": "Quota épuisé et limite de dette atteinte — rechargez le portefeuille ou changez d'offre"
+    "customer_hidden_hint": "Hors quota et limite de dette — affichez la commande en la payant",
+    "confirm_reveal_one": "Afficher cette commande pour {{amount}} DA du portefeuille ?"
   }
 }

@@ -1,4 +1,5 @@
 // قائمة الطلبات للهاتف: تبويبات الحالات بعددها، بحث بالاسم أو الهاتف، وتغيير الحالة من البطاقة
+import OrderQuotaCard from '../components/OrderQuotaCard';
 import { ReasonSheet } from '../components/OrderNotes';
 import { asksReason } from '../lib/order-notes';
 import { useCallback, useEffect, useState } from 'react';
@@ -131,6 +132,8 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-3">
+      {/* حصة الخطة: دين أو طلبات مخفية — الدفع بموافقة التاجر */}
+      <OrderQuotaCard compact onChanged={() => window.location.reload()} />
       <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
         {[['online', Globe], ['shop', StoreIcon]].map(([c, Icon]) => (
           <button key={c} type="button" onClick={() => { setChannel(c); setStatus(''); }}

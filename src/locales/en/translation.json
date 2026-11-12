@@ -1367,13 +1367,21 @@
   },
   "quota": {
     "title": "Orders this month",
-    "unlimited": "Unlimited confirmed orders on your plan",
-    "used": "{{used}} / {{limit}} confirmed orders",
-    "fee": "Beyond the quota, each confirmed order costs {{fee}} DA from the wallet",
-    "over": "Monthly quota reached — each extra confirmed order costs {{fee}} DA. Upgrade for a bigger quota.",
-    "debt": "You owe {{debt}} DA — taken at the next top-up",
-    "debt_max": "You owe {{debt}} DA (limit {{max}} DA) — taken at the next top-up",
+    "unlimited": "Unlimited orders on your plan",
+    "used": "{{used}} / {{limit}} orders",
+    "fee": "each extra order adds {{fee}} DA of debt",
+    "debt": "You owe {{debt}} DA (limit {{max}} DA) — never taken without your consent",
+    "debt_old": "You owe {{debt}} DA from a past month — orders over the quota are hidden until you pay",
+    "pay_debt": "Pay {{amount}} DA",
+    "confirm_debt": "Pay the {{amount}} DA debt from the wallet? (balance {{balance}} DA)",
+    "hidden_current": "{{count}} hidden order(s) this month",
+    "hidden_old": "{{count}} hidden order(s) from past months",
+    "reveal": "Show ({{amount}} DA)",
+    "confirm_reveal": "Show {{count}} hidden order(s) for {{amount}} DA from the wallet? (balance {{balance}} DA — as many as it covers, oldest first)",
+    "balance": "Wallet balance: {{balance}} DA",
+    "error": "Payment failed",
     "customer_hidden": "Customer hidden",
-    "customer_hidden_hint": "Quota used and debt limit reached — top up your wallet or upgrade to show it"
+    "customer_hidden_hint": "Over your plan quota and debt limit — show the order by paying for it",
+    "confirm_reveal_one": "Show this order for {{amount}} DA from the wallet?"
   }
 }

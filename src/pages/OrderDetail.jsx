@@ -92,6 +92,13 @@ export default function OrderDetail() {
   const [sheet, setSheet] = useState(false);
   const [reasonFor, setReasonFor] = useState(null); // سبب اختياري بعد تغيير الحالة
   const [notesKey, setNotesKey] = useState(0);
+  const [revealing, setRevealing] = useState(false);
+  // طلب مخفي (حصة الخطة): كشفه بدفع ثمنه — بعد تأكيد التاجر
+  const revealOne = async () => {
+    if (!window.confirm(t('quota.confirm_reveal_one', { amount: Number(order.quotaFee || 0) }))) return;
+    setRevealing(true);
+    try { await api.post(`/subscription/my/order-quota/reveal/${order.id}`, {}); load(); } catch (e) { toast.error(errorMessage(e, t('quota.error'))); } finally { setRevealing(false); }
+  };
   // حالة جديدة: تُحدَّث الصفحة، ويُعرض «السبب» إن كانت ملغى/مرتجع/مؤجل/لا يرد
   const statusChanged = (st, patch = null) => {
     const from = order?.status;
@@ -234,7 +241,12 @@ export default function OrderDetail() {
         <div className={`${box} space-y-2`}>
           <p className="font-bold">{t('quota.customer_hidden')}</p>
           <p className="text-xs text-rose-600 font-semibold">{t('quota.customer_hidden_hint')}</p>
-          <Link to="/wallet" className="inline-block px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold">{t('nav.wallet', 'Wallet')}</Link>
+          <div className="flex gap-2">
+            <button type="button" disabled={revealing} onClick={revealOne} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50">
+              {revealing && <Loader2 className="w-4 h-4 animate-spin" />}{t('quota.reveal', { amount: Number(order.quotaFee || 0) })}
+            </button>
+            <Link to="/wallet" className="px-4 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm font-bold">{t('nav.wallet', 'Wallet')}</Link>
+          </div>
         </div>
       ) : <div className={`${box} space-y-3`}>
         <div className="flex items-start justify-between gap-2">
