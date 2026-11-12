@@ -1372,6 +1372,8 @@
     "fee": "Au-delà du quota : chaque commande confirmée coûte {{fee}} DA du portefeuille",
     "over": "Quota du mois atteint — chaque commande confirmée en plus coûte {{fee}} DA. Passez à une offre supérieure.",
     "debt": "Dette de {{debt}} DA — déduite à la prochaine recharge",
-    "debt_max": "Dette de {{debt}} DA (limite {{max}} DA) — déduite à la prochaine recharge"
+    "debt_max": "Dette de {{debt}} DA (limite {{max}} DA) — déduite à la prochaine recharge",
+    "customer_hidden": "Client masqué",
+    "customer_hidden_hint": "Quota épuisé et limite de dette atteinte — rechargez le portefeuille ou changez d'offre"
   }
 }

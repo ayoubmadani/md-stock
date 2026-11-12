@@ -230,7 +230,13 @@ export default function OrderDetail() {
       )}
 
       {/* الزبون — طلب محل: إضافة زبون من القائمة أو تغييره */}
-      <div className={`${box} space-y-3`}>
+      {order.customerHidden ? (
+        <div className={`${box} space-y-2`}>
+          <p className="font-bold">{t('quota.customer_hidden')}</p>
+          <p className="text-xs text-rose-600 font-semibold">{t('quota.customer_hidden_hint')}</p>
+          <Link to="/wallet" className="inline-block px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold">{t('nav.wallet', 'Wallet')}</Link>
+        </div>
+      ) : <div className={`${box} space-y-3`}>
         <div className="flex items-start justify-between gap-2">
           <p className="font-bold text-lg min-w-0 truncate"><bdi>{order.customerName || '—'}</bdi></p>
           {pos && can('pos.sell') && (
@@ -265,7 +271,7 @@ export default function OrderDetail() {
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* المنتجات */}
       <div className={`${box} space-y-3`}>

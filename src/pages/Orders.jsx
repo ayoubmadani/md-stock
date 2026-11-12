@@ -28,7 +28,7 @@ function OrderCard({ order, canManage, onStatus }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 min-w-0">
-            <p className="font-bold text-sm truncate"><bdi>{order.customerName || '—'}</bdi></p>
+            <p className="font-bold text-sm truncate"><bdi>{order.customerHidden ? t('quota.customer_hidden') : (order.customerName || '—')}</bdi></p>
             {!order.customerId && <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" title={t('orders.suspicious')} />}
           </div>
           <p className="text-xs text-gray-500 dark:text-zinc-400 truncate mt-0.5">

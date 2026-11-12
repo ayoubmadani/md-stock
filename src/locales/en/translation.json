@@ -1372,6 +1372,8 @@
     "fee": "Beyond the quota, each confirmed order costs {{fee}} DA from the wallet",
     "over": "Monthly quota reached — each extra confirmed order costs {{fee}} DA. Upgrade for a bigger quota.",
     "debt": "You owe {{debt}} DA — taken at the next top-up",
-    "debt_max": "You owe {{debt}} DA (limit {{max}} DA) — taken at the next top-up"
+    "debt_max": "You owe {{debt}} DA (limit {{max}} DA) — taken at the next top-up",
+    "customer_hidden": "Customer hidden",
+    "customer_hidden_hint": "Quota used and debt limit reached — top up your wallet or upgrade to show it"
   }
 }
