@@ -1,4 +1,5 @@
 // الاشتراك: الخطة الحالية (المدة، الأيام المتبقية، الحدود، التجديد التلقائي) + الاشتراك/الترقية من المحفظة مع كوبون
+import OrderQuotaCard from '../components/OrderQuotaCard';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -160,6 +161,7 @@ export default function SubscriptionPage() {
       {/* الاشتراك / الترقية */}
       {options.length > 0 && (
         <>
+          <OrderQuotaCard />
           <p className="text-xs font-semibold text-gray-500 px-1 pt-2">{sub && !sub.isTrial ? t('sub.upgrade_title') : t('sub.choose')}</p>
           <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
             {['month', 'year'].map((k) => (

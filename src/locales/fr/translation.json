@@ -1364,5 +1364,14 @@
       "duplicate": "Commande en double",
       "other": "Autre raison"
     }
+  },
+  "quota": {
+    "title": "Commandes ce mois",
+    "unlimited": "Commandes confirmées illimitées dans votre offre",
+    "used": "{{used}} / {{limit}} commandes confirmées",
+    "fee": "Au-delà du quota : chaque commande confirmée coûte {{fee}} DA du portefeuille",
+    "over": "Quota du mois atteint — chaque commande confirmée en plus coûte {{fee}} DA. Passez à une offre supérieure.",
+    "debt": "Dette de {{debt}} DA — déduite à la prochaine recharge",
+    "debt_max": "Dette de {{debt}} DA (limite {{max}} DA) — déduite à la prochaine recharge"
   }
 }
