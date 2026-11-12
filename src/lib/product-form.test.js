@@ -139,3 +139,15 @@ describe('add-ons (الإضافات)', () => {
     expect('addons' in productPayload(base, { attributes: [], offers: [], images: [] })).toBe(false);
   });
 });
+
+describe('colour name', () => {
+  it('setValueName stores the colour name; empty → back to the code; changing the colour keeps the name', async () => {
+    const { setValueName, replaceValue } = await import('./product-form');
+    const attr = { name: 'اللون', type: 'color', variants: [{ id: 'v1', name: '#e11d48', value: '#e11d48' }] };
+    const named = setValueName(attr, 'v1', 'أحمر');
+    expect(named.variants[0]).toMatchObject({ name: 'أحمر', value: '#e11d48' });
+    expect(setValueName(named, 'v1', '  ').variants[0].name).toBe('#e11d48');
+    expect(replaceValue(named, 'v1', '#be123c').variants[0]).toMatchObject({ name: 'أحمر', value: '#be123c' });
+    expect(replaceValue(attr, 'v1', '#be123c').variants[0]).toMatchObject({ name: '#be123c', value: '#be123c' });
+  });
+});

@@ -220,7 +220,8 @@
       "none_picked": "No colour picked yet",
       "no_product_images": "Add product images first (Images section above), then link each colour to its image.",
       "mode_text": "Text",
-      "duplicate_name": "Duplicate name — each attribute needs its own name"
+      "duplicate_name": "Duplicate name — each attribute needs its own name",
+      "color_name": "Colour name (Red, Black…)"
     },
     "offer": {
       "title": "Offers",

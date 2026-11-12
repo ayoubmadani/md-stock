@@ -98,7 +98,13 @@ export const COLOR_PALETTE = [
 /** تعديل قيمة (لون) مع إبقاء معرّفها وصورتها المربوطة؛ null إن كانت القيمة الجديدة لقيمة أخرى */
 export function replaceValue(attr, id, value) {
   if (attr.variants.some((v) => v.id !== id && v.value === value)) return null;
-  return { ...attr, variants: attr.variants.map((v) => (v.id === id ? { ...v, name: value, value } : v)) };
+  // اسم اللون الذي كتبه التاجر (أحمر) يبقى عند تغيير الرمز
+  return { ...attr, variants: attr.variants.map((v) => (v.id === id ? { ...v, name: v.name && v.name !== v.value ? v.name : value, value } : v)) };
+}
+
+/** اسم قيمة (اسم اللون): فارغ ← يعود الاسم إلى الرمز */
+export function setValueName(attr, id, name) {
+  return { ...attr, variants: attr.variants.map((v) => (v.id === id ? { ...v, name: String(name ?? '').trim() || v.value } : v)) };
 }
 
 /** إضافة عدة قيم دفعة واحدة (مثلاً ألوان من النافذة)، بلا تكرار */

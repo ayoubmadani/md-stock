@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check, Ruler, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
-import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
+import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, setValueName, addValues, uniqueAttrName, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -106,16 +106,17 @@ export function DescEditor({ value, onChange }) {
 }
 
 /* ── نافذة الألوان: درجات جاهزة + لون مخصص. الإضافة تقبل عدة ألوان، والتعديل لوناً واحداً ── */
-function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
+function ColorSheet({ initial, initialName = '', editing, existing = [], onSave, onClose }) {
   const { t } = useTranslation();
   const [value, setValue] = useState(initial);
+  const [colorName, setColorName] = useState(initialName); // اسم اللون (تعديل لون واحد)
   const [hex, setHex] = useState(initial);
   const [picked, setPicked] = useState([]);
   const setCurrent = (c) => { setValue(c); setHex(c); };
   const toggle = (c) => setPicked((l) => (l.includes(c) ? l.filter((x) => x !== c) : [...l, c]));
   const tap = (c) => { setCurrent(c); if (!editing) toggle(c); };
   const on = (c) => (editing ? value === c : picked.includes(c));
-  const save = () => (editing ? onSave(value) : onSave(picked.length ? picked : [value]));
+  const save = () => (editing ? onSave(value, colorName) : onSave(picked.length ? picked : [value]));
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 sm:p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md h-[80dvh] sm:h-[640px] flex flex-col p-4 gap-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
@@ -157,6 +158,10 @@ function ColorSheet({ initial, editing, existing = [], onSave, onClose }) {
               <button key={c} type="button" onClick={() => toggle(c)} className="shrink-0 w-7 h-7 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: c }} aria-label={c} />
             ))}
           </div>
+        )}
+        {editing && (
+          <input value={colorName} onChange={(e) => setColorName(e.target.value)} placeholder={t('product.attr.color_name')}
+            className="shrink-0 w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-sm" />
         )}
         <div className="flex items-center gap-3 shrink-0">
           {editing && <span className="w-11 h-11 rounded-xl border border-gray-200 dark:border-zinc-700 shrink-0" style={{ backgroundColor: value }} />}
@@ -213,9 +218,10 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
       {attr.variants.length > 0 && <div className="flex flex-wrap gap-1.5">
         {attr.variants.map((v) => (
           <span key={v.id} className="inline-flex items-center gap-1 ps-1 pe-1.5 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 text-sm">
-            {mode === 'color' ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value })} aria-label={t('product.attr.edit_color')} className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
+            {mode === 'color' ? <button type="button" onClick={() => setColorSheet({ id: v.id, value: v.value, name: v.name && v.name !== v.value ? v.name : '' })} aria-label={t('product.attr.edit_color')} className="w-6 h-6 rounded-md border border-gray-200 dark:border-zinc-700" style={{ backgroundColor: v.value }} />
               : mode === 'image' ? <img src={v.value} alt="" className="w-8 h-8 rounded-md object-cover" />
                 : <span className="px-1.5 font-semibold">{v.value}</span>}
+            {mode !== 'text' && v.name && v.name !== v.value && <span className="text-xs font-semibold">{v.name}</span>}
             {attr.type === 'color' && (
               <button type="button" onClick={() => setPickFor(v.id)} aria-label={t('product.attr.link_image')}
                 className="w-7 h-7 rounded-md overflow-hidden border border-dashed border-gray-300 dark:border-zinc-600 flex items-center justify-center text-gray-400">
@@ -255,12 +261,12 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
         </button>
       )}
       {colorSheet && (
-        <ColorSheet initial={colorSheet.value} editing={!!colorSheet.id} existing={attr.variants.map((v) => v.value)} onClose={() => setColorSheet(null)}
-          onSave={(value) => {
+        <ColorSheet initial={colorSheet.value} initialName={colorSheet.name || ''} editing={!!colorSheet.id} existing={attr.variants.map((v) => v.value)} onClose={() => setColorSheet(null)}
+          onSave={(value, name) => {
             if (!colorSheet.id) { onChange(addValues(attr, value)); setColorSheet(null); return; }
             const next = replaceValue(attr, colorSheet.id, value);
             if (!next) { toast.error(t('product.attr.duplicate_value')); return; }
-            onChange(next); setColorSheet(null);
+            onChange(setValueName(next, colorSheet.id, name)); setColorSheet(null);
           }} />
       )}
       {mode === 'image' && (
