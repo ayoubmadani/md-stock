@@ -25,7 +25,8 @@ export default function OrderQuotaCard({ compact = false, onChanged, reloadKey =
   if (!u) return null;
   const unlimited = u.limit < 0;
   const hidden = (u.hidden?.current || 0) + (u.hidden?.old || 0);
-  if (compact && !u.debt && !hidden) return null;
+  // صفحة الطلبات: تظهر لكل خطة بحصة (لشرح طلب التجربة)، أو عند وجود دين/مخفي
+  if (compact && unlimited && !u.debt && !hidden) return null;
   const pct = unlimited ? 0 : Math.min(100, Math.round((u.used / Math.max(1, u.limit)) * 100));
   const btn = 'shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold disabled:opacity-50';
   return (
@@ -67,7 +68,7 @@ export default function OrderQuotaCard({ compact = false, onChanged, reloadKey =
         </div>
       )}
       {hidden > 0 && <p className="text-[11px] text-gray-500">{t('quota.balance', { balance: u.balance })}</p>}
-      {!unlimited && (
+      {compact && !unlimited && (
         <p className="text-[11px] text-gray-500 border-t border-gray-100 dark:border-zinc-800 pt-2">🧪 <span dangerouslySetInnerHTML={{ __html: t('quota.test_hint') }} /></p>
       )}
     </div>
