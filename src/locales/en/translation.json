@@ -363,7 +363,8 @@
     "cancel_ship": "Cancel shipment",
     "cancel_ship_confirm": "Cancel the shipment? The parcel is deleted at the delivery company and the order goes back to \"confirmed\". Only possible before pickup.",
     "cancel_ship_done": "Shipment cancelled — order confirmed again",
-    "cancel_ship_error": "Could not cancel the shipment"
+    "cancel_ship_error": "Could not cancel the shipment",
+    "source": "Source"
   },
   "library": {
     "title_products": "Product images",

@@ -1,4 +1,5 @@
 // قائمة الطلبات للهاتف: تبويبات الحالات بعددها، بحث بالاسم أو الهاتف، وتغيير الحالة من البطاقة
+import { SourceBadge } from '../components/SourceBadge';
 import OrderQuotaCard from '../components/OrderQuotaCard';
 import { ReasonSheet } from '../components/OrderNotes';
 import { asksReason } from '../lib/order-notes';
@@ -30,6 +31,7 @@ function OrderCard({ order, canManage, onStatus }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 min-w-0">
             <p className="font-bold text-sm truncate"><bdi>{order.customerHidden ? t('quota.customer_hidden') : (order.customerName || '—')}</bdi></p>
+            {order.source?.channel && <SourceBadge source={order.source} />}
             {order.quotaState === 'test' && <span className="shrink-0 px-1.5 rounded bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300 text-[10px] font-bold">{t('quota.test_order')}</span>}
             {!order.customerId && <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" title={t('orders.suspicious')} />}
           </div>

@@ -363,7 +363,8 @@
     "cancel_ship": "Annuler l'expédition",
     "cancel_ship_confirm": "Annuler l'expédition ? Le colis est supprimé chez le transporteur et la commande redevient « confirmée ». Possible seulement avant le ramassage.",
     "cancel_ship_done": "Expédition annulée — commande de nouveau confirmée",
-    "cancel_ship_error": "Impossible d'annuler l'expédition"
+    "cancel_ship_error": "Impossible d'annuler l'expédition",
+    "source": "Source"
   },
   "library": {
     "title_products": "Images des produits",

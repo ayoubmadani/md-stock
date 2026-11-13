@@ -1,4 +1,5 @@
 // صفحة طلب واحد: الزبون (اتصال/واتساب/نسخ)، العنوان، المنتجات، المبالغ، والحالة
+import { SourceBadge } from '../components/SourceBadge';
 import { OrderNotesCard, ReasonSheet } from '../components/OrderNotes';
 import { asksReason } from '../lib/order-notes';
 import { useCallback, useEffect, useState } from 'react';
@@ -222,6 +223,15 @@ export default function OrderDetail() {
       {/* الخطوة التالية */}
       {order.platform === 'pos' && (order.status === 'unpaid' || order.payments?.length > 0) && <PaymentsCard order={order} canPay={can('order.manage')} onPaid={(o) => setOrder((x) => ({ ...x, ...o }))} />}
       {can('order.manage') && <NextStepCard order={order} highlight={scanned} onShip={() => setAction('ship')} onChanged={(st) => statusChanged(st)} />}
+
+      {/* من أين جاء الزبون */}
+      {order.source?.channel && (
+        <div className={`${box} flex flex-wrap items-center gap-2 text-sm`}>
+          <span className="text-xs text-gray-500">{t('orders.source')}:</span>
+          <SourceBadge source={order.source} />
+          {[order.source.campaign, order.source.content, order.source.ref].filter(Boolean).map((x) => <span key={x} className="text-xs font-semibold">{x}</span>)}
+        </div>
+      )}
 
       {/* ملاحظات الطلب (المتجر والمؤكّدون) */}
       {order.platform !== 'pos' && <OrderNotesCard orderId={order.id} reloadKey={notesKey} />}
