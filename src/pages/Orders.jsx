@@ -94,7 +94,9 @@ export default function OrdersPage() {
     api.get(`/orders/get-count-status/${storeId}`, { params: { channel } }).then((r) => setCounts(sumCounts(r.data))).catch(() => {});
   }, [storeId, channel]);
 
+  const [quotaKey, setQuotaKey] = useState(0); // تحديث القائمة يحدّث بطاقة حصة الخطة
   const load = useCallback(async (p) => {
+    if (!p || p === 1) setQuotaKey((k) => k + 1);
     const { data } = await api.get(`/orders/${storeId}`, { params: { status: status || undefined, query: query || undefined, page: p, channel } });
     const list = Array.isArray(data) ? data : [];
     setHasMore(list.length === PAGE_SIZE);
@@ -133,7 +135,7 @@ export default function OrdersPage() {
   return (
     <div className="space-y-3">
       {/* حصة الخطة: دين أو طلبات مخفية — الدفع بموافقة التاجر */}
-      <OrderQuotaCard compact onChanged={() => window.location.reload()} />
+      <OrderQuotaCard compact reloadKey={quotaKey} onChanged={() => load(1).then(setOrders).catch(() => {})} />
       <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
         {[['online', Globe], ['shop', StoreIcon]].map(([c, Icon]) => (
           <button key={c} type="button" onClick={() => { setChannel(c); setStatus(''); }}

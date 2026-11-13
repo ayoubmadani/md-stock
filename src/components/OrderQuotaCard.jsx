@@ -8,12 +8,13 @@ import { api, errorMessage } from '../lib/api';
 
 const Q = '/subscription/my/order-quota';
 
-export default function OrderQuotaCard({ compact = false, onChanged }) {
+// reloadKey: يتغير ← يُعاد التحميل (مع تحميل قائمة الطلبات)
+export default function OrderQuotaCard({ compact = false, onChanged, reloadKey = 0 }) {
   const { t } = useTranslation();
   const [u, setU] = useState(null);
   const [busy, setBusy] = useState(null);
   const load = useCallback(() => { api.get(Q).then((r) => setU(r.data)).catch(() => setU(null)); }, []);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, reloadKey]);
 
   const act = async (key, path, body, text) => {
     if (!window.confirm(text)) return;
