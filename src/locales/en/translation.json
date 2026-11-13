@@ -1385,6 +1385,7 @@
     "customer_hidden": "Customer hidden",
     "customer_hidden_hint": "Over your plan quota and debt limit — show the order by paying for it",
     "confirm_reveal_one": "Show this order for {{amount}} DA from the wallet?",
-    "test_order": "Test"
+    "test_order": "Test",
+    "test_order_hint": "Test order — not counted in your plan quota"
   }
 }

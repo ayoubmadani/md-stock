@@ -1385,6 +1385,7 @@
     "customer_hidden": "بيانات الزبون مخفية",
     "customer_hidden_hint": "فوق حصة خطتك وحد الدين — اكشف الطلب بدفع ثمنه",
     "confirm_reveal_one": "كشف هذا الطلب مقابل {{amount}} د.ج من المحفظة؟",
-    "test_order": "تجربة"
+    "test_order": "تجربة",
+    "test_order_hint": "طلب تجربة — لا يُحسب في حصة خطتك"
   }
 }
