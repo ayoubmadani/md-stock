@@ -1386,6 +1386,7 @@
     "customer_hidden_hint": "Hors quota et limite de dette — affichez la commande en la payant",
     "confirm_reveal_one": "Afficher cette commande pour {{amount}} DA du portefeuille ?",
     "test_order": "Test",
-    "test_order_hint": "Commande test — non comptée dans le quota"
+    "test_order_hint": "Commande test — non comptée dans le quota",
+    "test_hint": "Pour tester une commande sans qu'elle compte : nom <b>mdStore</b> et numéro <b dir=\"ltr\">0551525354</b>"
   }
 }

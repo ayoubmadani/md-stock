@@ -67,6 +67,9 @@ export default function OrderQuotaCard({ compact = false, onChanged, reloadKey =
         </div>
       )}
       {hidden > 0 && <p className="text-[11px] text-gray-500">{t('quota.balance', { balance: u.balance })}</p>}
+      {!unlimited && (
+        <p className="text-[11px] text-gray-500 border-t border-gray-100 dark:border-zinc-800 pt-2">🧪 <span dangerouslySetInnerHTML={{ __html: t('quota.test_hint') }} /></p>
+      )}
     </div>
   );
 }
