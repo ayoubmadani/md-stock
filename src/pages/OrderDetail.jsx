@@ -134,11 +134,13 @@ export default function OrderDetail() {
   const queue = QUEUE.includes(order.status);
   // بيع في المحل: لا شركة تأكيد ولا شحن
   const pos = order.platform === 'pos';
-  const canSend = can('order.manage') && queue && !order.confirmationCompanyId && !order.isDigital && !pos;
+  // طلب مخفي (حصة الخطة): لا يُعدَّل ولا يُرسل ولا يُشحن ولا تتغير حالته حتى يُكشف
+  const locked = !!order.customerHidden;
+  const canSend = can('order.manage') && !locked && queue && !order.confirmationCompanyId && !order.isDigital && !pos;
   const canRecall = can('order.manage') && order.confirmationCompanyId && (queue || order.status === 'cancelled');
-  const canShip = can('order.manage') && !pos && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital && !nextActions(order).some((a) => a.action === 'ship');
+  const canShip = can('order.manage') && !locked && !pos && order.status === 'confirmed' && !order.shippingTrackingId && !order.isDigital && !nextActions(order).some((a) => a.action === 'ship');
   // تعديل بيع المحل يفتح صفحة البيع: يحتاج «البيع في المحل»
-  const canEdit = can(order.platform === 'pos' ? 'pos.sell' : 'order.manage') && !order.confirmationCompanyId;
+  const canEdit = can(order.platform === 'pos' ? 'pos.sell' : 'order.manage') && !order.confirmationCompanyId && !locked;
 
   // طلب محل: ربط زبون من قائمة زبائن المتجر
   const setClient = async (c) => {
@@ -199,7 +201,7 @@ export default function OrderDetail() {
               </p>
             )}
           </div>
-          <OrderStatusBadge order={order} onClick={can('order.manage') ? () => setSheet(true) : undefined} />
+          <OrderStatusBadge order={order} onClick={can('order.manage') && !locked ? () => setSheet(true) : undefined} />
         </div>
         {order.shippingTrackingId && (
           <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
@@ -222,7 +224,7 @@ export default function OrderDetail() {
 
       {/* الخطوة التالية */}
       {order.platform === 'pos' && (order.status === 'unpaid' || order.payments?.length > 0) && <PaymentsCard order={order} canPay={can('order.manage')} onPaid={(o) => setOrder((x) => ({ ...x, ...o }))} />}
-      {can('order.manage') && <NextStepCard order={order} highlight={scanned} onShip={() => setAction('ship')} onChanged={(st) => statusChanged(st)} />}
+      {can('order.manage') && !locked && <NextStepCard order={order} highlight={scanned} onShip={() => setAction('ship')} onChanged={(st) => statusChanged(st)} />}
 
       {/* من أين جاء الزبون */}
       {order.source?.channel && (

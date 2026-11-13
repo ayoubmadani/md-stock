@@ -58,7 +58,7 @@ function OrderCard({ order, canManage, onStatus }) {
         <span className="flex-1" />
         {order.status === 'shipping' && <ShipStatusBadge order={order} />}
         <span onClick={(e) => e.stopPropagation()}>
-          <OrderStatusBadge order={order} onClick={canManage ? () => onStatus(order) : undefined} />
+          <OrderStatusBadge order={order} onClick={canManage && !order.customerHidden ? () => onStatus(order) : undefined} />
         </span>
       </div>
     </div>
