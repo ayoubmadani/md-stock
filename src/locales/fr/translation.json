@@ -1384,6 +1384,7 @@
     "error": "Paiement impossible",
     "customer_hidden": "Client masqué",
     "customer_hidden_hint": "Hors quota et limite de dette — affichez la commande en la payant",
-    "confirm_reveal_one": "Afficher cette commande pour {{amount}} DA du portefeuille ?"
+    "confirm_reveal_one": "Afficher cette commande pour {{amount}} DA du portefeuille ?",
+    "test_order": "Test"
   }
 }

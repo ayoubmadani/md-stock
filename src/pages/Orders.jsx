@@ -22,7 +22,7 @@ function OrderCard({ order, canManage, onStatus }) {
   const navigate = useNavigate();
   return (
     <div role="link" tabIndex={0} onClick={() => navigate(`/orders/${order.id}`)} onKeyDown={(e) => e.key === 'Enter' && navigate(`/orders/${order.id}`)}
-      className="cursor-pointer block rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 p-3 space-y-2.5">
+      className={`cursor-pointer block rounded-2xl p-3 space-y-2.5 border ${order.quotaState === 'test' ? 'border-2 border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800/60' : 'bg-white dark:bg-zinc-900 border-gray-100 dark:border-zinc-800/80'}`}>
       <div className="flex items-start gap-3">
         <div className="w-11 h-11 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
           {image && <img src={image} alt="" className="w-full h-full object-cover" />}
@@ -30,6 +30,7 @@ function OrderCard({ order, canManage, onStatus }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 min-w-0">
             <p className="font-bold text-sm truncate"><bdi>{order.customerHidden ? t('quota.customer_hidden') : (order.customerName || '—')}</bdi></p>
+            {order.quotaState === 'test' && <span className="shrink-0 px-1.5 rounded bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300 text-[10px] font-bold">{t('quota.test_order')}</span>}
             {!order.customerId && <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" title={t('orders.suspicious')} />}
           </div>
           <p className="text-xs text-gray-500 dark:text-zinc-400 truncate mt-0.5">
