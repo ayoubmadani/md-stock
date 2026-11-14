@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, Loader2, Plus, Printer, ScanLine, Star, Trash2, Wand2, X, Palette, Check, Ruler, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
+import { MAIN_IMAGE_CLASS, imageSlotClass } from '../lib/image-slots';
 import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, setValueName, addValues, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
@@ -61,17 +62,18 @@ export function ImagesEditor({ images, onChange }) {
   const Before = rtl ? ChevronRight : ChevronLeft;
   const After = rtl ? ChevronLeft : ChevronRight;
   return (
-    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+    // نفس ترتيب لوحة التحكم: الرئيسية 2×2، الثانية تحت زر الإضافة، ثم الأعمدة أعلى/أسفل، ثم من السطر الثالث
+    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
       <button type="button" onClick={() => (room ? setOpen(true) : toast.error(t('library.max', { max: limit })))}
-        className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-1 text-gray-400 text-[11px]">
+        className={`${imageSlotClass(0)} aspect-square rounded-xl border-2 border-dashed border-gray-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-1 text-gray-400 text-[11px]`}>
         <ImagePlus className="w-6 h-6" />
         {t('product.add_images')}
         {limit > 0 && <span dir="ltr">{images.length}/{limit}</span>}
       </button>
       {open && <ImageLibrary folder="products" max={room} edit="image" onPick={pick} onClose={() => setOpen(false)} />}
       {images.map((src, i) => (
-        // الصورة الرئيسية أكبر من الباقي
-        <div key={src} className={`relative shrink-0 rounded-xl overflow-hidden border ${i === 0 ? 'w-40 h-40 border-indigo-400 dark:border-indigo-500' : 'w-24 h-24 border-gray-200 dark:border-zinc-800'}`}>
+        // الصورة الرئيسية أكبر (2×2)، والباقي في خاناته
+        <div key={src} className={`relative aspect-square rounded-xl overflow-hidden border ${i === 0 ? `${MAIN_IMAGE_CLASS} border-indigo-400 dark:border-indigo-500` : `${imageSlotClass(i)} border-gray-200 dark:border-zinc-800`}`}>
           <img src={src} alt="" className="w-full h-full object-cover" />
           {i === 0 && <span className="absolute top-1 start-1 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-bold"><Star className="w-3 h-3" />{t('product.main')}</span>}
           <button type="button" onClick={() => onChange(images.filter((x) => x !== src))} className="absolute top-1 end-1 p-0.5 rounded-md bg-black/60 text-white"><X className="w-3.5 h-3.5" /></button>
