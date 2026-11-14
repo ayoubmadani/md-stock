@@ -11,6 +11,8 @@ import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { POS_STATUSES, STATUSES, STATUS_DOT, money, orderAmounts, paymentState, sumCounts } from '../lib/orders';
 import { OrderStatusBadge, ShipStatusBadge, StatusSheet, timeAgo } from '../components/orders';
+import { CustomerSignalLine } from '../components/CustomerSignal';
+import { signalBorder } from '../lib/customerSignalBorder';
 
 const PAGE_SIZE = 50; // نفس حد الخادم
 
@@ -23,7 +25,9 @@ function OrderCard({ order, canManage, onStatus }) {
   const navigate = useNavigate();
   return (
     <div role="link" tabIndex={0} onClick={() => navigate(`/orders/${order.id}`)} onKeyDown={(e) => e.key === 'Enter' && navigate(`/orders/${order.id}`)}
-      className={`cursor-pointer block rounded-2xl p-3 space-y-2.5 border ${order.quotaState === 'test' ? 'border-2 border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800/60' : 'bg-white dark:bg-zinc-900 border-gray-100 dark:border-zinc-800/80'}`}>
+      className={`cursor-pointer block rounded-2xl p-3 space-y-2.5 border ${order.quotaState === 'test' ? 'border-2 border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800/60' : `bg-white dark:bg-zinc-900 ${signalBorder(order.customerSignal) || 'border-gray-100 dark:border-zinc-800/80'}`}`}>
+      {/* تنبيه نفس الزبون: سطر واحد في الأعلى */}
+      <CustomerSignalLine signal={order.customerSignal} />
       <div className="flex items-start gap-3">
         <div className="w-11 h-11 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
           {image && <img src={image} alt="" className="w-full h-full object-cover" />}

@@ -15,6 +15,7 @@ import { NextStepCard, OrderStatusBadge, SendConfirmationSheet, ShipSheet, ShipS
 import { shipStatusInfo } from '../lib/shipping-status';
 import { VariantParts } from '../components/inventory';
 import { CustomerPickerSheet } from '../components/customers';
+import { CustomerSignalCard } from '../components/CustomerSignal';
 
 const QUEUE = ['pending', 'appl1', 'appl2', 'appl3', 'postponed'];
 const actionBtn = 'flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold';
@@ -249,6 +250,8 @@ export default function OrderDetail() {
       )}
 
       {/* الزبون — طلب محل: إضافة زبون من القائمة أو تغييره */}
+      {/* نفس الزبون: مكرر / تاريخ الزبون / نفس الجهاز — للمعلومة فقط */}
+      {order.customerSignal && <CustomerSignalCard signal={order.customerSignal} />}
       {/* طلب تجربة (mdStore + 0551525354): لا يُحسب في حصة الخطة */}
       {order.quotaState === 'test' && (
         <div className="rounded-2xl border-2 border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800/60 px-4 py-3 text-sm font-bold text-gray-600 dark:text-zinc-300">🧪 {t('quota.test_order_hint')}</div>
