@@ -254,7 +254,8 @@
       "price": "Prix",
       "add": "Nouveau supplément",
       "hide": "Masquer",
-      "show": "Afficher"
+      "show": "Afficher",
+      "delete": "Supprimer l'option"
     }
   },
   "no_permission": "Vous n'avez pas l'autorisation pour cette section dans cette boutique — demandez-la au propriétaire",

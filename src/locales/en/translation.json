@@ -254,7 +254,8 @@
       "price": "Price",
       "add": "New add-on",
       "hide": "Hide",
-      "show": "Show"
+      "show": "Show",
+      "delete": "Delete add-on"
     }
   },
   "no_permission": "You don't have permission for this section in this store — ask the store owner",

@@ -204,7 +204,7 @@ function AttributeCard({ attr, images = [], duplicate = false, onChange, onRemov
   };
   return (
     // كل خاصية بطاقة مستقلة واضحة (خلفية + إطار + أيقونة نوعها) حتى لا تبدو اللون والمقاس كتلة واحدة
-    <div className="rounded-2xl border border-gray-200 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/40 p-3 space-y-3 shadow-sm">
+    <div className="rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/60 dark:bg-indigo-500/5 p-3 space-y-3 shadow-sm">
       <div className="flex items-center gap-2">
         <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${attr.type === 'color' ? 'bg-pink-100 text-pink-600 dark:bg-pink-500/15 dark:text-pink-300' : /size|taille|مقاس|حجم/i.test(attr.name || '') ? 'bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-300' : 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300'}`}>
           {attr.type === 'color' ? <Palette className="w-4 h-4" /> : /size|taille|مقاس|حجم/i.test(attr.name || '') ? <Ruler className="w-4 h-4" /> : <Tag className="w-4 h-4" />}
@@ -429,28 +429,28 @@ export function GenerateBarcodesButton({ storeId, productId, variants, onDone })
   );
 }
 
-/* ── العروض: كمية بسعر ── */
+/* ── العروض: كمية بسعر — لون أخضر (الخيارات نيلي، الإضافات كهرماني) ── */
 export function OffersEditor({ offers, onChange }) {
   const { t } = useTranslation();
   const set = (id, patch) => onChange(offers.map((o) => (o.id === id ? { ...o, ...patch } : o)));
   return (
     <div className="space-y-2">
       {offers.map((o) => (
-        <div key={o.id} className="rounded-xl border border-gray-100 dark:border-zinc-800 p-3 space-y-2">
+        <div key={o.id} className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/5 p-3 space-y-2">
           <div className="flex gap-2">
             <input value={o.name} onChange={(e) => set(o.id, { name: e.target.value })} placeholder={t('product.offer.name')} className={`${small} flex-1 min-w-0`} />
             <button type="button" onClick={() => onChange(offers.filter((x) => x.id !== o.id))} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('product.offer.quantity')}</span>
+            <label className="space-y-1"><span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t('product.offer.quantity')}</span>
               <input type="number" inputMode="numeric" dir="ltr" value={o.quantity} onChange={(e) => set(o.id, { quantity: e.target.value })} className={`${small} w-full`} /></label>
-            <label className="space-y-1"><span className="text-[11px] text-gray-400">{t('product.offer.price')}</span>
+            <label className="space-y-1"><span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t('product.offer.price')}</span>
               <input type="number" inputMode="decimal" dir="ltr" value={o.price} onChange={(e) => set(o.id, { price: e.target.value })} className={`${small} w-full`} /></label>
           </div>
           <Toggle checked={!!o.shippingFree} onChange={(c) => set(o.id, { shippingFree: c })}>{t('product.free_shipping')}</Toggle>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...offers, newOffer()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+      <button type="button" onClick={() => onChange([...offers, newOffer()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/40 text-sm font-bold text-emerald-700 dark:text-emerald-400">
         <Plus className="w-4 h-4" />{t('product.offer.add')}
       </button>
     </div>
@@ -465,18 +465,29 @@ export function AddonsEditor({ addons, onChange }) {
     <div className="space-y-2">
       <p className="text-[11px] text-gray-400">{t('product.addons.hint')}</p>
       {addons.map((a) => (
-        <div key={a.id} className={`flex items-center gap-2 ${a.isActive === false ? 'opacity-50' : ''}`}>
-          <input value={a.name} onChange={(e) => set(a.id, { name: e.target.value })} placeholder={t('product.addons.name')} className={`${small} flex-1 min-w-0`} />
-          <input type="number" inputMode="decimal" min={0} dir="ltr" value={a.price} onChange={(e) => set(a.id, { price: e.target.value })} placeholder={t('product.addons.price')} className={`${small} w-24 shrink-0`} />
-          {/* أقصى كمية يختارها الزبون (فارغ = 1) */}
-          <input type="number" inputMode="numeric" min={1} max={99} step={1} dir="ltr" value={a.maxQty ?? ''} onChange={(e) => set(a.id, { maxQty: e.target.value })} placeholder="×1" title={t('product.addons.max_qty')} aria-label={t('product.addons.max_qty')} className={`${small} w-14 shrink-0`} />
-          <button type="button" onClick={() => set(a.id, { isActive: a.isActive === false })} title={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} className="p-2 rounded-lg text-gray-400 shrink-0">
-            {a.isActive === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-          <button type="button" onClick={() => onChange(addons.filter((x) => x.id !== a.id))} className="p-2 rounded-lg text-rose-500 shrink-0"><Trash2 className="w-4 h-4" /></button>
+        // كل إضافة في إطارها (لون كهرماني حتى لا تختلط بالعروض): الاسم في الأعلى، ثم السعر والكمية تحته
+        <div key={a.id} className={`p-3 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50/70 dark:bg-amber-500/5 space-y-2 ${a.isActive === false ? 'opacity-50' : ''}`}>
+          <div className="flex items-center gap-2">
+            <input value={a.name} onChange={(e) => set(a.id, { name: e.target.value })} placeholder={t('product.addons.name')} aria-label={t('product.addons.name')} className={`${small} flex-1 min-w-0`} />
+            <button type="button" onClick={() => set(a.id, { isActive: a.isActive === false })} title={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} aria-label={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} className="p-2 rounded-lg text-gray-400 shrink-0">
+              {a.isActive === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+            <button type="button" onClick={() => onChange(addons.filter((x) => x.id !== a.id))} aria-label={t('product.addons.delete')} className="p-2 rounded-lg text-rose-500 shrink-0"><Trash2 className="w-4 h-4" /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block space-y-1">
+              <span className="block text-[11px] font-bold text-amber-800 dark:text-amber-300">{t('product.addons.price')}</span>
+              <input type="number" inputMode="decimal" min={0} dir="ltr" value={a.price} onChange={(e) => set(a.id, { price: e.target.value })} placeholder="0" className={`${small} w-full`} />
+            </label>
+            {/* أقصى كمية يختارها الزبون (فارغ = 1) */}
+            <label className="block space-y-1">
+              <span className="block text-[11px] font-bold text-amber-800 dark:text-amber-300 truncate">{t('product.addons.max_qty')}</span>
+              <input type="number" inputMode="numeric" min={1} max={99} step={1} dir="ltr" value={a.maxQty ?? ''} onChange={(e) => set(a.id, { maxQty: e.target.value })} placeholder="×1" className={`${small} w-full`} />
+            </label>
+          </div>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...addons, newAddon()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+      <button type="button" onClick={() => onChange([...addons, newAddon()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/40 text-sm font-bold text-amber-700 dark:text-amber-400">
         <Plus className="w-4 h-4" />{t('product.addons.add')}
       </button>
     </div>
