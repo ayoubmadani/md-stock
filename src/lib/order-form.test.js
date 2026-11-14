@@ -78,6 +78,17 @@ describe('missingFields', () => {
 describe('editing add-ons in an order', () => {
   const product = { addons: [{ id: 'c', name: 'جبن', price: 100, maxQty: 3 }, { id: 's', name: 'صلصة', price: 50 }, { id: 'x', name: 'مخفي', price: 9, isActive: false }] };
 
+  // الثيمات المشتركة ترسل الإضافة مكررة = كمية لكل قطعة (qty)، وسعرها × qty داخل finalPrice
+  it('a per-piece add-on with a quantity: current quantity = qty × pieces, conversion keeps the total', () => {
+    let it = { product, productId: 'p', quantity: 2, finalPrice: 1200, addons: [{ id: 'c', name: 'جبن', price: 100, qty: 2 }] };
+    expect(itemAddonQty(it)).toEqual({ c: 4 });
+    expect(itemsTotal([it])).toBe(2400);
+    it = { ...it, ...editAddon(it, 's', 1) };
+    expect(it.finalPrice).toBe(1000);
+    expect(it.addonQty).toEqual({ c: 4, s: 1 });
+    expect(itemsTotal([it])).toBe(2000 + 400 + 50);
+  });
+
   it('current quantities come from the saved line (separate keep their qty)', () => {
     expect(itemAddonQty({ product, addons: [{ id: 'c', price: 100, qty: 2, separate: true }] })).toEqual({ c: 2 });
     expect(itemAddonQty({ product, addonQty: { s: 1 } })).toEqual({ s: 1 });

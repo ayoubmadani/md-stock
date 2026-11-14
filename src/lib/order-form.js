@@ -50,11 +50,11 @@ export const addonsExtra = (it) => {
 
 export const itemsTotal = (items) => (items || []).reduce((s, it) => s + Number(it.finalPrice || 0) * (it.quantity || 1) + addonsExtra(it), 0);
 
-/** كميات الإضافات الحالية للسطر: { معرّف: كمية } (القديمة لكل قطعة = كمية القطع) */
+/** كميات الإضافات الحالية للسطر: { معرّف: كمية } (التي لكل قطعة = كميتها لكل قطعة × عدد القطع) */
 export const itemAddonQty = (it) => {
   if (it?.addonQty) return it.addonQty;
   const out = {};
-  for (const a of it?.addons || []) out[a.id] = a.separate ? Number(a.qty || 1) : Number(it.quantity || 1);
+  for (const a of it?.addons || []) out[a.id] = a.separate ? Number(a.qty || 1) : Number(a.qty || 1) * Number(it.quantity || 1);
   return out;
 };
 
@@ -63,7 +63,7 @@ export const itemAddonQty = (it) => {
 export function editAddon(it, id, n) {
   const patch = {};
   if (!it.addonQty) {
-    const oldInside = (it.addons || []).filter((a) => !a.separate).reduce((s, a) => s + Number(a.price || 0), 0);
+    const oldInside = (it.addons || []).filter((a) => !a.separate).reduce((s, a) => s + Number(a.price || 0) * Number(a.qty || 1), 0);
     if (oldInside) patch.finalPrice = Number(it.finalPrice || 0) - oldInside;
   }
   const next = { ...itemAddonQty(it) };
