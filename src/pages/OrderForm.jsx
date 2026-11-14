@@ -1,5 +1,5 @@
 // تعديل طلب أو إنشاء طلب يدوي من الهاتف: الزبون، العنوان والتوصيل، المنتجات بنسخها وعروضها
-import { groupOfferItems } from '../lib/offer-groups';
+import { groupOfferItems, expandPieces, resizePieces, offerLines } from '../lib/offer-groups';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -52,6 +52,90 @@ function ProductPicker({ storeId, onPick, onClose }) {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+// بطاقات العرض في تعديل الطلب: كل عرض مستقل (معلومات المنتج، قائمة عرضه، سعره) وتحته خيارات قطعه؛ الكمية = عدد العروض
+function OfferCards({ g, options, disabled, onReplace }) {
+  const { t } = useTranslation();
+  const variants = options?.variants || [];
+  const offers = (options?.offers || []).filter((o) => o.isActive !== false);
+  const groups = attrGroups(variants);
+  const per = Math.max(1, Number(g.offer.quantity) || 1);
+  const pieces = expandPieces(g.items);
+  const count = Math.max(1, Math.ceil(pieces.length / per));
+  const keyOf = (a) => a.attrName || a.attrId || '';
+  const setCount = (n) => onReplace(offerLines(resizePieces(pieces, n, per), g.offer));
+  const setUnitOffer = (b, id) => {
+    const seen = new Set();
+    const before = offerLines(pieces.slice(0, b * per), g.offer, seen);
+    const after = offerLines(pieces.slice(b * per + per), g.offer, seen);
+    const unit = pieces.slice(b * per, b * per + per);
+    const o = offers.find((x) => String(x.id) === String(id));
+    const mid = o
+      ? offerLines(resizePieces(unit, 1, Number(o.quantity) || 1), o, seen)
+      : unit.slice(0, 1).map((p) => {
+        const price = Number(p.variantDetail?.price) > -1 && p.variantDetail?.price != null ? Number(p.variantDetail.price) : Number(p.product?.price || 0);
+        return { ...p, id: `new-${Date.now()}-n${b}`, offerId: null, offer: null, noOffer: true, quantity: 1, finalPrice: price };
+      });
+    onReplace([...before, ...mid, ...after]);
+  };
+  const setAttr = (k, key, value) => {
+    const cur = Array.isArray(pieces[k].variantDetail?.name) ? pieces[k].variantDetail.name : [];
+    const v = findVariant(variants, cur, key, value);
+    if (!v) return toast.error(t('orders.form.unavailable'));
+    onReplace(offerLines(pieces.map((p, x) => (x === k ? { ...p, variantDetailId: v.id, variantDetail: v } : p)), g.offer));
+  };
+  const sel = 'bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-2 py-1.5 text-xs font-bold';
+  return (
+    <div className="rounded-2xl border border-orange-200 dark:border-orange-500/30 overflow-hidden mb-3">
+      <div className="flex items-center gap-3 px-3 py-2 bg-orange-50 dark:bg-orange-500/10">
+        <p className="flex-1 text-xs font-bold text-gray-500">{t('orders.form.qty', 'الكمية')}</p>
+        <div className="inline-flex items-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden" dir="ltr">
+          <button type="button" disabled={disabled || count <= 1} onClick={() => setCount(count - 1)} className="w-8 h-8 font-black disabled:opacity-30">−</button>
+          <span className="w-8 text-center text-sm font-black">{count}</span>
+          <button type="button" disabled={disabled} onClick={() => setCount(count + 1)} className="w-8 h-8 font-black disabled:opacity-30">+</button>
+        </div>
+        <p className="text-sm font-black text-orange-700 dark:text-orange-300" dir="ltr">{money(itemsTotal(g.items))} DA</p>
+      </div>
+      {Array.from({ length: count }, (_, b) => (
+        <div key={b} className="m-2 p-3 rounded-xl border border-orange-200 dark:border-orange-500/30 bg-white dark:bg-zinc-900">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">{g.product?.imagesProduct?.[0]?.imageUrl && <img src={g.product.imagesProduct[0].imageUrl} alt="" className="w-full h-full object-cover" />}</span>
+            <p className="flex-1 min-w-0 text-xs font-bold truncate"><bdi>{g.product?.name}</bdi></p>
+            <select value={g.offer.id} disabled={disabled} onChange={(e) => setUnitOffer(b, e.target.value)} className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg px-2 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+              <option value="">{t('orders.form.no_offer', 'بدون عرض')}</option>
+              {offers.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+            </select>
+            <span className="text-sm font-black text-orange-700 dark:text-orange-300 shrink-0" dir="ltr">{money(g.offer.price)} DA</span>
+          </div>
+          <div className="space-y-2">
+            {pieces.slice(b * per, b * per + per).map((p, i) => {
+              const k = b * per + i;
+              const cur = Array.isArray(p.variantDetail?.name) ? p.variantDetail.name : [];
+              return (
+                <div key={k} className="flex flex-wrap items-center gap-2">
+                  {per > 1 && <span className="text-[11px] font-bold text-gray-500 w-12 shrink-0">{t('orders.form.piece', 'القطعة')} {i + 1}</span>}
+                  {groups.map((gr) => {
+                    const value = cur.find((a) => keyOf(a) === gr.key)?.value ?? '';
+                    return (
+                      <label key={gr.key} className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                        {gr.attrName}
+                        <select value={value} disabled={disabled} onChange={(e) => setAttr(k, gr.key, e.target.value)} className={sel}>
+                          {!value && <option value="">—</option>}
+                          {gr.options.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+                        </select>
+                      </label>
+                    );
+                  })}
+                  {p.addons?.length > 0 && <span className="text-[11px] font-semibold text-orange-600">+ {p.addons.map((a) => `${a.name}${Number(a.qty) > 1 ? ` ×${a.qty}` : ''}`).join('، ')}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -262,6 +346,23 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
     }));
     loadOptions([p.id]);
   };
+  const replaceGroup = (g, lines) => setForm((f) => {
+    const ids = new Set(g.items.map((it) => it.id));
+    const at = f.items.findIndex((it) => ids.has(it.id));
+    const rest = f.items.filter((it) => !ids.has(it.id));
+    rest.splice(at < 0 ? rest.length : at, 0, ...lines);
+    return { ...f, items: rest };
+  });
+  // منتج جديد في الطلب وله عروض: يبدأ كبطاقة عرض بأول عرض (إلا إن اختار التاجر «بدون عرض»)
+  useEffect(() => {
+    const pending = form.items.filter((it) => String(it.id).startsWith('new-') && !it.offerId && !it.noOffer && (options[it.productId]?.offers || []).some((o) => o.isActive !== false));
+    if (!pending.length) return;
+    setForm((f) => ({ ...f, items: f.items.flatMap((it) => {
+      if (!pending.some((x) => x.id === it.id)) return [it];
+      const o = options[it.productId].offers.find((x) => x.isActive !== false);
+      return offerLines(resizePieces(expandPieces([it]), 1, Number(o.quantity) || 1), o);
+    }) }));
+  }, [form.items, options]);
   const changeItem = (itemId, patch) => setForm((f) => ({ ...f, items: f.items.map((it) => (it.id === itemId ? { ...it, ...patch } : it)) }));
   const removeItem = (itemId) => {
     if (!isNew && form.items.length <= 1) return toast.error(t('orders.form.last_item'));
@@ -360,26 +461,11 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
 
       {/* المنتجات */}
       <div className={box}>
-        {/* سطور العرض الواحد في صندوق: اسم العرض وسعره والمنتج، وتحته خيارات كل سطر للتعديل */}
-        {groupOfferItems(form.items).map((g) => {
-          const card = (it) => (
-            <ItemCard key={it.id} item={it} options={options[it.productId]} disabled={locked}
-              onChange={(patch) => changeItem(it.id, patch)} onRemove={() => removeItem(it.id)} />
-          );
-          if (g.type === 'item') return card(g.item);
-          return (
-            <div key={g.key} className="rounded-2xl border border-orange-200 dark:border-orange-500/30 overflow-hidden mb-3">
-              <div className="flex items-center gap-3 px-3 py-2.5 bg-orange-50 dark:bg-orange-500/10">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-black text-orange-700 dark:text-orange-300 truncate"><bdi>{g.offer.name}</bdi>{g.boxes > 1 && <span dir="ltr"> ×{g.boxes}</span>}</p>
-                  <p className="text-xs text-gray-500 truncate"><bdi>{g.product?.name || '—'}</bdi></p>
-                </div>
-                <p className="text-sm font-black shrink-0" dir="ltr">{money(itemsTotal(g.items))} DA</p>
-              </div>
-              <div className="p-2 space-y-2">{g.items.map(card)}</div>
-            </div>
-          );
-        })}
+        {/* بطاقات العرض: كل عرض مستقل، الكمية = عدد العروض */}
+        {groupOfferItems(form.items).map((g) => g.type === 'item'
+          ? <ItemCard key={g.item.id} item={g.item} options={options[g.item.productId]} disabled={locked}
+              onChange={(patch) => changeItem(g.item.id, patch)} onRemove={() => removeItem(g.item.id)} />
+          : <OfferCards key={g.key} g={g} options={options[g.items[0].productId]} disabled={locked} onReplace={(lines) => replaceGroup(g, lines)} />)}
         {!locked && (
           <button type="button" onClick={() => setPicker(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
             <Plus className="w-4 h-4" />{t('orders.form.add_product')}
