@@ -5,7 +5,8 @@ import { ChevronLeft, ChevronRight, Bold, Eye, EyeOff, ImagePlus, Italic, List, 
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
 import { MAIN_IMAGE_CLASS, imageSlotClass } from '../lib/image-slots';
-import { moveItem, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, setValueName, addValues, duplicateAttrIds } from '../lib/product-form';
+import { useLongPressReorder } from '../lib/use-long-press-reorder';
+import { moveItem, moveTo, newAddon, newAttribute, newOffer, newValue, linkVariantImage, COLOR_PALETTE, replaceValue, setValueName, addValues, duplicateAttrIds } from '../lib/product-form';
 import Scanner from './Scanner';
 import { fillMissingBarcodes, randomStoreCode } from '../lib/barcode';
 import { printLabel } from '../lib/label';
@@ -61,6 +62,8 @@ export function ImagesEditor({ images, onChange }) {
   // «قبل» في القراءة = يمين في العربية
   const Before = rtl ? ChevronRight : ChevronLeft;
   const After = rtl ? ChevronLeft : ChevronRight;
+  // ضغط مطوّل على صورة ثم سحبها فوق أخرى = تأخذ مكانها
+  const { drag, bind } = useLongPressReorder((from, to) => onChange(moveTo(images, from, to)));
   return (
     // نفس ترتيب لوحة التحكم: الرئيسية 2×2، الثانية تحت زر الإضافة، ثم الأعمدة أعلى/أسفل، ثم من السطر الثالث
     <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -73,8 +76,9 @@ export function ImagesEditor({ images, onChange }) {
       {open && <ImageLibrary folder="products" max={room} edit="image" onPick={pick} onClose={() => setOpen(false)} />}
       {images.map((src, i) => (
         // الصورة الرئيسية أكبر (2×2)، والباقي في خاناته
-        <div key={src} className={`relative aspect-square rounded-xl overflow-hidden border ${i === 0 ? `${MAIN_IMAGE_CLASS} border-indigo-400 dark:border-indigo-500` : `${imageSlotClass(i)} border-gray-200 dark:border-zinc-800`}`}>
-          <img src={src} alt="" className="w-full h-full object-cover" />
+        <div key={src} {...bind(i)}
+          className={`relative aspect-square rounded-xl overflow-hidden border transition ${i === 0 ? `${MAIN_IMAGE_CLASS} border-indigo-400 dark:border-indigo-500` : `${imageSlotClass(i)} border-gray-200 dark:border-zinc-800`} ${drag?.from === i ? 'opacity-40 scale-95' : ''} ${drag && drag.over === i && drag.from !== i ? 'ring-4 ring-indigo-500' : ''}`}>
+          <img src={src} alt="" draggable={false} className="w-full h-full object-cover pointer-events-none" />
           {i === 0 && <span className="absolute top-1 start-1 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-bold"><Star className="w-3 h-3" />{t('product.main')}</span>}
           <button type="button" onClick={() => onChange(images.filter((x) => x !== src))} className="absolute top-1 end-1 p-0.5 rounded-md bg-black/60 text-white"><X className="w-3.5 h-3.5" /></button>
           <div className="absolute bottom-1 inset-x-1 flex justify-between">
@@ -432,28 +436,28 @@ export function GenerateBarcodesButton({ storeId, productId, variants, onDone })
   );
 }
 
-/* ── العروض: كمية بسعر — لون أخضر (الخيارات نيلي، الإضافات كهرماني) ── */
+/* ── العروض: كمية بسعر — لون برتقالي (الخيارات نيلي، الإضافات أخضر) ── */
 export function OffersEditor({ offers, onChange }) {
   const { t } = useTranslation();
   const set = (id, patch) => onChange(offers.map((o) => (o.id === id ? { ...o, ...patch } : o)));
   return (
     <div className="space-y-2">
       {offers.map((o) => (
-        <div key={o.id} className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/5 p-3 space-y-2">
+        <div key={o.id} className="rounded-xl border border-orange-200 dark:border-orange-500/30 bg-orange-50/60 dark:bg-orange-500/5 p-3 space-y-2">
           <div className="flex gap-2">
             <input value={o.name} onChange={(e) => set(o.id, { name: e.target.value })} placeholder={t('product.offer.name')} className={`${small} flex-1 min-w-0`} />
             <button type="button" onClick={() => onChange(offers.filter((x) => x.id !== o.id))} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <label className="space-y-1"><span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t('product.offer.quantity')}</span>
+            <label className="space-y-1"><span className="text-[11px] font-bold text-orange-800 dark:text-orange-300">{t('product.offer.quantity')}</span>
               <input type="number" inputMode="numeric" dir="ltr" value={o.quantity} onChange={(e) => set(o.id, { quantity: e.target.value })} className={`${small} w-full`} /></label>
-            <label className="space-y-1"><span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t('product.offer.price')}</span>
+            <label className="space-y-1"><span className="text-[11px] font-bold text-orange-800 dark:text-orange-300">{t('product.offer.price')}</span>
               <input type="number" inputMode="decimal" dir="ltr" value={o.price} onChange={(e) => set(o.id, { price: e.target.value })} className={`${small} w-full`} /></label>
           </div>
           <Toggle checked={!!o.shippingFree} onChange={(c) => set(o.id, { shippingFree: c })}>{t('product.free_shipping')}</Toggle>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...offers, newOffer()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/40 text-sm font-bold text-emerald-700 dark:text-emerald-400">
+      <button type="button" onClick={() => onChange([...offers, newOffer()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-orange-300 dark:border-orange-500/40 text-sm font-bold text-orange-700 dark:text-orange-400">
         <Plus className="w-4 h-4" />{t('product.offer.add')}
       </button>
     </div>
@@ -468,8 +472,8 @@ export function AddonsEditor({ addons, onChange }) {
     <div className="space-y-2">
       <p className="text-[11px] text-gray-400">{t('product.addons.hint')}</p>
       {addons.map((a) => (
-        // كل إضافة في إطارها (لون كهرماني حتى لا تختلط بالعروض): الاسم في الأعلى، ثم السعر والكمية تحته
-        <div key={a.id} className={`p-3 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50/70 dark:bg-amber-500/5 space-y-2 ${a.isActive === false ? 'opacity-50' : ''}`}>
+        // كل إضافة في إطارها (لون أخضر حتى لا تختلط بالعروض): الاسم في الأعلى، ثم السعر والكمية تحته
+        <div key={a.id} className={`p-3 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/70 dark:bg-emerald-500/5 space-y-2 ${a.isActive === false ? 'opacity-50' : ''}`}>
           <div className="flex items-center gap-2">
             <input value={a.name} onChange={(e) => set(a.id, { name: e.target.value })} placeholder={t('product.addons.name')} aria-label={t('product.addons.name')} className={`${small} flex-1 min-w-0`} />
             <button type="button" onClick={() => set(a.id, { isActive: a.isActive === false })} title={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} aria-label={t(a.isActive === false ? 'product.addons.show' : 'product.addons.hide')} className="p-2 rounded-lg text-gray-400 shrink-0">
@@ -479,18 +483,18 @@ export function AddonsEditor({ addons, onChange }) {
           </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="block space-y-1">
-              <span className="block text-[11px] font-bold text-amber-800 dark:text-amber-300">{t('product.addons.price')}</span>
+              <span className="block text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t('product.addons.price')}</span>
               <input type="number" inputMode="decimal" min={0} dir="ltr" value={a.price} onChange={(e) => set(a.id, { price: e.target.value })} placeholder="0" className={`${small} w-full`} />
             </label>
             {/* أقصى كمية يختارها الزبون (فارغ = 1) */}
             <label className="block space-y-1">
-              <span className="block text-[11px] font-bold text-amber-800 dark:text-amber-300 truncate">{t('product.addons.max_qty')}</span>
+              <span className="block text-[11px] font-bold text-emerald-800 dark:text-emerald-300 truncate">{t('product.addons.max_qty')}</span>
               <input type="number" inputMode="numeric" min={1} max={99} step={1} dir="ltr" value={a.maxQty ?? ''} onChange={(e) => set(a.id, { maxQty: e.target.value })} placeholder="×1" className={`${small} w-full`} />
             </label>
           </div>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...addons, newAddon()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/40 text-sm font-bold text-amber-700 dark:text-amber-400">
+      <button type="button" onClick={() => onChange([...addons, newAddon()])} className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/40 text-sm font-bold text-emerald-700 dark:text-emerald-400">
         <Plus className="w-4 h-4" />{t('product.addons.add')}
       </button>
     </div>

@@ -170,3 +170,15 @@ describe('one attribute kind', () => {
     expect(newAttribute('attribute', '')).toMatchObject({ type: 'color', displayMode: 'text', name: '', variants: [] });
   });
 });
+
+// الضغط المطوّل ثم السحب: الصورة تُنقل إلى مكان الصورة التي تُركت فوقها، والباقي يتزحزح
+describe('moveTo', () => {
+  it('moves an item to another place, the others shift', async () => {
+    const { moveTo } = await import('./product-form.js');
+    expect(moveTo(['a', 'b', 'c', 'd'], 3, 0)).toEqual(['d', 'a', 'b', 'c']);
+    expect(moveTo(['a', 'b', 'c', 'd'], 0, 2)).toEqual(['b', 'c', 'a', 'd']);
+    expect(moveTo(['a', 'b', 'c'], 1, 1)).toEqual(['a', 'b', 'c']);
+    expect(moveTo(['a', 'b', 'c'], 1, 7)).toEqual(['a', 'b', 'c']);
+    expect(moveTo(['a', 'b', 'c'], -1, 0)).toEqual(['a', 'b', 'c']);
+  });
+});

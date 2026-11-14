@@ -20,6 +20,15 @@ export const newAddon = () => ({ id: uid('add'), name: '', price: '', isActive: 
 export const newOffer = () => ({ id: uid('off'), name: '', subTitle: '', quantity: '', price: '', shippingFree: false });
 
 /** تحريك عنصر خطوة (−1 / +1) داخل القائمة */
+/** نقل عنصر إلى مكان آخر (سحب الصورة بعد ضغط مطوّل)، والباقي يتزحزح. خارج الحدود = بلا تغيير */
+export function moveTo(list, from, to) {
+  if (from === to || from < 0 || to < 0 || from >= list.length || to >= list.length) return list;
+  const next = [...list];
+  const [moved] = next.splice(from, 1);
+  next.splice(to, 0, moved);
+  return next;
+}
+
 export function moveItem(list, index, step) {
   const to = index + step;
   if (to < 0 || to >= list.length) return list;
