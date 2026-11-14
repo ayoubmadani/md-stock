@@ -182,3 +182,16 @@ describe('moveTo', () => {
     expect(moveTo(['a', 'b', 'c'], -1, 0)).toEqual(['a', 'b', 'c']);
   });
 });
+
+// تعديل المنتج: المخزون يُرسل فقط إن غيّره التاجر (المخزون السالب يرفضه الخادم، والرقم القديم يمحو ما أنقصته الطلبات)
+describe('stock on edit', () => {
+  const form = { name: 'x', price: '100', stock: '-2' };
+  it('unchanged stock is left out on edit', () => {
+    expect(productPayload(form, { attributes: [], offers: [], images: [], initialStock: -2 })).not.toHaveProperty('stock');
+  });
+  it('changed stock is sent; a new product always sends it', () => {
+    expect(productPayload({ ...form, stock: '7' }, { attributes: [], offers: [], images: [], initialStock: -2 }).stock).toBe(7);
+    expect(productPayload({ ...form, stock: '4' }, { attributes: [], offers: [], images: [] }).stock).toBe(4);
+  });
+});
+

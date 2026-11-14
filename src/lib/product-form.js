@@ -38,7 +38,9 @@ export function moveItem(list, index, step) {
 }
 
 /** جسم POST/PATCH المنتج. النسخ يولّدها الخادم من الخصائص ويحافظ على سعر وكمية الموجود منها */
-export function productPayload(form, { attributes, offers, images, addons }) {
+// initialStock (التعديل فقط): المخزون كما حُمّل — يُرسل فقط إن غيّره التاجر (السالب يرفضه الخادم،
+// والرقم القديم يمحو ما أنقصته الطلبات المؤكدة أثناء فتح الصفحة)
+export function productPayload(form, { attributes, offers, images, addons, initialStock }) {
   const num = (v) => (v === '' || v == null ? null : Number(v));
   const out = {
     name: form.name.trim(),
@@ -56,7 +58,10 @@ export function productPayload(form, { attributes, offers, images, addons }) {
     offers: offers.map((o) => ({ id: o.id, name: o.name.trim(), subTitle: o.subTitle?.trim() || '', quantity: Number(o.quantity) || 0, price: Number(o.price) || 0, shippingFree: !!o.shippingFree })),
     images,
   };
-  if (!attributes.length) out.stock = Number(form.stock) || 0;
+  if (!attributes.length) {
+    const stock = Number(form.stock) || 0;
+    if (initialStock === undefined || stock !== (Number(initialStock) || 0)) out.stock = stock;
+  }
   // الإضافات: الأسطر بلا اسم تُتجاهل (نفس اللوحة)
   if (addons) out.addons = addons.filter((a) => a.name?.trim()).map((a) => ({ id: String(a.id), name: a.name.trim(), price: Number(a.price) || 0, isActive: a.isActive !== false, maxQty: Math.min(99, Math.max(1, Math.floor(Number(a.maxQty) || 1))) }));
   return out;

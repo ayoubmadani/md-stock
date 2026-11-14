@@ -1,4 +1,5 @@
 // تعديل طلب أو إنشاء طلب يدوي من الهاتف: الزبون، العنوان والتوصيل، المنتجات بنسخها وعروضها
+import { groupOfferItems } from '../lib/offer-groups';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -359,10 +360,26 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
 
       {/* المنتجات */}
       <div className={box}>
-        {form.items.map((it) => (
-          <ItemCard key={it.id} item={it} options={options[it.productId]} disabled={locked}
-            onChange={(patch) => changeItem(it.id, patch)} onRemove={() => removeItem(it.id)} />
-        ))}
+        {/* سطور العرض الواحد في صندوق: اسم العرض وسعره والمنتج، وتحته خيارات كل سطر للتعديل */}
+        {groupOfferItems(form.items).map((g) => {
+          const card = (it) => (
+            <ItemCard key={it.id} item={it} options={options[it.productId]} disabled={locked}
+              onChange={(patch) => changeItem(it.id, patch)} onRemove={() => removeItem(it.id)} />
+          );
+          if (g.type === 'item') return card(g.item);
+          return (
+            <div key={g.key} className="rounded-2xl border border-orange-200 dark:border-orange-500/30 overflow-hidden mb-3">
+              <div className="flex items-center gap-3 px-3 py-2.5 bg-orange-50 dark:bg-orange-500/10">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-black text-orange-700 dark:text-orange-300 truncate"><bdi>{g.offer.name}</bdi>{g.boxes > 1 && <span dir="ltr"> ×{g.boxes}</span>}</p>
+                  <p className="text-xs text-gray-500 truncate"><bdi>{g.product?.name || '—'}</bdi></p>
+                </div>
+                <p className="text-sm font-black shrink-0" dir="ltr">{money(itemsTotal(g.items))} DA</p>
+              </div>
+              <div className="p-2 space-y-2">{g.items.map(card)}</div>
+            </div>
+          );
+        })}
         {!locked && (
           <button type="button" onClick={() => setPicker(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
             <Plus className="w-4 h-4" />{t('orders.form.add_product')}

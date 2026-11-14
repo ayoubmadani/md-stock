@@ -1,5 +1,5 @@
 // المنتج كاملاً من الهاتف (نفس نموذج لوحة التاجر): الصور، الأساسيات، الخصائص والنسخ، العروض، المخزون
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, BarChart3, Loader2, Megaphone, Radar, Trash2 } from 'lucide-react';
@@ -31,12 +31,15 @@ export default function ProductForm() {
   const [offers, setOffers] = useState([]);
   const [links, setLinks] = useState(null); // 'pixels'
   const [addons, setAddons] = useState([]);
+  // المخزون كما حُمّل (التعديل): يُرسل عند الحفظ فقط إن تغيّر
+  const initialStock = useRef(undefined);
   const [variants, setVariants] = useState([]); // لزر «توليد باركود للكل» فقط — تعديل النسخ في صفحة عرض المنتج
   const [ads, setAds] = useState(false);
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v?.target ? v.target.value : v }));
 
   const load = () => api.get(`/stores/${storeId}/products/${id}`).then(({ data }) => {
     const p = data?.data || data;
+    initialStock.current = p.stock ?? 0;
     setForm({
       name: p.name || '', desc: p.desc || '', price: String(p.price ?? ''), priceOriginal: p.priceOriginal ? String(p.priceOriginal) : '',
       costPrice: p.costPrice != null ? String(p.costPrice) : '', stock: String(p.stock ?? 0), lowStockThreshold: String(p.lowStockThreshold ?? 5),
@@ -66,7 +69,7 @@ export default function ProductForm() {
     if (errs.length) return toast.error(errs.map((k) => t(`product.err.${k}`)).join(' — '));
     setSaving(true);
     try {
-      const body = productPayload(form, { attributes, offers, images, addons });
+      const body = productPayload(form, { attributes, offers, images, addons, initialStock: isNew ? undefined : initialStock.current });
       let productId = id;
       if (isNew) {
         const { data } = await api.post(`/stores/${storeId}/products`, body);
