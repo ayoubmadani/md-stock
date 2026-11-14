@@ -70,7 +70,7 @@ export default function ConfirmationPage() {
   const { storeId } = useAuth();
   const [tab, setTab] = useState('saved');
   const [saved, setSaved] = useState(null);
-  const [auto, setAuto] = useState({ enabled: false, companyId: null, agentIds: [] });
+  const [auto, setAuto] = useState({ enabled: false, companyId: null, agentIds: [], hold: ['dup_open', 'dup_progress'] });
   const [autoAgents, setAutoAgents] = useState([]); // مؤكّدو شركة الإرسال التلقائي (فارغ إن كانت لا تسمح)
   const [accounts, setAccounts] = useState([]);
   const [wilayas, setWilayas] = useState([]);
@@ -165,6 +165,27 @@ export default function ConfirmationPage() {
                     })}
                   </div>
                   <p className="text-[11px] text-gray-400">{t('confirm.auto_agents_hint')}</p>
+                </div>
+              )}
+              {/* «لا تُرسل تلقائياً» (الافتراضي: المكرر فقط) — نفس خيارات لوحة التحكم */}
+              {auto.companyId && (
+                <div className="space-y-2 pt-1">
+                  <p className="text-xs font-bold text-gray-500">{t('confirm.hold_title')}</p>
+                  <div className="grid gap-2">
+                    {[['dup_open', '🟠'], ['dup_progress', '🟣'], ['risk', '🔴'], ['caution', '🟡']].map(([key, dot]) => {
+                      const cur = auto.hold || [];
+                      const on = cur.includes(key);
+                      return (
+                        <button key={key} type="button" role="checkbox" aria-checked={on} disabled={busy === 'auto'}
+                          onClick={() => updateAuto({ enabled: auto.enabled, companyId: auto.companyId, hold: on ? cur.filter((x) => x !== key) : [...cur, key] })}
+                          className={`px-3 py-2 rounded-xl border-2 text-start disabled:opacity-50 ${on ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-gray-100 dark:border-zinc-800'}`}>
+                          <span className="block text-sm font-bold">{on ? '✓ ' : ''}{dot} {t(`confirm.hold_${key}`)}</span>
+                          <span className="block text-[11px] text-gray-500">{t(`confirm.hold_${key}_hint`)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] text-gray-400">{t('confirm.hold_hint')}</p>
                 </div>
               )}
             </div>

@@ -865,7 +865,17 @@
     "already": "Enregistrée ✓",
     "save": "Enregistrer",
     "auto_agents": "Confirmateurs préférés (optionnel)",
-    "auto_agents_hint": "Chaque nouvelle commande aux choisis seuls 2 h, puis à toute l'équipe."
+    "auto_agents_hint": "Chaque nouvelle commande aux choisis seuls 2 h, puis à toute l'équipe.",
+    "hold_title": "Ne pas envoyer automatiquement",
+    "hold_dup_open": "Doublon — la première commande n'est pas traitée",
+    "hold_dup_open_hint": "Même téléphone et même produit, la première commande attend encore",
+    "hold_dup_progress": "Doublon — la première est confirmée ou en livraison",
+    "hold_dup_progress_hint": "Même téléphone et même produit, la première commande est en cours",
+    "hold_risk": "Client à retours fréquents",
+    "hold_risk_hint": "50 % de retours ou plus (au moins 2 commandes terminées)",
+    "hold_caution": "Attention",
+    "hold_caution_hint": "A refusé une livraison, 30–49 % de retours, ou 3 annulations sans livraison",
+    "hold_hint": "La commande retenue reste chez vous avec une note expliquant la raison ; envoyez-la manuellement si vous voulez."
   },
   "messages": {
     "tab_inbox": "Nouveaux",

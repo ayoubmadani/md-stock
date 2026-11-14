@@ -865,7 +865,17 @@
     "already": "Saved ✓",
     "save": "Save to my companies",
     "auto_agents": "Preferred confirmers (optional)",
-    "auto_agents_hint": "Each new order to the chosen ones alone for 2 h, then to the whole team."
+    "auto_agents_hint": "Each new order to the chosen ones alone for 2 h, then to the whole team.",
+    "hold_title": "Don't send automatically",
+    "hold_dup_open": "Duplicate — first order not handled",
+    "hold_dup_open_hint": "Same phone and same product, the first order is still waiting",
+    "hold_dup_progress": "Duplicate — first order confirmed or shipping",
+    "hold_dup_progress_hint": "Same phone and same product, the first order is in progress",
+    "hold_risk": "Customer who often returns",
+    "hold_risk_hint": "Returned 50% or more (at least 2 finished orders)",
+    "hold_caution": "Heads-up",
+    "hold_caution_hint": "Refused a delivery once, 30–49% returns, or 3 cancellations with nothing received",
+    "hold_hint": "A held order stays with you with a note giving the reason; send it manually if you want."
   },
   "messages": {
     "tab_inbox": "New",
