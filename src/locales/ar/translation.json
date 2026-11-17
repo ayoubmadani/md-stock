@@ -313,7 +313,13 @@
       "f_contact": "البريد أو واتساب",
       "f_wilaya": "الولاية",
       "f_commune": "البلدية",
-      "f_items": "المنتجات"
+      "f_items": "المنتجات",
+      "edit_piece": "تعديل",
+      "options": "الخيارات",
+      "piece": "القطعة",
+      "add_piece": "قطعة أخرى من نفس المنتج",
+      "choose_options": "اختر الخيارات",
+      "done": "تم"
     },
     "actions": {
       "edit": "تعديل",

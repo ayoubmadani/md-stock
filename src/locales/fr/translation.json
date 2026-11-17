@@ -313,7 +313,13 @@
       "f_contact": "Email ou WhatsApp",
       "f_wilaya": "Wilaya",
       "f_commune": "Commune",
-      "f_items": "Produits"
+      "f_items": "Produits",
+      "edit_piece": "Modifier",
+      "options": "Options",
+      "piece": "Pièce",
+      "add_piece": "Une autre pièce du même produit",
+      "choose_options": "Choisir les options",
+      "done": "OK"
     },
     "actions": {
       "edit": "Modifier",

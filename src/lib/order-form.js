@@ -105,8 +105,8 @@ export function orderPayload(form, { free, storeId } = {}) {
       finalPrice: Number(it.finalPrice || 0),
       // عدّل التاجر الإضافات: السيرفر يحفظها بكمياتها ويحسب سعرها من المنتج (بدونها يحتفظ بالقديمة)
       ...(it.addonQty ? { addonQty: it.addonQty } : {}),
-      // سطر قطعة من بطاقة عرض: إضافاته لكل قطعة (تكرار المعرّف = الكمية)
-      ...(!it.addonQty && it.offerId && !(it.addons || []).some((a) => a.separate)
+      // كل سطر (قطعة من بطاقة عرض أو من منتج بخيارات) يرسل إضافاته لكل قطعة (تكرار المعرّف = الكمية)
+      ...(!it.addonQty && !(it.addons || []).some((a) => a.separate)
         ? { addonIds: (it.addons || []).flatMap((a) => Array(Math.max(1, Number(a.qty) || 1)).fill(a.id)) }
         : {}),
     };

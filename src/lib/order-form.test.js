@@ -57,6 +57,8 @@ describe('orderPayload', () => {
       customerName: 'Ali', customerPhone: '0555', customerEmail: undefined, customerWhatsapp: undefined,
       customerWilayaId: 16, customerCommuneId: 554, status: 'confirmed', typeShip: 'home', priceShip: 600,
       productId: 'p1', quantity: 2, variantDetailId: 'v1', offerId: null, finalPrice: 1500,
+      // بلا إضافات: قائمة فارغة صريحة، فلا ينسخ الخادم إضافات سطر آخر لنفس المنتج
+      addonIds: [],
     }]);
   });
   it('create: adds the store, the dashboard platform and the line total, without status', () => {
@@ -129,13 +131,15 @@ describe('offer piece lines save their own add-ons', () => {
     expect(a.addonIds).toEqual(['t', 't']);
     expect(b.addonIds).toEqual([]);
   });
-  it('lines without an offer, or with add-ons by quantity (addonQty), keep their old payload', () => {
-    const [a, b] = orderPayload({ items: [
+  it('a line without an offer sends its own add-ons too (one card per piece); add-ons by quantity (addonQty) keep their payload', () => {
+    const [a, b, c] = orderPayload({ items: [
       { productId: 'p', quantity: 1, offerId: null, finalPrice: 100, addons: [{ id: 't', price: 1 }] },
       { productId: 'p', quantity: 1, offerId: 'o2', finalPrice: 100, addonQty: { t: 1 } },
+      { productId: 'p', quantity: 1, offerId: null, finalPrice: 100, addons: [{ id: 's', price: 5, qty: 2, separate: true }] },
     ] });
-    expect(a).not.toHaveProperty('addonIds');
+    expect(a.addonIds).toEqual(['t']);
     expect(b).not.toHaveProperty('addonIds');
     expect(b.addonQty).toEqual({ t: 1 });
+    expect(c).not.toHaveProperty('addonIds');
   });
 });
