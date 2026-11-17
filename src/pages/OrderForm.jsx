@@ -367,6 +367,17 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // منتج جديد في الطلب وله عروض: يبدأ كبطاقة عرض بأول عرض (إلا إن اختار التاجر «بدون عرض»)
+  useEffect(() => {
+    if (!form?.items?.length) return;
+    const pending = form.items.filter((it) => String(it.id).startsWith('new-') && !it.offerId && !it.noOffer && (options[it.productId]?.offers || []).some((o) => o.isActive !== false));
+    if (!pending.length) return;
+    setForm((f) => ({ ...f, items: f.items.flatMap((it) => {
+      if (!pending.some((x) => x.id === it.id)) return [it];
+      const o = options[it.productId].offers.find((x) => x.isActive !== false);
+      return offerLines(resizePieces(expandPieces([it]), 1, Number(o.quantity) || 1), o);
+    }) }));
+  }, [form?.items, options]);
   const free = useMemo(() => (form ? isFreeShipping(form, orderStore || store) : false), [form, orderStore, store]);
   if (!form) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
 
@@ -401,16 +412,6 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
     rest.splice(at < 0 ? rest.length : at, 0, ...lines);
     return { ...f, items: rest };
   });
-  // منتج جديد في الطلب وله عروض: يبدأ كبطاقة عرض بأول عرض (إلا إن اختار التاجر «بدون عرض»)
-  useEffect(() => {
-    const pending = form.items.filter((it) => String(it.id).startsWith('new-') && !it.offerId && !it.noOffer && (options[it.productId]?.offers || []).some((o) => o.isActive !== false));
-    if (!pending.length) return;
-    setForm((f) => ({ ...f, items: f.items.flatMap((it) => {
-      if (!pending.some((x) => x.id === it.id)) return [it];
-      const o = options[it.productId].offers.find((x) => x.isActive !== false);
-      return offerLines(resizePieces(expandPieces([it]), 1, Number(o.quantity) || 1), o);
-    }) }));
-  }, [form.items, options]);
   const changeItem = (itemId, patch) => setForm((f) => ({ ...f, items: f.items.map((it) => (it.id === itemId ? { ...it, ...patch } : it)) }));
   const removeItem = (itemId) => {
     if (!isNew && form.items.length <= 1) return toast.error(t('orders.form.last_item'));

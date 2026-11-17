@@ -180,22 +180,27 @@ export default function OrderDetail() {
   };
 
   // سطر طلب عادي (بلا عرض) — نفس الشكل السابق
+  // سطر بدون عرض: نفس صندوق العروض (الصورة والاسم والسعر، ثم الخيارات والكمية)
   const itemRow = (it) => (
-          <div key={it.id} className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
-              {it.product?.imagesProduct?.[0]?.imageUrl ? <img src={it.product.imagesProduct[0].imageUrl} alt="" className="w-full h-full object-cover" /> : !it.productId && <Receipt className="w-5 h-5 text-gray-400" />}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate"><bdi>{it.product?.name || it.title || '—'}</bdi></p>
-              {Array.isArray(it.variantDetail?.name) && <VariantParts parts={it.variantDetail.name} className="text-xs text-gray-500 mt-0.5" />}
-              {!it.productId && <p className="text-[11px] text-gray-400">{t('pos.service')}{it.cost != null && <> · {t('pos.service_cost')}: <bdi dir="ltr">{money(it.cost)}</bdi></>}</p>}
-              {it.addons?.length > 0 && <p className="text-[11px] text-gray-400 truncate">+ {it.addons.map((a) => `${a.name}${Number(a.qty) > 1 ? ` ×${a.qty}` : ''}`).join('، ')}</p>}
-            </div>
-            <div className="text-end shrink-0">
-              <p className="text-sm font-bold" dir="ltr">{money(it.finalPrice)} DA</p>
-              <p className="text-xs text-gray-400" dir="ltr">× {it.quantity}</p>
-            </div>
-          </div>
+    <div key={it.id} className="rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+      <div className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 dark:bg-zinc-800/50">
+        <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0 flex items-center justify-center">
+          {it.product?.imagesProduct?.[0]?.imageUrl ? <img src={it.product.imagesProduct[0].imageUrl} alt="" className="w-full h-full object-cover" /> : !it.productId && <Receipt className="w-5 h-5 text-gray-400" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-black truncate"><bdi>{it.product?.name || it.title || '—'}</bdi></p>
+          {!it.productId && <p className="text-[11px] text-gray-400">{t('pos.service')}{it.cost != null && <> · {t('pos.service_cost')}: <bdi dir="ltr">{money(it.cost)}</bdi></>}</p>}
+        </div>
+        <p className="text-sm font-black shrink-0" dir="ltr">{money(Number(it.finalPrice || 0) * Number(it.quantity || 1))} DA</p>
+      </div>
+      <div className="flex items-center gap-2 px-3 py-2">
+        <div className="flex-1 min-w-0">
+          {Array.isArray(it.variantDetail?.name) && it.variantDetail.name.length ? <VariantParts parts={it.variantDetail.name} className="text-sm font-semibold" /> : <p className="text-sm text-gray-400">—</p>}
+          {it.addons?.length > 0 && <p className="text-[11px] text-gray-400 truncate">+ {it.addons.map((a) => `${a.name}${Number(a.qty) > 1 ? ` ×${a.qty}` : ''}`).join('، ')}</p>}
+        </div>
+        <p className="text-xs font-bold text-gray-500 shrink-0" dir="ltr">× {it.quantity}</p>
+      </div>
+    </div>
   );
 
   return (
