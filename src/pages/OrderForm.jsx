@@ -56,8 +56,9 @@ function ProductPicker({ storeId, onPick, onClose }) {
   );
 }
 
-// بطاقات العرض في تعديل الطلب: كل عرض مستقل (معلومات المنتج، قائمة عرضه، سعره) وتحته خيارات قطعه؛ الكمية = عدد العروض
-function OfferCards({ g, options, disabled, onReplace }) {
+// بطاقات العرض في تعديل الطلب (مثل لوحة التحكم): كل عرض بطاقة مستقلة بنفس تصميم بطاقة المنتج —
+// الصورة والاسم، السعر وشارة العرض، زر حذف؛ وتحتها خيارات كل قطعة وإضافاتها. لإضافة عرض: «إضافة منتج»
+function OfferCards({ g, options, disabled, onReplace, canRemove }) {
   const { t } = useTranslation();
   const variants = options?.variants || [];
   const offers = (options?.offers || []).filter((o) => o.isActive !== false);
@@ -66,7 +67,11 @@ function OfferCards({ g, options, disabled, onReplace }) {
   const pieces = expandPieces(g.items);
   const count = Math.max(1, Math.ceil(pieces.length / per));
   const keyOf = (a) => a.attrName || a.attrId || '';
-  const setCount = (n) => onReplace(offerLines(resizePieces(pieces, n, per), g.offer));
+  const addonsList = productAddons(g.product);
+  const removeUnit = (b) => {
+    if (!canRemove(per)) return toast.error(t('orders.form.last_item'));
+    onReplace(offerLines([...pieces.slice(0, b * per), ...pieces.slice(b * per + per)], g.offer));
+  };
   const setUnitOffer = (b, id) => {
     const seen = new Set();
     const before = offerLines(pieces.slice(0, b * per), g.offer, seen);
@@ -87,56 +92,99 @@ function OfferCards({ g, options, disabled, onReplace }) {
     if (!v) return toast.error(t('orders.form.unavailable'));
     onReplace(offerLines(pieces.map((p, x) => (x === k ? { ...p, variantDetailId: v.id, variantDetail: v } : p)), g.offer));
   };
-  const sel = 'bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-2 py-1.5 text-xs font-bold';
+  // إضافات القطعة (لكل قطعة، حتى حد التاجر) — سعرها داخل سعر القطعة
+  const setAddon = (k, a, qty) => {
+    const max = Math.max(1, Math.floor(Number(a.maxQty) || 1));
+    const q = Math.max(0, Math.min(max, qty));
+    const cur = (pieces[k].addons || []).filter((x) => !x.separate && x.id !== a.id);
+    const next = q > 0 ? [...cur, { id: a.id, name: a.name, price: Number(a.price) || 0, ...(q > 1 ? { qty: q } : {}) }] : cur;
+    onReplace(offerLines(pieces.map((p, x) => (x === k ? { ...p, addons: next.length ? next : null } : p)), g.offer));
+  };
   return (
-    <div className="rounded-2xl border border-orange-200 dark:border-orange-500/30 overflow-hidden mb-3">
-      <div className="flex items-center gap-3 px-3 py-2 bg-orange-50 dark:bg-orange-500/10">
-        <p className="flex-1 text-xs font-bold text-gray-500">{t('orders.form.qty', 'الكمية')}</p>
-        <div className="inline-flex items-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden" dir="ltr">
-          <button type="button" disabled={disabled || count <= 1} onClick={() => setCount(count - 1)} className="w-8 h-8 font-black disabled:opacity-30">−</button>
-          <span className="w-8 text-center text-sm font-black">{count}</span>
-          <button type="button" disabled={disabled} onClick={() => setCount(count + 1)} className="w-8 h-8 font-black disabled:opacity-30">+</button>
-        </div>
-        <p className="text-sm font-black text-orange-700 dark:text-orange-300" dir="ltr">{money(itemsTotal(g.items))} DA</p>
-      </div>
+    <>
       {Array.from({ length: count }, (_, b) => (
-        <div key={b} className="m-2 p-3 rounded-xl border border-orange-200 dark:border-orange-500/30 bg-white dark:bg-zinc-900">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">{g.product?.imagesProduct?.[0]?.imageUrl && <img src={g.product.imagesProduct[0].imageUrl} alt="" className="w-full h-full object-cover" />}</span>
-            <p className="flex-1 min-w-0 text-xs font-bold truncate"><bdi>{g.product?.name}</bdi></p>
-            <select value={g.offer.id} disabled={disabled} onChange={(e) => setUnitOffer(b, e.target.value)} className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg px-2 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
-              <option value="">{t('orders.form.no_offer', 'بدون عرض')}</option>
-              {offers.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
-            </select>
-            <span className="text-sm font-black text-orange-700 dark:text-orange-300 shrink-0" dir="ltr">{money(g.offer.price)} DA</span>
+        <div key={b} className="rounded-xl border border-gray-100 dark:border-zinc-800 p-3 space-y-3 mb-3">
+          <div className="flex items-center gap-3">
+            <span className="w-11 h-11 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
+              {g.product?.imagesProduct?.[0]?.imageUrl && <img src={g.product.imagesProduct[0].imageUrl} alt="" className="w-full h-full object-cover" />}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold truncate"><bdi>{g.product?.name}</bdi></p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-sm font-black text-indigo-600 dark:text-indigo-400" dir="ltr">{money(g.offer.price)} DA</span>
+                {/* العرض: شارة صغيرة، والضغط يفتح قائمة العروض */}
+                <span className="relative inline-flex items-center">
+                  <select value={g.offer.id} disabled={disabled} onChange={(e) => setUnitOffer(b, e.target.value)}
+                    className="appearance-none rounded-full border border-amber-300 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-900/20 ps-2.5 pe-6 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-300 outline-none">
+                    <option value="">{t('orders.form.no_offer')}</option>
+                    {offers.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+                  </select>
+                  <span aria-hidden="true" className="pointer-events-none absolute end-2 text-[9px] text-amber-600">▾</span>
+                </span>
+              </div>
+            </div>
+            {!disabled && <button type="button" onClick={() => removeUnit(b)} className="p-2 rounded-lg text-rose-500"><Trash2 className="w-4 h-4" /></button>}
           </div>
-          <div className="space-y-2">
-            {pieces.slice(b * per, b * per + per).map((p, i) => {
-              const k = b * per + i;
-              const cur = Array.isArray(p.variantDetail?.name) ? p.variantDetail.name : [];
-              return (
-                <div key={k} className="flex flex-wrap items-center gap-2">
-                  {per > 1 && <span className="text-[11px] font-bold text-gray-500 w-12 shrink-0">{t('orders.form.piece', 'القطعة')} {i + 1}</span>}
-                  {groups.map((gr) => {
-                    const value = cur.find((a) => keyOf(a) === gr.key)?.value ?? '';
-                    return (
-                      <label key={gr.key} className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-                        {gr.attrName}
-                        <select value={value} disabled={disabled} onChange={(e) => setAttr(k, gr.key, e.target.value)} className={sel}>
-                          {!value && <option value="">—</option>}
-                          {gr.options.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
-                        </select>
-                      </label>
-                    );
-                  })}
-                  {p.addons?.length > 0 && <span className="text-[11px] font-semibold text-orange-600">+ {p.addons.map((a) => `${a.name}${Number(a.qty) > 1 ? ` ×${a.qty}` : ''}`).join('، ')}</span>}
-                </div>
-              );
-            })}
-          </div>
+
+          {pieces.slice(b * per, b * per + per).map((p, i) => {
+            const k = b * per + i;
+            const cur = Array.isArray(p.variantDetail?.name) ? p.variantDetail.name : [];
+            return (
+              <div key={k} className="rounded-xl bg-gray-50 dark:bg-zinc-950 p-2.5 space-y-2.5">
+                {per > 1 && <p className="text-xs font-bold text-gray-500">{t('orders.form.piece', 'القطعة')} {i + 1}</p>}
+                {groups.map((gr) => {
+                  const sel = cur.find((a) => keyOf(a) === gr.key)?.value;
+                  return (
+                    <div key={gr.key} className="space-y-1.5">
+                      <p className="text-[11px] text-gray-400">{gr.attrName}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {gr.options.map((o) => {
+                          const on = sel === o.value;
+                          const cls = `rounded-lg border text-xs font-semibold ${on ? 'border-indigo-500 ring-2 ring-indigo-500/30' : 'border-gray-200 dark:border-zinc-700'} disabled:opacity-50`;
+                          return gr.displayMode === 'color' ? (
+                            <button key={o.value} type="button" disabled={disabled} onClick={() => setAttr(k, gr.key, o.value)} className={`${cls} w-8 h-8`} style={{ backgroundColor: o.value }} />
+                          ) : gr.displayMode === 'image' ? (
+                            <button key={o.value} type="button" disabled={disabled} onClick={() => setAttr(k, gr.key, o.value)} className={`${cls} w-10 h-10 overflow-hidden`}><img src={o.value} alt="" className="w-full h-full object-cover" /></button>
+                          ) : (
+                            <button key={o.value} type="button" disabled={disabled} onClick={() => setAttr(k, gr.key, o.value)} className={`${cls} px-3 py-1.5 bg-white dark:bg-zinc-900`}>{o.value}</button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+                {addonsList.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-gray-500">{t('orders.form.addons')}</p>
+                    {addonsList.map((a) => {
+                      const found = (p.addons || []).find((x) => x.id === a.id);
+                      const n = found ? Number(found.qty) || 1 : 0;
+                      const max = Math.max(1, Math.floor(Number(a.maxQty) || 1));
+                      return (
+                        <div key={a.id} className={`flex items-center gap-2 rounded-xl border px-2 py-1.5 ${n ? 'border-orange-300 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'}`}>
+                          <button type="button" disabled={disabled} onClick={() => setAddon(k, a, n ? 0 : 1)} className="flex-1 min-w-0 flex items-center gap-2 text-start text-sm">
+                            <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 text-[11px] ${n ? 'bg-orange-500 border-orange-500 text-white' : 'border-gray-300 dark:border-zinc-600'}`}>{n ? '✓' : ''}</span>
+                            <span className="truncate font-semibold">{a.name}</span>
+                            <span className="text-xs text-gray-400 shrink-0" dir="ltr">+{money(Number(a.price) || 0)} DA</span>
+                          </button>
+                          {n > 0 && max > 1 && (
+                            <div className="flex items-center gap-1 shrink-0" dir="ltr">
+                              <button type="button" disabled={disabled} onClick={() => setAddon(k, a, n - 1)} className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center"><Minus className="w-3.5 h-3.5" /></button>
+                              <span className="w-6 text-center text-sm font-bold">{n}</span>
+                              <button type="button" disabled={disabled || n >= max} onClick={() => setAddon(k, a, n + 1)} className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center disabled:opacity-40"><Plus className="w-3.5 h-3.5" /></button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -465,7 +513,7 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
         {groupOfferItems(form.items).map((g) => g.type === 'item'
           ? <ItemCard key={g.item.id} item={g.item} options={options[g.item.productId]} disabled={locked}
               onChange={(patch) => changeItem(g.item.id, patch)} onRemove={() => removeItem(g.item.id)} />
-          : <OfferCards key={g.key} g={g} options={options[g.items[0].productId]} disabled={locked} onReplace={(lines) => replaceGroup(g, lines)} />)}
+          : <OfferCards key={g.key} g={g} options={options[g.items[0].productId]} disabled={locked} onReplace={(lines) => replaceGroup(g, lines)} canRemove={(n) => isNew || form.items.length - n > 0} />)}
         {!locked && (
           <button type="button" onClick={() => setPicker(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700 text-sm font-bold text-indigo-600 dark:text-indigo-400">
             <Plus className="w-4 h-4" />{t('orders.form.add_product')}

@@ -118,3 +118,24 @@ describe('editing add-ons in an order', () => {
     expect('addonQty' in orderPayload({ items: [{ productId: 'p', quantity: 1, finalPrice: 10 }] })[0]).toBe(false);
   });
 });
+
+// بطاقات العرض: كل قطعة سطر بإضافاتها (لكل قطعة) — تُرسل addonIds لكل سطر، وإلا ينسخ الخادم إضافات أول سطر للمنتج
+describe('offer piece lines save their own add-ons', () => {
+  it('an offer line sends addonIds (a repeated id = quantity); an empty list clears them', () => {
+    const [a, b] = orderPayload({ items: [
+      { productId: 'p', quantity: 1, offerId: 'o2', finalPrice: 2350, addons: [{ id: 't', name: 'test', price: 100, qty: 2 }] },
+      { productId: 'p', quantity: 1, offerId: 'o2', finalPrice: 2250, addons: null },
+    ] });
+    expect(a.addonIds).toEqual(['t', 't']);
+    expect(b.addonIds).toEqual([]);
+  });
+  it('lines without an offer, or with add-ons by quantity (addonQty), keep their old payload', () => {
+    const [a, b] = orderPayload({ items: [
+      { productId: 'p', quantity: 1, offerId: null, finalPrice: 100, addons: [{ id: 't', price: 1 }] },
+      { productId: 'p', quantity: 1, offerId: 'o2', finalPrice: 100, addonQty: { t: 1 } },
+    ] });
+    expect(a).not.toHaveProperty('addonIds');
+    expect(b).not.toHaveProperty('addonIds');
+    expect(b.addonQty).toEqual({ t: 1 });
+  });
+});
