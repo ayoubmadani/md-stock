@@ -20,6 +20,12 @@ describe('storePayload', () => {
     expect(p.topBar).toEqual({ enabled: true, text: 'hi', color: f.primaryColor });
     expect(p.hero.title).toBe('T');
   });
+  it('colours: sent with defaults when creating, never when editing (they are chosen from the active-theme panel)', () => {
+    expect(storePayload(f, { subdomain: 'x', isNew: true }).design).toMatchObject({ primaryColor: f.primaryColor, secondaryColor: f.secondaryColor });
+    const edit = storePayload({ ...f, primaryColor: '#000000' }, { subdomain: 'x' }).design;
+    expect(edit).not.toHaveProperty('primaryColor');
+    expect(edit).not.toHaveProperty('secondaryColor');
+  });
   it('sends the logo and the favicon in design', () => {
     expect(storePayload({ ...f, logo: 'L', favicon: 'F' }, { subdomain: 'x' }).design).toMatchObject({ logoUrl: 'L', faviconUrl: 'F' });
   });

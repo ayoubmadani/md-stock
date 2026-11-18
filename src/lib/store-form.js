@@ -17,14 +17,15 @@ export function generateSubdomain(name, rnd = () => Math.random().toString(36).s
 
 const s = (v) => String(v ?? '').trim();
 
-export function storePayload(f, { subdomain }) {
+// الألوان تُختار من إطار الثيم المفعّل (صفحة الثيمات): تُرسل بقيمها الافتراضية عند الإنشاء فقط، ولا تُرسل عند التعديل كي لا تكتب فوقها
+export function storePayload(f, { subdomain, isNew = false }) {
   return {
     store: {
       name: s(f.name), subdomain, currency: f.currency, country: f.country, division: f.division || '', language: f.language,
       cart: !!f.cart, supportQty: !!f.supportQty, supportFreeShipping: !!f.supportFreeShipping,
       freeShippingMinAmount: f.supportFreeShipping && f.freeShippingMinAmount !== '' ? Number(f.freeShippingMinAmount) : null,
     },
-    design: { primaryColor: f.primaryColor, secondaryColor: f.secondaryColor, logoUrl: f.logo || null, faviconUrl: f.favicon || null, showStoreName: !!f.showStoreName, nameBeforeLogo: !!f.nameBeforeLogo },
+    design: { ...(isNew ? { primaryColor: f.primaryColor, secondaryColor: f.secondaryColor } : {}), logoUrl: f.logo || null, faviconUrl: f.favicon || null, showStoreName: !!f.showStoreName, nameBeforeLogo: !!f.nameBeforeLogo },
     topBar: { enabled: !!f.showTopBar, text: s(f.topBarText), color: f.primaryColor },
     contact: { email: s(f.email) || null, phone: s(f.phone) || null, whatsapp: s(f.whatsapp).replace(/[\s-]/g, '') || null, wilaya: f.wilaya || null, address: s(f.address) || null },
     hero: { imageUrl: f.heroImage || null, mobileImageUrl: f.heroImageMobile || null, title: s(f.heroTitle), subtitle: s(f.heroSubtitle) },

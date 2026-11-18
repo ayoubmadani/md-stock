@@ -77,7 +77,7 @@ export default function StoreForm({ onboarding = false }) {
     setSaving(true);
     try {
       if (isNew) {
-        const { data } = await api.post('/stores/create-full', storePayload(f, { subdomain: generateSubdomain(f.name) }));
+        const { data } = await api.post('/stores/create-full', storePayload(f, { subdomain: generateSubdomain(f.name), isNew: true }));
         toast.success(t('stores.created'));
         await refresh();
         const newId = data?.data?.id;
@@ -123,14 +123,6 @@ export default function StoreForm({ onboarding = false }) {
         <Toggle checked={f.showStoreName} onChange={set('showStoreName')}>{t('stores.show_name')}</Toggle>
         {f.showStoreName && <Toggle checked={f.nameBeforeLogo} onChange={set('nameBeforeLogo')}>{t('stores.name_before_logo')}</Toggle>}
         <LogoPreview f={f} label={t('stores.site_preview')} hint={t('stores.site_preview_hint')} />
-        <div className="grid grid-cols-2 gap-3">
-          {['primaryColor', 'secondaryColor'].map((k) => (
-            <label key={k} className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-zinc-800 p-2">
-              <input type="color" value={f[k]} onChange={set(k)} className="w-9 h-9 rounded-lg border-0 bg-transparent p-0" />
-              <span className="text-xs text-gray-500">{t(`stores.${k}`)}</span>
-            </label>
-          ))}
-        </div>
       </Section>
 
       <Section title={t('stores.contact')}>
