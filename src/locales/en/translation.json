@@ -740,7 +740,30 @@
     "section_primary": "Made for your niche",
     "section_secondary": "Also suit your niche",
     "section_general": "General themes",
-    "section_other": "Other themes"
+    "section_other": "Other themes",
+    "panel": {
+      "active": "Active",
+      "colors_title": "Store colours",
+      "primary": "Primary colour",
+      "secondary": "Secondary colour",
+      "preview_button": "Order now",
+      "preview_badge": "Offer",
+      "save": "Save colours",
+      "colors_saved": "Colours saved",
+      "colors_error": "Couldn't save the colours",
+      "fixed_colors": "This theme's colours are fixed — they don't follow the store colour.",
+      "notes_title": "Tips for this theme to look right",
+      "fix": "Fix",
+      "note_logo_ok": "Logo uploaded",
+      "note_logo_missing": "No store logo",
+      "note_hero_ok": "Cover image set",
+      "note_hero_missing": "No home cover image",
+      "note_products_ok": "All products have images",
+      "note_products_missing": "{{count}} product(s) without images",
+      "note_products_empty": "No products yet",
+      "note_categories_ok": "Categories set",
+      "note_categories_missing": "No categories — the home page shows categories"
+    }
   },
   "sub": {
     "month": "Monthly",

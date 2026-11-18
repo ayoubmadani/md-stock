@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth';
 import { money } from '../lib/orders';
 import { themeName, themeStatus } from '../lib/themes';
 import { input } from '../components/product';
+import ActiveThemePanel from '../components/ActiveThemePanel';
 
 const PREVIEW = 'https://mdstore.top/show/';
 // اسم المجال بلغة التاجر
@@ -83,6 +84,7 @@ export default function ThemesPage() {
   const [plan, setPlan] = useState([]);
   const [planIds, setPlanIds] = useState([]);
   const [activeId, setActiveId] = useState(null);
+  const [storeData, setStoreData] = useState(null); // ألوان المتجر وشعاره وغلافه ← إطار الثيم المفعّل
   const [niches, setNiches] = useState([]); // المجالات المترجمة بدل أنواع الثيمات
   const [storeNiche, setStoreNiche] = useState(null); // مجال المتجر ← ترتيب الثيمات
   const [type, setType] = useState('');
@@ -96,7 +98,7 @@ export default function ThemesPage() {
       api.get('/theme/plan-sub').then((r) => r.data ?? []).catch(() => []),
       api.get('/theme/plan-info').then((r) => r.data?.planThemeIds ?? []).catch(() => []),
       api.get(`/stores/${storeId}`).then((r) => r.data?.data ?? r.data ?? null).catch(() => null),
-    ]).then(([m, p, ids, st]) => { setMine(m); setPlan(p); setPlanIds(ids); setActiveId(st?.themeId ?? null); setStoreNiche((prev) => { const sn = st?.niche?.id ?? ''; if (prev === null && sn) setType(sn); return sn; }); });
+    ]).then(([m, p, ids, st]) => { setMine(m); setPlan(p); setPlanIds(ids); setActiveId(st?.themeId ?? null); setStoreData(st); setStoreNiche((prev) => { const sn = st?.niche?.id ?? ''; if (prev === null && sn) setType(sn); return sn; }); });
   }, [storeId]);
   useEffect(() => { load(); }, [load]);
   useEffect(() => { api.get('/niches').then((r) => { const d = r.data?.data ?? r.data; setNiches(Array.isArray(d) ? d : []); }).catch(() => {}); }, []);
@@ -154,6 +156,9 @@ export default function ThemesPage() {
         </div>
         {store?.subdomain && <a href={`https://${store.subdomain}.mdstore.top`} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-indigo-500"><ExternalLink className="w-4 h-4" /></a>}
       </div>
+
+      {/* ألوان المتجر (إن كان الثيم يتبعها) + ملاحظات ليظهر الثيم جيداً */}
+      {active && storeData && <ActiveThemePanel theme={active} store={storeData} storeId={storeId} onStoreChange={setStoreData} />}
 
       <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100 dark:bg-zinc-900">
         {['my', 'gallery'].map((k) => (

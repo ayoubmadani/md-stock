@@ -740,7 +740,30 @@
     "section_primary": "Conçus pour votre domaine",
     "section_secondary": "Conviennent aussi à votre domaine",
     "section_general": "Thèmes généraux",
-    "section_other": "Autres thèmes"
+    "section_other": "Autres thèmes",
+    "panel": {
+      "active": "Actif",
+      "colors_title": "Couleurs de la boutique",
+      "primary": "Couleur principale",
+      "secondary": "Couleur secondaire",
+      "preview_button": "Commander",
+      "preview_badge": "Offre",
+      "save": "Enregistrer",
+      "colors_saved": "Couleurs enregistrées",
+      "colors_error": "Impossible d'enregistrer les couleurs",
+      "fixed_colors": "Les couleurs de ce thème sont fixes — elles ne suivent pas la couleur de la boutique.",
+      "notes_title": "Conseils pour un bon rendu",
+      "fix": "Corriger",
+      "note_logo_ok": "Logo ajouté",
+      "note_logo_missing": "Aucun logo",
+      "note_hero_ok": "Image de couverture présente",
+      "note_hero_missing": "Aucune image de couverture",
+      "note_products_ok": "Tous les produits ont des images",
+      "note_products_missing": "{{count}} produit(s) sans image",
+      "note_products_empty": "Aucun produit pour l'instant",
+      "note_categories_ok": "Catégories présentes",
+      "note_categories_missing": "Aucune catégorie — l'accueil affiche les catégories"
+    }
   },
   "sub": {
     "month": "Mensuel",

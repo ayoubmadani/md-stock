@@ -740,7 +740,30 @@
     "section_primary": "مصممة لمجال متجرك",
     "section_secondary": "تناسب مجالك أيضاً",
     "section_general": "ثيمات عامة",
-    "section_other": "ثيمات أخرى"
+    "section_other": "ثيمات أخرى",
+    "panel": {
+      "active": "مفعّل",
+      "colors_title": "ألوان المتجر",
+      "primary": "اللون الأساسي",
+      "secondary": "اللون الثانوي",
+      "preview_button": "اطلب الآن",
+      "preview_badge": "عرض",
+      "save": "حفظ الألوان",
+      "colors_saved": "تم حفظ الألوان",
+      "colors_error": "تعذّر حفظ الألوان",
+      "fixed_colors": "ألوان هذا الثيم ثابتة في تصميمه — لا تتغير بلون المتجر.",
+      "notes_title": "ملاحظات ليظهر الثيم جيداً",
+      "fix": "إصلاح",
+      "note_logo_ok": "الشعار مرفوع",
+      "note_logo_missing": "لا يوجد شعار للمتجر",
+      "note_hero_ok": "صورة الغلاف موجودة",
+      "note_hero_missing": "لا توجد صورة غلاف للصفحة الرئيسية",
+      "note_products_ok": "كل المنتجات لها صور",
+      "note_products_missing": "{{count}} منتج بلا صور",
+      "note_products_empty": "لا توجد منتجات بعد",
+      "note_categories_ok": "الفئات موجودة",
+      "note_categories_missing": "لا توجد فئات — الصفحة الرئيسية تعرض الفئات للتصفح"
+    }
   },
   "sub": {
     "month": "شهري",
