@@ -46,11 +46,29 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
     try { await navigator.clipboard.writeText(`https://${d.domain}`); setCopied(true); setTimeout(() => { setCopied(false); setOpen(false); }, 900); } catch { /* المتصفح منع النسخ */ }
   };
   const run = (fn) => () => { setOpen(false); fn(); };
+  // ضغط مطوّل على الصف = نسخ الرابط (والضغط العادي يفتح المتجر)
+  const hold = useRef({ timer: null, copied: false, x: 0, y: 0 });
+  const holdStart = (e) => {
+    hold.current.copied = false; hold.current.x = e.clientX; hold.current.y = e.clientY;
+    clearTimeout(hold.current.timer);
+    hold.current.timer = setTimeout(async () => {
+      hold.current.copied = true;
+      try { await navigator.clipboard.writeText(`https://${d.domain}`); toast.success(t('domains.link_copied')); } catch { /* المتصفح منع النسخ */ }
+      if (navigator.vibrate) navigator.vibrate(30);
+    }, 550);
+  };
+  const holdMove = (e) => { if (Math.abs(e.clientX - hold.current.x) > 10 || Math.abs(e.clientY - hold.current.y) > 10) clearTimeout(hold.current.timer); };
+  const holdEnd = () => clearTimeout(hold.current.timer);
+  const rowClick = (e) => { if (hold.current.copied) { e.preventDefault(); hold.current.copied = false; } };
   const item = 'w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-semibold text-start rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-60';
   return (
     <div className="flex items-center gap-2 px-3 py-2.5">
       {/* الصف نفسه يفتح المتجر على هذا الدومين */}
-      <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" className="flex-1 min-w-0 space-y-0.5 -my-1 py-1 rounded-lg active:bg-gray-50 dark:active:bg-zinc-800/60">
+      <a href={`https://${d.domain}`} target="_blank" rel="noreferrer"
+        onPointerDown={holdStart} onPointerMove={holdMove} onPointerUp={holdEnd} onPointerLeave={holdEnd} onPointerCancel={holdEnd}
+        onClick={rowClick} onContextMenu={(e) => e.preventDefault()}
+        style={{ WebkitTouchCallout: 'none', userSelect: 'none' }}
+        className="flex-1 min-w-0 space-y-0.5 -my-1 py-1 rounded-lg active:bg-gray-50 dark:active:bg-zinc-800/60">
         <p className="flex items-center gap-2 font-bold text-sm min-w-0">
           <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
           <span className="truncate"><bdi dir="ltr">{d.domain}</bdi></span>
