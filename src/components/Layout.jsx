@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store, Wallet } from 'lucide-react';
 import { MORE } from '../pages/More';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { navVisible, useAuth } from '../lib/auth';
 import { Avatar } from './Accounts';
 import TrialOffer from './TrialOffer';
@@ -40,7 +41,9 @@ export default function Layout() {
   const { pathname } = useLocation();
   const scanActive = ['/scan', '/pos'].some((x) => pathname.startsWith(x));
   const ordersActive = pathname.startsWith('/orders');
-  const bottomNav = NAV.filter(visible);
+  // الشريط السفلي: الخانات الخمس ثابتة دائماً (التصميم لا يتحرك) — ما لا صلاحية له يبقى في مكانه باهتاً
+  const bottomNav = NAV;
+  const denied = () => toast.error(t('no_permission'));
   const navCls = ({ isActive }) =>
     `flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-[11px] md:text-sm font-semibold transition-colors ${
       isActive ? 'text-indigo-600 dark:text-indigo-400 md:bg-indigo-50 md:dark:bg-indigo-500/10' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
@@ -106,13 +109,18 @@ export default function Layout() {
       {/* شريط سفلي على الهاتف */}
       {/* ما ليس للعضو صلاحيته لا يظهر (المسح: المنتجات أو الطلبات) */}
       <nav style={{ gridTemplateColumns: `repeat(${bottomNav.length}, minmax(0, 1fr))` }} className="md:hidden fixed bottom-0 inset-x-0 z-40 grid bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-gray-100 dark:border-zinc-900 pb-[env(safe-area-inset-bottom)]">
-        {bottomNav.map((n) => n.primary ? (
-          <NavLink key={n.to} to={n.to} aria-label={t(`nav.${n.key}`)} className="flex flex-col items-center justify-center -mt-5">
-            <span className={`w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 ${ordersActive ? 'bg-emerald-700' : 'bg-emerald-600'}`}><n.icon className="w-6 h-6" /></span>
-          </NavLink>
-        ) : (
-          <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
-        ))}
+        {bottomNav.map((n) => {
+          const ok = visible(n);
+          if (n.primary) {
+            const big = <span className={`w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 ${ordersActive ? 'bg-emerald-700' : 'bg-emerald-600'}`}><n.icon className="w-6 h-6" /></span>;
+            return ok
+              ? <NavLink key={n.to} to={n.to} aria-label={t(`nav.${n.key}`)} className="flex flex-col items-center justify-center -mt-5">{big}</NavLink>
+              : <button key={n.to} type="button" onClick={denied} aria-label={t(`nav.${n.key}`)} aria-disabled="true" className="flex flex-col items-center justify-center -mt-5 opacity-40">{big}</button>;
+          }
+          return ok
+            ? <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
+            : <button key={n.to} type="button" onClick={denied} aria-disabled="true" className={`${navCls({ isActive: false })} opacity-40`}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</button>;
+        })}
       </nav>
     </div>
   );
