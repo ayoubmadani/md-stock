@@ -1,7 +1,7 @@
 // الدومين: معلومات الربط في الأعلى، ثم تبويبات (روابط المتجر / المخصصة / صفحات الهبوط) بأزرار تحقق، ربط، فسخ، حذف
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Copy, Search, Wrench, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, Package, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
+import { Check, Copy, Search, Wrench, ExternalLink, Globe, LayoutTemplate, Link2, Loader2, MoreHorizontal, Package, Plus, RefreshCw, Trash2, Unlink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api, errorMessage } from '../lib/api';
@@ -25,45 +25,72 @@ function CopyRow({ label, value }) {
   );
 }
 
-const btn = 'shrink-0 w-7 h-7 flex items-center justify-center rounded-lg disabled:opacity-60';
-
-// سطر دومين (أو رابط فرعي .mdstore.top بنفس المعاملة): الحالة والاسم وصفحة الهبوط المربوطة، وأيقونات في نفس السطر:
-// تحقق (للدومين المنتظر فقط — الرابط الفرعي متصل دائماً)، ربط، فسخ، نسخ، فتح، حذف
+// سطر دومين (أو رابط فرعي .mdstore.top بنفس المعاملة): الحالة والاسم وصفحة الهبوط المربوطة،
+// زر واحد واضح («فتح»، أو «تحقّق» للدومين المنتظر) وباقي الأوامر بأسمائها في قائمة «⋯» — الحذف آخرها بالأحمر
 function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
   const { t } = useTranslation();
   const sub = d.domain.endsWith('.mdstore.top');
+  const pending = !sub && !d.isActive;
   const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(false);
+  const menu = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (e) => { if (menu.current && !menu.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', esc); };
+  }, [open]);
   const copy = async () => {
-    try { await navigator.clipboard.writeText(`https://${d.domain}`); setCopied(true); setTimeout(() => setCopied(false), 1200); } catch { /* المتصفح منع النسخ */ }
+    try { await navigator.clipboard.writeText(`https://${d.domain}`); setCopied(true); setTimeout(() => { setCopied(false); setOpen(false); }, 900); } catch { /* المتصفح منع النسخ */ }
   };
+  const run = (fn) => () => { setOpen(false); fn(); };
+  const item = 'w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-semibold text-start rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-60';
   return (
-    <div className="px-3 py-2 space-y-1">
-      {/* السطر الأول: الدومين كاملاً */}
-      <p className="flex items-center gap-2 font-bold text-sm min-w-0">
-        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
-        <span className="truncate"><bdi dir="ltr">{d.domain}</bdi></span>
-      </p>
-      {/* السطر الثاني: الحالة وصفحة الهبوط، والأيقونات */}
-      <div className="flex items-center gap-1.5">
-        <p className="flex-1 flex items-center gap-1.5 text-[11px] font-semibold min-w-0 ps-4">
+    <div className="flex items-center gap-2 px-3 py-2.5">
+      <div className="flex-1 min-w-0 space-y-0.5">
+        <p className="flex items-center gap-2 font-bold text-sm min-w-0">
+          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+          <span className="truncate"><bdi dir="ltr">{d.domain}</bdi></span>
+        </p>
+        <p className="flex items-center gap-1.5 text-[11px] font-semibold min-w-0 ps-4">
           <span className={`shrink-0 ${d.isActive ? 'text-gray-500' : 'text-amber-500'}`}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
           {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{d.builderPage?.name || page?.name || (d.splitTestId ? t('domains.split_test') : t('domains.landing_page'))}</span></span>}
           {d.scope === 'product' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 dark:bg-amber-500/10 min-w-0"><Package className="w-3 h-3 shrink-0" /><span className="truncate">{t('product_links.product_badge')}</span></span>}
         </p>
-      {!sub && !d.isActive && (
-          <button type="button" disabled={busy} onClick={onCheck} title={t('domains.check')} aria-label={t('domains.check')} className={`${btn} bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300`}>
-            {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-          </button>
+      </div>
+
+      {/* الزر الواضح: الدومين المنتظر يحتاج «تحقّق»، والمتصل «فتح» */}
+      {pending ? (
+        <button type="button" disabled={busy} onClick={onCheck} className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-xs font-bold bg-indigo-600 text-white disabled:opacity-60">
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}{t('domains.check')}
+        </button>
+      ) : (
+        <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-xs font-bold border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200">
+          {t('domains.open')}<ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      )}
+
+      <div ref={menu} className="relative shrink-0">
+        <button type="button" onClick={() => setOpen((o) => !o)} aria-haspopup="menu" aria-expanded={open} aria-label={t('domains.more_actions')} title={t('domains.more_actions')}
+          className={`w-9 h-9 flex items-center justify-center rounded-xl border ${open ? 'border-indigo-300 bg-indigo-50 text-indigo-600 dark:border-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-300' : 'border-gray-200 dark:border-zinc-700 text-gray-500'}`}>
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+        {open && (
+          <div role="menu" className="absolute z-30 top-full mt-1.5 end-0 w-56 p-1.5 rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl">
+            <button type="button" role="menuitem" onClick={copy} className={item}>
+              {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-gray-400" />}{copied ? t('domains.copied', 'تم النسخ') : t('domains.copy')}
+            </button>
+            {d.scope === 'store'
+              ? <button type="button" role="menuitem" disabled={busy} onClick={run(onLink)} className={item}><Link2 className="w-4 h-4 text-gray-400" />{t('domains.link_menu')}</button>
+              : <button type="button" role="menuitem" disabled={busy} onClick={run(onUnlink)} className={item}><Unlink className="w-4 h-4 text-gray-400" />{t('domains.unlink_menu')}</button>}
+            {pending && <button type="button" role="menuitem" disabled={busy} onClick={run(onCheck)} className={item}><RefreshCw className="w-4 h-4 text-gray-400" />{t('domains.check_menu')}</button>}
+            {pending && <a role="menuitem" href={`https://${d.domain}`} target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className={item}><ExternalLink className="w-4 h-4 text-gray-400" />{t('domains.open')}</a>}
+            <div className="my-1 border-t border-gray-100 dark:border-zinc-800" />
+            <button type="button" role="menuitem" disabled={busy} onClick={run(onRemove)} className={`${item} text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10`}><Trash2 className="w-4 h-4" />{t('domains.delete_menu')}</button>
+          </div>
         )}
-        {d.scope === 'store' && (
-          <button type="button" disabled={busy} onClick={onLink} title={t('domains.link')} aria-label={t('domains.link')} className={`${btn} bg-purple-50 dark:bg-purple-500/10 text-purple-600`}><Link2 className="w-3.5 h-3.5" /></button>
-        )}
-        {d.scope !== 'store' && (
-          <button type="button" disabled={busy} onClick={onUnlink} title={t('domains.unlink')} aria-label={t('domains.unlink')} className={`${btn} bg-amber-50 dark:bg-amber-500/10 text-amber-600`}><Unlink className="w-3.5 h-3.5" /></button>
-        )}
-        <button type="button" onClick={copy} title={t('domains.copy')} aria-label={t('domains.copy')} className={`${btn} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600`}>{copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}</button>
-        <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" title={d.domain} aria-label={d.domain} className={`${btn} bg-gray-100 dark:bg-zinc-800 text-gray-500`}><ExternalLink className="w-3.5 h-3.5" /></a>
-        <button type="button" disabled={busy} onClick={onRemove} title={t('domains.delete')} aria-label={t('domains.delete')} className={`${btn} bg-rose-50 dark:bg-rose-500/10 text-rose-600`}><Trash2 className="w-3.5 h-3.5" /></button>
       </div>
     </div>
   );
