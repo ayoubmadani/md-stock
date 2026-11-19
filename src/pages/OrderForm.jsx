@@ -1,5 +1,7 @@
 // تعديل طلب أو إنشاء طلب يدوي من الهاتف: الزبون، العنوان والتوصيل، المنتجات بنسخها وعروضها
 import { groupOfferItems, expandPieces, resizePieces, offerLines } from '../lib/offer-groups';
+import { externalParts, isExternalLine } from '../lib/external-line';
+import { VariantParts } from '../components/inventory';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -62,8 +64,6 @@ function PieceRow({ label, variants, cur, onPick, addonsList, pieceAddons, onAdd
   const groups = attrGroups(variants);
   const keyOf = (a) => a.attrName || a.attrId || '';
   const missing = groups.some((g) => !cur.find((a) => keyOf(a) === g.key));
-  const colorPart = cur.find((a) => a.displayMode === 'color');
-  const text = cur.map((a) => (a.displayMode === 'color' ? (a.label || '') : a.value)).filter(Boolean).join(' · ');
   const added = (pieceAddons || []).filter((a) => !a.separate);
   return (
     <div className="border-t border-gray-100 dark:border-zinc-800">
@@ -71,8 +71,8 @@ function PieceRow({ label, variants, cur, onPick, addonsList, pieceAddons, onAdd
         <span className="w-14 shrink-0 text-[11px] font-bold text-gray-500">{label}</span>
         <div className="flex-1 min-w-0 flex flex-wrap items-center gap-1.5 text-sm">
           {missing && <span className="font-bold text-amber-600 dark:text-amber-400">⚠ {t('orders.form.choose_options', 'اختر الخيارات')}</span>}
-          {colorPart && <span className="w-3 h-3 rounded-full border border-gray-300 dark:border-zinc-600" style={{ background: colorPart.value }} />}
-          {text && <span className="font-semibold">{text}</span>}
+          {/* colour dot, picture or text — never a picture's link */}
+          <VariantParts parts={cur} className="font-semibold" />
           {added.length > 0 && <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300 text-[11px] font-bold">+ {added.map((a) => `${a.name}${Number(a.qty) > 1 ? ` ×${a.qty}` : ''}`).join('، ')}</span>}
         </div>
         {!disabled && (
@@ -233,6 +233,27 @@ function OfferCards({ g, options, disabled, onReplace, canRemove }) {
 }
 
 // منتج بدون عرض وله خيارات: نفس البطاقة، سطر للقطعة، و«+ قطعة أخرى من نفس المنتج»
+// سطر من متجر مربوط (WooCommerce…) بلا منتج MD Store: يُعرض كما جاء، يُعدَّل في ذلك المتجر
+function ExternalCard({ item }) {
+  const { t } = useTranslation();
+  const parts = externalParts(item.external);
+  return (
+    <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 p-3 space-y-2">
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
+          {item.external?.image && <img src={item.external.image} alt="" className="w-full h-full object-cover" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold line-clamp-2"><bdi>{item.title || '—'}</bdi></p>
+          <p className="text-sm font-black text-indigo-600 dark:text-indigo-400" dir="ltr">{money(Number(item.finalPrice || 0))} DA <span className="text-xs text-gray-400">× {item.quantity}</span></p>
+        </div>
+      </div>
+      {parts.length > 0 && <div className="border-t border-gray-100 dark:border-zinc-800 pt-2"><VariantParts parts={parts} className="text-sm font-semibold" /></div>}
+      <p className="text-[11px] text-gray-400">{t('orders.form.external_line', 'من متجرك المربوط — يُعدَّل هناك')}</p>
+    </div>
+  );
+}
+
 function PlainCard({ item, options, disabled, onChange, onRemove, onAddPiece }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -587,7 +608,8 @@ export default function OrderForm({ orderId, onDone, onClose } = {}) {
       <div className={box}>
         {/* بطاقات العرض: كل عرض مستقل، الكمية = عدد العروض */}
         {groupOfferItems(form.items).map((g) => g.type === 'item'
-          ? ((options[g.item.productId]?.variants || []).length > 0 && !g.item.offerId
+          ? (isExternalLine(g.item) ? <ExternalCard key={g.item.id} item={g.item} />
+            : (options[g.item.productId]?.variants || []).length > 0 && !g.item.offerId
             ? <PlainCard key={g.item.id} item={g.item} options={options[g.item.productId]} disabled={locked}
                 onChange={(patch) => changeItem(g.item.id, patch)} onRemove={() => removeItem(g.item.id)}
                 onAddPiece={() => setForm((f) => { const at = f.items.findIndex((x) => x.id === g.item.id); const items = [...f.items]; items.splice(at + 1, 0, { ...g.item, id: `new-${Date.now()}`, quantity: 1, noOffer: true }); return { ...f, items }; })} />
