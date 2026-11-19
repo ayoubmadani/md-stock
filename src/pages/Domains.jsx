@@ -49,27 +49,25 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
   const item = 'w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-semibold text-start rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-60';
   return (
     <div className="flex items-center gap-2 px-3 py-2.5">
-      <div className="flex-1 min-w-0 space-y-0.5">
+      {/* الصف نفسه يفتح المتجر على هذا الدومين */}
+      <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" className="flex-1 min-w-0 space-y-0.5 -my-1 py-1 rounded-lg active:bg-gray-50 dark:active:bg-zinc-800/60">
         <p className="flex items-center gap-2 font-bold text-sm min-w-0">
           <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.isActive ? 'bg-emerald-500' : 'bg-amber-400'}`} />
           <span className="truncate"><bdi dir="ltr">{d.domain}</bdi></span>
+          <ExternalLink className="w-3.5 h-3.5 text-gray-400 shrink-0" />
         </p>
         <p className="flex items-center gap-1.5 text-[11px] font-semibold min-w-0 ps-4">
           <span className={`shrink-0 ${d.isActive ? 'text-gray-500' : 'text-amber-500'}`}>{d.isActive ? t('domains.status_active') : t('domains.status_pending')}</span>
           {d.scope === 'landing_page' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-600 dark:bg-purple-500/10 min-w-0"><LayoutTemplate className="w-3 h-3 shrink-0" /><span className="truncate">{d.builderPage?.name || page?.name || (d.splitTestId ? t('domains.split_test') : t('domains.landing_page'))}</span></span>}
           {d.scope === 'product' && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 dark:bg-amber-500/10 min-w-0"><Package className="w-3 h-3 shrink-0" /><span className="truncate">{t('product_links.product_badge')}</span></span>}
         </p>
-      </div>
+      </a>
 
-      {/* الزر الواضح: الدومين المنتظر يحتاج «تحقّق»، والمتصل «فتح» */}
-      {pending ? (
+      {/* الدومين المنتظر: «تحقّق» ظاهر — هو ما يحتاجه التاجر وقتها */}
+      {pending && (
         <button type="button" disabled={busy} onClick={onCheck} className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-xs font-bold bg-indigo-600 text-white disabled:opacity-60">
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}{t('domains.check')}
         </button>
-      ) : (
-        <a href={`https://${d.domain}`} target="_blank" rel="noreferrer" className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-xs font-bold border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200">
-          {t('domains.open')}<ExternalLink className="w-3.5 h-3.5" />
-        </a>
       )}
 
       <div ref={menu} className="relative shrink-0">
@@ -86,7 +84,6 @@ function DomainRow({ d, page, busy, onCheck, onLink, onUnlink, onRemove }) {
               ? <button type="button" role="menuitem" disabled={busy} onClick={run(onLink)} className={item}><Link2 className="w-4 h-4 text-gray-400" />{t('domains.link_menu')}</button>
               : <button type="button" role="menuitem" disabled={busy} onClick={run(onUnlink)} className={item}><Unlink className="w-4 h-4 text-gray-400" />{t('domains.unlink_menu')}</button>}
             {pending && <button type="button" role="menuitem" disabled={busy} onClick={run(onCheck)} className={item}><RefreshCw className="w-4 h-4 text-gray-400" />{t('domains.check_menu')}</button>}
-            {pending && <a role="menuitem" href={`https://${d.domain}`} target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className={item}><ExternalLink className="w-4 h-4 text-gray-400" />{t('domains.open')}</a>}
             <div className="my-1 border-t border-gray-100 dark:border-zinc-800" />
             <button type="button" role="menuitem" disabled={busy} onClick={run(onRemove)} className={`${item} text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10`}><Trash2 className="w-4 h-4" />{t('domains.delete_menu')}</button>
           </div>
