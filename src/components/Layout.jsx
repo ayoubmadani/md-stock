@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store } from 'lucide-react';
+import { Home, Boxes, LogOut, Languages, Sun, Moon, ScanLine, ShoppingBag, LayoutGrid, ChevronDown, Store, Wallet } from 'lucide-react';
 import { MORE } from '../pages/More';
 import { useState } from 'react';
 import { navVisible, useAuth } from '../lib/auth';
@@ -9,11 +9,12 @@ import TrialOffer from './TrialOffer';
 import { scanTarget } from '../lib/scan-menu';
 
 // الشريط السفلي: 5 أزرار ثابتة؛ ما لا صلاحية له يظهر باهتاً ويفتح رسالة «لا صلاحية»
+// الطلبات في الوسط (الزر الأخضر الكبير)، والمسح صار في الشريط العلوي
 const NAV = [
   { to: '/', key: 'home', icon: Home, end: true },
-  { to: '/orders', key: 'orders', icon: ShoppingBag, perm: 'order.view' },
-  { to: '/scan', key: 'scan', icon: ScanLine, primary: true },
   { to: '/stock', key: 'stock', icon: Boxes, perm: 'product.crud' },
+  { to: '/orders', key: 'orders', icon: ShoppingBag, perm: 'order.view', primary: true },
+  { to: '/wallet', key: 'wallet', icon: Wallet, storeOwner: true },
   { to: '/more', key: 'more', icon: LayoutGrid, mobileOnly: true },
 ];
 const LANGS = ['ar', 'fr', 'en'];
@@ -35,9 +36,10 @@ export default function Layout() {
 
   // زر المسح: البيع في المحل مباشرة، أو معلومات المنتج/الطلب لمن لا يبيع في المحل
   const scanTo = scanTarget(can);
-  const visible = (n) => (n.primary ? !!scanTo : navVisible(n, { can, isOwner, ownsAnyStore: owner }));
+  const visible = (n) => navVisible(n, { can, isOwner, ownsAnyStore: owner });
   const { pathname } = useLocation();
   const scanActive = ['/scan', '/pos'].some((x) => pathname.startsWith(x));
+  const ordersActive = pathname.startsWith('/orders');
   const bottomNav = NAV.filter(visible);
   const navCls = ({ isActive }) =>
     `flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-[11px] md:text-sm font-semibold transition-colors ${
@@ -54,7 +56,7 @@ export default function Layout() {
         </div>
         {/* القائمة تتمرر وحدها — زر الخروج يبقى ظاهراً في الأسفل */}
         <nav className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-1 -mx-1 px-1">
-          {[...NAV.filter((n) => !n.mobileOnly), ...MORE].filter(visible).map((n) => (
+          {[...NAV.filter((n) => !n.mobileOnly), ...MORE.filter((m) => !NAV.some((n) => n.to === m.to))].filter(visible).map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5 shrink-0" />{t(`nav.${n.key}`)}</NavLink>
           ))}
         </nav>
@@ -79,6 +81,13 @@ export default function Layout() {
             {stores.length > 1 && <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
           </Link>
           <div className="flex-1 hidden md:block" />
+          {/* المسح: البيع في المحل أو معلومات المنتج/الطلب */}
+          {scanTo && (
+            <Link to={scanTo} aria-label={t('nav.scan')} title={t('nav.scan')}
+              className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-white ${scanActive ? 'bg-indigo-700' : 'bg-indigo-600'}`}>
+              <ScanLine className="w-5 h-5" />
+            </Link>
+          )}
           <button onClick={nextLang} className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900 flex items-center gap-1 text-xs font-bold uppercase" title="Language">
             <Languages className="w-4 h-4" />{i18n.language}
           </button>
@@ -98,8 +107,8 @@ export default function Layout() {
       {/* ما ليس للعضو صلاحيته لا يظهر (المسح: المنتجات أو الطلبات) */}
       <nav style={{ gridTemplateColumns: `repeat(${bottomNav.length}, minmax(0, 1fr))` }} className="md:hidden fixed bottom-0 inset-x-0 z-40 grid bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-gray-100 dark:border-zinc-900 pb-[env(safe-area-inset-bottom)]">
         {bottomNav.map((n) => n.primary ? (
-          <NavLink key={n.to} to={scanTo} aria-label={t('nav.scan')} className="flex flex-col items-center justify-center -mt-5">
-            <span className={`w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 ${scanActive ? 'bg-indigo-700' : 'bg-indigo-600'}`}><n.icon className="w-6 h-6" /></span>
+          <NavLink key={n.to} to={n.to} aria-label={t(`nav.${n.key}`)} className="flex flex-col items-center justify-center -mt-5">
+            <span className={`w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 ${ordersActive ? 'bg-emerald-700' : 'bg-emerald-600'}`}><n.icon className="w-6 h-6" /></span>
           </NavLink>
         ) : (
           <NavLink key={n.to} to={n.to} end={n.end} className={navCls}><n.icon className="w-5 h-5" />{t(`nav.${n.key}`)}</NavLink>
