@@ -20,6 +20,19 @@ document.addEventListener('wheel', () => {
   if (el instanceof HTMLInputElement && el.type === 'number') el.blur();
 }, { passive: true });
 
+// بدون تدقيق إملائي (الخط الأحمر) في كل الخانات — صراحةً على كل خانة لأن بعض لوحات مفاتيح أندرويد تتجاهل الوراثة من <html>
+const noSpell = (el) => {
+  if (el.getAttribute('spellcheck') !== 'false') el.setAttribute('spellcheck', 'false');
+  if (!el.hasAttribute('autocorrect')) el.setAttribute('autocorrect', 'off');
+};
+const scanSpell = (root) => {
+  if (!(root instanceof Element)) return;
+  if (root.matches('input, textarea, [contenteditable]')) noSpell(root);
+  root.querySelectorAll('input, textarea, [contenteditable]').forEach(noSpell);
+};
+new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach(scanSpell)))
+  .observe(document.documentElement, { childList: true, subtree: true });
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
