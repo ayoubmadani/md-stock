@@ -392,6 +392,7 @@
     "paste": "Paste",
     "paste_empty": "No copied image",
     "paste_failed": "Could not read the copied image — allow clipboard access or copy the image again",
+    "open_failed": "Could not open the image for cropping — check your connection and try again",
     "title_store": "Store images",
     "title_logo": "Logos",
     "title_favicon": "Favicons",

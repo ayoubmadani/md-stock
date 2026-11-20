@@ -392,6 +392,7 @@
     "paste": "Coller",
     "paste_empty": "Aucune image copiée",
     "paste_failed": "Impossible de lire l'image copiée — autorisez l'accès au presse-papiers ou recopiez l'image",
+    "open_failed": "Impossible d'ouvrir l'image pour le recadrage — vérifiez la connexion et réessayez",
     "title_store": "Images de la boutique",
     "title_logo": "Logos",
     "title_favicon": "Favicons",

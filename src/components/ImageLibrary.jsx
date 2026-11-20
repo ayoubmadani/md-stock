@@ -11,6 +11,14 @@ import { clipboardImages, pastedImages } from '../lib/clipboard';
 import { longPress } from '../lib/long-press';
 
 const PAGE = 18;
+// بايتات الصور التي رُفعت أو فُتحت في المحرر خلال هذه الجلسة (رابط ← ملف):
+// اختيار نفس الصورة مرة ثانية للقص (مثلاً غلاف الكمبيوتر ثم غلاف الهاتف) يفتح المحرر فوراً بلا تنزيل
+const recentFiles = new Map();
+const remember = (url, file) => {
+  recentFiles.delete(url);
+  recentFiles.set(url, file);
+  if (recentFiles.size > 12) recentFiles.delete(recentFiles.keys().next().value);
+};
 /**
  * folder: products | productVariant | category | store | logo | favicon | hero
  * max: كم صورة يمكن اختيارها (1 = اختيار مباشر بالضغط)
@@ -81,7 +89,7 @@ export default function ImageLibrary({ folder: initialFolder = 'products', max =
         const { data } = await api.post(`/images/upload?folder=${folder}`, body, {
           onUploadProgress: (e) => setProgress({ done: i, total: list.length, pct: Math.round(((i + (e.total ? e.loaded / e.total : 0)) / list.length) * 100) }),
         });
-        if (data?.url) uploaded.push(data);
+        if (data?.url) { uploaded.push(data); remember(data.url, file); }
       }
     } catch (e) {
       toast.error(errorMessage(e, t('library.upload_failed')));
@@ -106,11 +114,25 @@ export default function ImageLibrary({ folder: initialFolder = 'products', max =
   };
 
   // صورة من المكتبة: نجلب بايتاتها عبر الـ API (R2 يمنع المتصفح من قراءة البكسلات) ثم المحرر؛ إن تعذّر تُختار كما هي
+  // opening: الصورة التي يُجلب ملفها الآن (مؤشر تحميل عليها، والنقرات الأخرى تُتجاهل حتى ينتهي)
+  const [opening, setOpening] = useState(null);
   const editExisting = async (img) => {
+    if (opening) return;
+    const cached = recentFiles.get(img.url);
+    if (cached) { setEditing({ url: img.url, file: cached }); return; }
+    if (!img.id) { toggle(img.url); return; }
+    setOpening(img.url);
     try {
-      const { data } = await api.get(`/images/${img.id}/raw`, { responseType: 'blob' });
-      setEditing({ url: img.url, file: new File([data], (img.url.split('/').pop() || 'image').replace(/\?.*$/, ''), { type: data.type || 'image/png' }) });
-    } catch { toggle(img.url); }
+      const get = () => api.get(`/images/${img.id}/raw`, { responseType: 'blob', timeout: 30000 });
+      const { data } = await get().catch(get); // محاولة ثانية عند انقطاع الشبكة
+      const file = new File([data], (img.url.split('/').pop() || 'image').replace(/\?.*$/, ''), { type: data.type || 'image/png' });
+      remember(img.url, file);
+      setEditing({ url: img.url, file });
+    } catch {
+      toast.error(t('library.open_failed'));
+    } finally {
+      setOpening(null);
+    }
   };
 
   // لصق صورة منسوخة: زر «لصق» (الهاتف) أو Ctrl+V (الحاسوب)
@@ -218,6 +240,9 @@ export default function ImageLibrary({ folder: initialFolder = 'products', max =
                           className={`w-full h-full rounded-xl overflow-hidden border-2 select-none [-webkit-touch-callout:none] ${marked ? 'border-rose-500' : n >= 0 && !bulk ? 'border-indigo-500' : 'border-transparent'}`}>
                           <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover bg-gray-100 dark:bg-zinc-800" />
                         </button>
+                        {opening === img.url && (
+                          <span className="pointer-events-none absolute inset-0 rounded-xl bg-black/50 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-white" /></span>
+                        )}
                         {edit && multi && !bulk && (
                           <button type="button" onClick={() => editExisting(img)} aria-label={t('image_editor.edit')}
                             className="absolute bottom-1.5 start-1.5 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center"><Pencil className="w-3.5 h-3.5" /></button>
